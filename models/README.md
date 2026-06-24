@@ -1,8 +1,8 @@
 # YE NAN 3D 模型接入说明
 
-正式模型文件放在本目录，并命名为：
+当前正式模型文件：
 
-`yenan-avatar.glb`
+`images/HOME/有骨骼的娃娃.glb`
 
 ## 视觉要求
 

@@ -221,11 +221,6 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
   // ---- 构建人物 ----
   const character = new THREE.Group();
   const bodyParts = {};   // 记录各部位，用于点击检测
-  const fallbackExpression = {
-    brows: [],
-    mouth: null,
-    cheeks: [],
-  };
   character.position.y = 0.68;
   character.scale.setScalar(0.84);
 
@@ -545,7 +540,6 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
     brow.position.set(side * 0.12, 0.17, 0.29);
     brow.rotation.z = side * 0.08;
     headGroup.add(brow);
-    fallbackExpression.brows.push(brow);
   }
 
   // 鼻子
@@ -569,7 +563,6 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
   mouth.rotation.y = Math.PI;
   mouth.scale.set(1.2, 0.5, 1);
   headGroup.add(mouth);
-  fallbackExpression.mouth = mouth;
 
   // 腮红
   for (const side of [-1, 1]) {
@@ -583,7 +576,6 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
     );
     cheek.position.set(side * 0.22, 0.015, 0.337);
     headGroup.add(cheek);
-    fallbackExpression.cheeks.push(cheek);
   }
 
   character.add(headGroup);
@@ -689,23 +681,23 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
   function buildInteractionRig(pivot, avatarRoot) {
     const mappedParts = {
-      head: findModelNode(avatarRoot, [/^head$/, /head/, /neck/]) || avatarRoot,
-      face: findModelNode(avatarRoot, [/face/, /head/]) || avatarRoot,
-      body: findModelNode(avatarRoot, [/upperchest/, /chest/, /spine2/, /spine1/, /spine/, /hips/]) || avatarRoot,
-      stomach: findModelNode(avatarRoot, [/spine1/, /spine/, /abdomen/, /belly/, /hips/]) || avatarRoot,
-      'left-shoulder': findModelNode(avatarRoot, [/leftshoulder/, /shoulderl/, /leftupperarm/, /upperarml/]) || avatarRoot,
-      'right-shoulder': findModelNode(avatarRoot, [/rightshoulder/, /shoulderr/, /rightupperarm/, /upperarmr/]) || avatarRoot,
-      'left-elbow': findModelNode(avatarRoot, [/leftlowerarm/, /lowerarml/, /leftforearm/, /forearml/]) || avatarRoot,
-      'right-elbow': findModelNode(avatarRoot, [/rightlowerarm/, /lowerarmr/, /rightforearm/, /forearmr/]) || avatarRoot,
-      'left-hand': findModelNode(avatarRoot, [/lefthand/, /handl/]) || avatarRoot,
-      'right-hand': findModelNode(avatarRoot, [/righthand/, /handr/]) || avatarRoot,
-      hips: findModelNode(avatarRoot, [/^hips$/, /pelvis/]) || avatarRoot,
-      'left-hip': findModelNode(avatarRoot, [/leftupperleg/, /upperlegl/, /leftthigh/, /thighl/]) || avatarRoot,
-      'right-hip': findModelNode(avatarRoot, [/rightupperleg/, /upperlegr/, /rightthigh/, /thighr/]) || avatarRoot,
-      'left-knee': findModelNode(avatarRoot, [/leftlowerleg/, /lowerlegl/, /leftshin/, /shinl/]) || avatarRoot,
-      'right-knee': findModelNode(avatarRoot, [/rightlowerleg/, /lowerlegr/, /rightshin/, /shinr/]) || avatarRoot,
-      'left-foot': findModelNode(avatarRoot, [/leftfoot/, /footl/, /lefttoe/]) || avatarRoot,
-      'right-foot': findModelNode(avatarRoot, [/rightfoot/, /footr/, /righttoe/]) || avatarRoot,
+      head: findModelNode(avatarRoot, [/^head$/]) || findModelNode(avatarRoot, [/neck/]) || avatarRoot,
+      face: findModelNode(avatarRoot, [/^head$/]) || avatarRoot,
+      body: findModelNode(avatarRoot, [/spine02/, /spine2/, /upperchest/, /chest/]) || avatarRoot,
+      stomach: findModelNode(avatarRoot, [/spine01/, /spine1/, /waist/, /abdomen/, /belly/]) || avatarRoot,
+      'left-shoulder': findModelNode(avatarRoot, [/^lupperarm$/, /leftupperarm/]) || findModelNode(avatarRoot, [/lclavicle/]) || avatarRoot,
+      'right-shoulder': findModelNode(avatarRoot, [/^rupperarm$/, /rightupperarm/]) || findModelNode(avatarRoot, [/rclavicle/]) || avatarRoot,
+      'left-elbow': findModelNode(avatarRoot, [/lforearm$/, /leftforearm/, /leftlowerarm/]) || avatarRoot,
+      'right-elbow': findModelNode(avatarRoot, [/rforearm$/, /rightforearm/, /rightlowerarm/]) || avatarRoot,
+      'left-hand': findModelNode(avatarRoot, [/lhand/, /lefthand/]) || avatarRoot,
+      'right-hand': findModelNode(avatarRoot, [/rhand/, /righthand/]) || avatarRoot,
+      hips: findModelNode(avatarRoot, [/^pelvis$/, /^hip$/, /^hips$/]) || avatarRoot,
+      'left-hip': findModelNode(avatarRoot, [/lthigh$/, /leftthigh/, /leftupperleg/]) || avatarRoot,
+      'right-hip': findModelNode(avatarRoot, [/rthigh$/, /rightthigh/, /rightupperleg/]) || avatarRoot,
+      'left-knee': findModelNode(avatarRoot, [/lcalf$/, /leftcalf/, /leftlowerleg/, /leftshin/]) || avatarRoot,
+      'right-knee': findModelNode(avatarRoot, [/rcalf$/, /rightcalf/, /rightlowerleg/, /rightshin/]) || avatarRoot,
+      'left-foot': findModelNode(avatarRoot, [/lfoot/, /leftfoot/, /lefttoe/]) || avatarRoot,
+      'right-foot': findModelNode(avatarRoot, [/rfoot/, /rightfoot/, /righttoe/]) || avatarRoot,
     };
 
     Object.values(mappedParts).forEach((part) => {
@@ -719,34 +711,27 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
     pivot.add(hitAreaGroup);
 
     const proxies = [
-      createHitProxy(hitAreaGroup, 'head', new THREE.SphereGeometry(0.3, 16, 12), new THREE.Vector3(0, 1.76, 0.24)),
-      createHitProxy(hitAreaGroup, 'face', new THREE.SphereGeometry(0.23, 16, 12), new THREE.Vector3(0, 1.43, 0.43)),
-      createHitProxy(hitAreaGroup, 'left-shoulder', new THREE.SphereGeometry(0.28, 14, 10), new THREE.Vector3(-0.52, 0.72, 0)),
-      createHitProxy(hitAreaGroup, 'right-shoulder', new THREE.SphereGeometry(0.28, 14, 10), new THREE.Vector3(0.52, 0.72, 0)),
-      createHitProxy(hitAreaGroup, 'left-hand', new THREE.SphereGeometry(0.24, 14, 10), new THREE.Vector3(-0.68, -0.22, 0.08)),
-      createHitProxy(hitAreaGroup, 'right-hand', new THREE.SphereGeometry(0.24, 14, 10), new THREE.Vector3(0.68, -0.22, 0.08)),
-      createHitProxy(hitAreaGroup, 'body', new THREE.BoxGeometry(0.88, 0.62, 0.58), new THREE.Vector3(0, 0.42, 0)),
-      createHitProxy(hitAreaGroup, 'stomach', new THREE.SphereGeometry(0.42, 14, 10), new THREE.Vector3(0, -0.18, 0.08)),
-      createHitProxy(hitAreaGroup, 'left-leg', new THREE.CapsuleGeometry(0.2, 0.78, 6, 12), new THREE.Vector3(-0.22, -1.13, 0.06)),
-      createHitProxy(hitAreaGroup, 'right-leg', new THREE.CapsuleGeometry(0.2, 0.78, 6, 12), new THREE.Vector3(0.22, -1.13, 0.06)),
-      createHitProxy(hitAreaGroup, 'left-foot', new THREE.SphereGeometry(0.34, 14, 10), new THREE.Vector3(-0.22, -2.02, 0.34)),
-      createHitProxy(hitAreaGroup, 'right-foot', new THREE.SphereGeometry(0.34, 14, 10), new THREE.Vector3(0.22, -2.02, 0.34)),
+      createHitProxy(hitAreaGroup, 'head', new THREE.SphereGeometry(0.28, 16, 12), new THREE.Vector3(0, 1.48, 0.18)),
+      createHitProxy(hitAreaGroup, 'face', new THREE.SphereGeometry(0.22, 16, 12), new THREE.Vector3(0, 1.3, 0.35)),
+      createHitProxy(hitAreaGroup, 'left-shoulder', new THREE.SphereGeometry(0.26, 14, 10), new THREE.Vector3(-0.48, 0.72, 0)),
+      createHitProxy(hitAreaGroup, 'right-shoulder', new THREE.SphereGeometry(0.26, 14, 10), new THREE.Vector3(0.48, 0.72, 0)),
+      createHitProxy(hitAreaGroup, 'left-hand', new THREE.SphereGeometry(0.22, 14, 10), new THREE.Vector3(-0.52, -0.05, 0.12)),
+      createHitProxy(hitAreaGroup, 'right-hand', new THREE.SphereGeometry(0.22, 14, 10), new THREE.Vector3(0.52, -0.05, 0.12)),
+      createHitProxy(hitAreaGroup, 'body', new THREE.BoxGeometry(0.82, 0.6, 0.52), new THREE.Vector3(0, 0.52, 0)),
+      createHitProxy(hitAreaGroup, 'stomach', new THREE.SphereGeometry(0.36, 14, 10), new THREE.Vector3(0, 0.04, 0.1)),
+      createHitProxy(hitAreaGroup, 'left-leg', new THREE.CapsuleGeometry(0.2, 0.62, 6, 12), new THREE.Vector3(-0.2, -0.72, 0.04)),
+      createHitProxy(hitAreaGroup, 'right-leg', new THREE.CapsuleGeometry(0.2, 0.62, 6, 12), new THREE.Vector3(0.2, -0.72, 0.04)),
+      createHitProxy(hitAreaGroup, 'left-foot', new THREE.SphereGeometry(0.29, 14, 10), new THREE.Vector3(-0.2, -1.5, 0.22)),
+      createHitProxy(hitAreaGroup, 'right-foot', new THREE.SphereGeometry(0.29, 14, 10), new THREE.Vector3(0.2, -1.5, 0.22)),
     ];
 
     return { mappedParts, proxies };
   }
 
   function fitAvatarToFullBody(avatarRoot) {
-    const initialBox = new THREE.Box3().setFromObject(avatarRoot);
-    const initialSize = initialBox.getSize(new THREE.Vector3());
-    const initialCenter = initialBox.getCenter(new THREE.Vector3());
-    const targetFullHeight = 3.75;
-    const scale = targetFullHeight / Math.max(initialSize.y, 0.001);
-
-    avatarRoot.scale.setScalar(scale);
-    avatarRoot.position.x = -initialCenter.x * scale;
-    avatarRoot.position.z = -initialCenter.z * scale;
-    avatarRoot.position.y = -initialCenter.y * scale - 0.12;
+    avatarRoot.scale.setScalar(3.5);
+    avatarRoot.rotation.y = -Math.PI * 0.5;
+    avatarRoot.position.set(0, -1.75, 0);
   }
 
   function loadProductionAvatar() {
@@ -754,7 +739,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
     updateModelStatus('Loading 3D character...');
 
     loader.load(
-      'models/yenan-avatar.glb',
+      'images/HOME/有骨骼的娃娃.glb',
       (gltf) => {
         const pivot = new THREE.Group();
         pivot.name = 'yenan-avatar-pivot';
@@ -905,312 +890,101 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
     return true;
   }
 
+  function rotateBoneToward(bone, endBone, targetWorld, amount) {
+    if (!bone || !endBone || !bone.parent) return false;
+
+    bone.updateWorldMatrix(true, true);
+    endBone.updateWorldMatrix(true, true);
+
+    const origin = new THREE.Vector3();
+    const end = new THREE.Vector3();
+    bone.getWorldPosition(origin);
+    endBone.getWorldPosition(end);
+
+    const currentDirection = end.sub(origin).normalize();
+    const targetDirection = targetWorld.clone().sub(origin).normalize();
+    if (currentDirection.lengthSq() < 0.001 || targetDirection.lengthSq() < 0.001) return false;
+
+    const delta = new THREE.Quaternion().setFromUnitVectors(currentDirection, targetDirection);
+    const worldRotation = new THREE.Quaternion();
+    bone.getWorldQuaternion(worldRotation);
+    delta.multiply(worldRotation);
+
+    const parentRotation = new THREE.Quaternion();
+    bone.parent.getWorldQuaternion(parentRotation);
+    const localTarget = parentRotation.invert().multiply(delta);
+    bone.quaternion.slerp(localTarget, amount);
+    bone.updateWorldMatrix(true, true);
+    return true;
+  }
+
+  function aimRigArm(side, elbowTarget, handTarget, amount) {
+    if (activeCharacter === character) return false;
+
+    const upperArm = activeBodyParts[`${side}-shoulder`];
+    const forearm = activeBodyParts[`${side}-elbow`];
+    const hand = activeBodyParts[`${side}-hand`];
+    if (!upperArm || !forearm || !hand) return false;
+
+    activeCharacter.updateMatrixWorld(true);
+    const elbowTargetWorld = activeCharacter.localToWorld(elbowTarget.clone());
+    const handTargetWorld = activeCharacter.localToWorld(handTarget.clone());
+    rotateBoneToward(upperArm, forearm, elbowTargetWorld, amount);
+    rotateBoneToward(forearm, hand, handTargetWorld, amount);
+    return true;
+  }
+
   function triggerReaction(partName) {
     if (stopActiveReaction) stopActiveReaction();
 
-    const head = activeBodyParts.head;
-    const body = activeBodyParts.body;
-    const stomach = activeBodyParts.stomach || body;
-    const leftShoulder = activeBodyParts['left-shoulder'];
-    const rightShoulder = activeBodyParts['right-shoulder'];
-    const leftElbow = activeBodyParts['left-elbow'];
-    const rightElbow = activeBodyParts['right-elbow'];
-    const leftHand = activeBodyParts['left-hand'];
-    const rightHand = activeBodyParts['right-hand'];
-    const hips = activeBodyParts.hips;
-    const leftHip = activeBodyParts['left-hip'];
-    const rightHip = activeBodyParts['right-hip'];
-    const leftKnee = activeBodyParts['left-knee'];
-    const rightKnee = activeBodyParts['right-knee'];
-    const leftFoot = activeBodyParts['left-foot'];
-    const rightFoot = activeBodyParts['right-foot'];
-    const affectedNodes = [...new Set([
-      activeCharacter,
-      head,
-      body,
-      stomach,
-      leftShoulder,
-      rightShoulder,
-      leftElbow,
-      rightElbow,
-      leftHand,
-      rightHand,
-      hips,
-      leftHip,
-      rightHip,
-      leftKnee,
-      rightKnee,
-      leftFoot,
-      rightFoot,
-      ...fallbackExpression.brows,
-      fallbackExpression.mouth,
-    ].filter(Boolean))];
-    const snapshots = affectedNodes.map((node) => ({
-      node,
-      position: node.position.clone(),
-      rotation: node.rotation.clone(),
-      scale: node.scale.clone(),
-    }));
-    const startTime = performance.now();
-    const durationByPart = {
-      head: 1750,
-      face: 1100,
-      stomach: 1900,
-      'left-foot': 1850,
-      'right-foot': 1850,
-      'left-hand': 1550,
-      'right-hand': 1550,
-      'left-leg': 1250,
-      'right-leg': 1250,
-      body: 1200,
+    // Map click target name to the body part to shake
+    var partMap = {
+      'head': activeBodyParts.head,
+      'face': activeBodyParts.head,
+      'body': activeBodyParts.body,
+      'stomach': activeBodyParts.stomach || activeBodyParts.body,
+      'left-shoulder': activeBodyParts['left-shoulder'],
+      'right-shoulder': activeBodyParts['right-shoulder'],
+      'left-hand': activeBodyParts['left-hand'],
+      'right-hand': activeBodyParts['right-hand'],
+      'left-leg': activeBodyParts['left-hip'],
+      'right-leg': activeBodyParts['right-hip'],
+      'left-foot': activeBodyParts['left-foot'],
+      'right-foot': activeBodyParts['right-foot'],
     };
-    const duration = durationByPart[partName] || 1050;
-    let frameId = 0;
+    var part = partMap[partName];
+    if (!part) return;
 
-    function setFallbackExpression(type, amount) {
-      if (activeCharacter !== character) return;
+    var originalRotation = part.rotation.clone();
+    var startTime = performance.now();
+    var duration = 500;
+    var frameId = 0;
 
-      fallbackExpression.cheeks.forEach((cheek) => {
-        cheek.material.opacity = 0.24;
-      });
-
-      if (type === 'angry') {
-        if (fallbackExpression.brows[0]) fallbackExpression.brows[0].rotation.z += 0.44 * amount;
-        if (fallbackExpression.brows[1]) fallbackExpression.brows[1].rotation.z -= 0.44 * amount;
-        if (fallbackExpression.mouth) {
-          fallbackExpression.mouth.rotation.z += Math.PI * amount;
-          fallbackExpression.mouth.scale.x *= 0.72;
-          fallbackExpression.mouth.scale.y *= 0.82;
-        }
-        fallbackExpression.cheeks.forEach((cheek) => {
-          cheek.material.opacity = 0.24 + amount * 0.52;
-        });
-      } else if (type === 'happy') {
-        if (fallbackExpression.mouth) fallbackExpression.mouth.scale.x *= 1 + amount * 0.35;
-        fallbackExpression.cheeks.forEach((cheek) => {
-          cheek.material.opacity = 0.24 + amount * 0.24;
-        });
-      } else if (type === 'surprised') {
-        if (fallbackExpression.brows[0]) fallbackExpression.brows[0].position.y += amount * 0.05;
-        if (fallbackExpression.brows[1]) fallbackExpression.brows[1].position.y += amount * 0.05;
-        if (fallbackExpression.mouth) {
-          fallbackExpression.mouth.scale.x *= 0.55;
-          fallbackExpression.mouth.scale.y *= 1 + amount * 0.85;
-        }
-      }
-    }
-
-    function restoreReaction() {
+    function restoreShake() {
       cancelAnimationFrame(frameId);
-      snapshots.forEach(({ node, position, rotation, scale }) => {
-        node.position.copy(position);
-        node.rotation.copy(rotation);
-        node.scale.copy(scale);
-      });
-      fallbackExpression.cheeks.forEach((cheek) => {
-        cheek.material.opacity = 0.24;
-      });
-      setMorphInfluence([/blink/, /smile/, /happy/, /joy/, /angry/, /puff/, /frown/], 0);
+      part.rotation.copy(originalRotation);
       stopActiveReaction = null;
     }
 
-    stopActiveReaction = restoreReaction;
+    stopActiveReaction = restoreShake;
 
-    function animateReaction(now) {
-      const elapsed = now - startTime;
-      const t = Math.min(elapsed / duration, 1);
-      const wave = Math.sin(t * Math.PI);
-      const bounce = Math.sin(t * Math.PI * 3) * (1 - t);
+    function animateShake(now) {
+      var elapsed = now - startTime;
+      var t = Math.min(elapsed / duration, 1);
+      // Damped oscillation: 5 half-cycles, amplitude decays to zero
+      var shake = Math.sin(t * Math.PI * 5) * (1 - t) * 0.12;
 
-      snapshots.forEach(({ node, position, rotation, scale }) => {
-        node.position.copy(position);
-        node.rotation.copy(rotation);
-        node.scale.copy(scale);
-      });
-      setMorphInfluence([/blink/, /smile/, /happy/, /joy/, /angry/, /puff/, /frown/], 0);
-
-      switch (partName) {
-        case 'head':
-          if (!aimFallbackArm(
-            'right',
-            new THREE.Vector3(0.72, 0.82, 0.36),
-            new THREE.Vector3(0.02, 1.38, 0.44),
-            wave
-          )) {
-            if (rightShoulder) {
-              rightShoulder.rotation.z -= wave * 2.18;
-              rightShoulder.rotation.x -= wave * 0.36;
-              rightShoulder.position.z += wave * 0.48;
-            }
-            if (rightElbow) {
-              rightElbow.rotation.z -= wave * 0.96;
-              rightElbow.rotation.x -= wave * 0.18;
-            }
-            if (rightHand) {
-              rightHand.rotation.z += wave * 0.22;
-              rightHand.position.z += wave * 0.16;
-            }
-          }
-          if (head) {
-            head.rotation.z -= wave * 0.11;
-            head.rotation.x += Math.sin(t * Math.PI * 2) * (1 - t) * 0.08;
-          }
-          setMorphInfluence([/smile/, /happy/, /joy/], wave * 0.45);
-          setFallbackExpression('happy', wave * 0.7);
-          break;
-        case 'face':
-          if (head) head.rotation.z += Math.sin(t * Math.PI * 2) * (1 - t) * 0.12;
-          setMorphInfluence([/blink/], Math.min(1, wave * 1.8));
-          setMorphInfluence([/smile/, /happy/, /joy/], wave * 0.85);
-          setFallbackExpression('happy', wave);
-          break;
-        case 'stomach':
-          if (activeCharacter === character) {
-            aimFallbackArm(
-              'left',
-              new THREE.Vector3(-0.64, -0.02, 0.34),
-              new THREE.Vector3(-0.17, -0.32, 0.5),
-              wave
-            );
-            aimFallbackArm(
-              'right',
-              new THREE.Vector3(0.64, -0.02, 0.34),
-              new THREE.Vector3(0.17, -0.32, 0.5),
-              wave
-            );
-          } else {
-            if (leftShoulder) {
-              leftShoulder.rotation.z += wave * 1.52;
-              leftShoulder.rotation.x -= wave * 0.72;
-              leftShoulder.position.z += wave * 0.18;
-            }
-            if (rightShoulder) {
-              rightShoulder.rotation.z -= wave * 1.52;
-              rightShoulder.rotation.x -= wave * 0.72;
-              rightShoulder.position.z += wave * 0.18;
-            }
-            if (leftElbow) {
-              leftElbow.rotation.z -= wave * 2.08;
-              leftElbow.rotation.x -= wave * 0.38;
-            }
-            if (rightElbow) {
-              rightElbow.rotation.z += wave * 2.08;
-              rightElbow.rotation.x -= wave * 0.38;
-            }
-            if (leftHand) leftHand.position.z += wave * 0.42;
-            if (rightHand) rightHand.position.z += wave * 0.42;
-          }
-          if (body) body.rotation.x += wave * 0.16;
-          if (head) {
-            head.rotation.x -= wave * 0.1;
-            head.rotation.z += Math.sin(t * Math.PI * 2) * (1 - t) * 0.06;
-          }
-          activeCharacter.position.y -= wave * 0.07;
-          setMorphInfluence([/angry/, /puff/, /frown/], wave);
-          setFallbackExpression('angry', wave);
-          break;
-        case 'left-shoulder':
-          if (leftShoulder) leftShoulder.rotation.z -= wave * 0.24;
-          if (head) head.rotation.z += wave * 0.12;
-          setFallbackExpression('surprised', wave * 0.5);
-          break;
-        case 'right-shoulder':
-          if (rightShoulder) rightShoulder.rotation.z += wave * 0.24;
-          if (head) head.rotation.z -= wave * 0.12;
-          setFallbackExpression('surprised', wave * 0.5);
-          break;
-        case 'left-hand':
-        case 'right-hand':
-          {
-            const isLeft = partName === 'left-hand';
-            const shoulder = isLeft ? leftShoulder : rightShoulder;
-            const elbow = isLeft ? leftElbow : rightElbow;
-            if (shoulder) {
-              shoulder.rotation.x -= wave * 1.35;
-              shoulder.rotation.z += (isLeft ? 1 : -1) * wave * 0.22;
-            }
-            if (elbow) elbow.rotation.x += wave * 0.22;
-            activeCharacter.position.z += wave * 0.34;
-            activeCharacter.rotation.x += wave * 0.09;
-            if (head) head.rotation.x -= wave * 0.08;
-            setMorphInfluence([/smile/, /happy/, /joy/], wave * 0.7);
-            setFallbackExpression('happy', wave);
-          }
-          break;
-        case 'left-foot':
-        case 'right-foot':
-          {
-            const isLeft = partName === 'left-foot';
-            const hip = isLeft ? leftHip : rightHip;
-            const knee = isLeft ? leftKnee : rightKnee;
-            const foot = isLeft ? leftFoot : rightFoot;
-            if (hip) hip.rotation.x -= wave * 0.9;
-            if (knee) knee.rotation.x += wave * 1.2;
-            if (foot) foot.rotation.x -= wave * 0.45;
-            if (activeCharacter === character) {
-              aimFallbackArm(
-                'left',
-                new THREE.Vector3(-0.78, -0.2, 0.2),
-                new THREE.Vector3(-0.42, -0.6, 0.3),
-                wave
-              );
-              aimFallbackArm(
-                'right',
-                new THREE.Vector3(0.78, -0.2, 0.2),
-                new THREE.Vector3(0.42, -0.6, 0.3),
-                wave
-              );
-            } else {
-              if (leftShoulder) leftShoulder.rotation.z -= wave * 0.82;
-              if (rightShoulder) rightShoulder.rotation.z += wave * 0.82;
-              if (leftElbow) leftElbow.rotation.z += wave * 1.46;
-              if (rightElbow) rightElbow.rotation.z -= wave * 1.46;
-            }
-            if (hips) hips.rotation.z += (isLeft ? -1 : 1) * wave * 0.06;
-            if (head) {
-              head.rotation.x -= wave * 0.08;
-              head.rotation.y += (isLeft ? -1 : 1) * wave * 0.05;
-            }
-            activeCharacter.position.y += wave * 0.06;
-            setMorphInfluence([/angry/, /puff/, /frown/], wave);
-            setFallbackExpression('angry', wave);
-          }
-          break;
-        case 'left-leg':
-        case 'right-leg':
-          {
-            const isLeft = partName === 'left-leg';
-            const hip = isLeft ? leftHip : rightHip;
-            const knee = isLeft ? leftKnee : rightKnee;
-            if (hip) hip.rotation.z += (isLeft ? 1 : -1) * wave * 0.2;
-            if (knee) knee.rotation.x += wave * 0.22;
-            activeCharacter.position.x += (isLeft ? 1 : -1) * wave * 0.06;
-            setFallbackExpression('surprised', wave * 0.65);
-          }
-          break;
-        case 'body':
-          activeCharacter.position.y += bounce * 0.12;
-          if (body) body.rotation.y += Math.sin(t * Math.PI * 2) * (1 - t) * 0.1;
-          if (leftShoulder) leftShoulder.rotation.z -= wave * 0.32;
-          if (rightShoulder) rightShoulder.rotation.z += wave * 0.32;
-          setMorphInfluence([/blink/], Math.min(1, wave * 1.4));
-          setFallbackExpression('surprised', wave);
-          break;
-        default:
-          activeCharacter.rotation.z += Math.sin(t * Math.PI * 2) * (1 - t) * 0.08;
-          if (head) head.rotation.z -= Math.sin(t * Math.PI * 2) * (1 - t) * 0.12;
-          setFallbackExpression('surprised', wave * 0.6);
-          break;
-      }
+      part.rotation.copy(originalRotation);
+      part.rotation.z += shake;
 
       if (t < 1) {
-        frameId = requestAnimationFrame(animateReaction);
+        frameId = requestAnimationFrame(animateShake);
       } else {
-        restoreReaction();
+        restoreShake();
       }
     }
 
-    frameId = requestAnimationFrame(animateReaction);
+    frameId = requestAnimationFrame(animateShake);
   }
 
   // ---- 渲染循环 ----
