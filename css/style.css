@@ -110,6 +110,7 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   font-family:var(--font-tag); font-size:inherit; font-weight:600;
   letter-spacing:.04em;
   padding:.4em .85em; border-radius:18px;
+  border:1.5px solid;
   background:#fff;
   pointer-events:none; opacity:0;
 }
@@ -125,13 +126,11 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   animation: ripR .6s cubic-bezier(.32,0,.67,0) forwards;
 }
 
-/* 撕完后框消失 */
+/* 撕完后原框消失（碎片已自行消失） */
 .tag-inner.torn {
   border-color:transparent!important;
   background:transparent!important;
 }
-.tag-inner.torn .shard-L,
-.tag-inner.torn .shard-R { display:none; }
 
 @keyframes ripL {
   0%   { transform:translate(0,0) rotate(0deg); opacity:1; }

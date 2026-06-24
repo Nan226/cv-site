@@ -81,8 +81,7 @@
     tag.addEventListener('click', (e) => {
       e.stopPropagation();
       if (inner.classList.contains('torn')) return;
-      inner.classList.add('tearing');
-      setTimeout(() => inner.classList.add('torn'), 500);
+      inner.classList.add('tearing', 'torn');
     });
   });
 })();
