@@ -119,37 +119,30 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
 .tag-inner.tearing .tag-orig { opacity:0; }
 .tag-inner.tearing .shard-L {
   clip-path: polygon(0% 0%,52% 0%,38% 10%,56% 22%,42% 34%,55% 46%,38% 58%,53% 70%,44% 82%,54% 94%,0% 100%);
-  animation: ripL .4s ease forwards;
+  animation: ripL .55s cubic-bezier(.32,0,.67,0) forwards;
 }
 .tag-inner.tearing .shard-R {
   clip-path: polygon(100% 0%,52% 0%,68% 16%,48% 28%,62% 40%,49% 52%,64% 64%,46% 76%,58% 88%,50% 96%,100% 100%);
-  animation: ripR .4s ease forwards;
+  animation: ripR .6s cubic-bezier(.32,0,.67,0) forwards;
 }
-.tag-inner.torn { border-color:transparent!important; background:transparent!important; }
-.tag-inner.torn .shard-L,
-.tag-inner.torn .shard-R { opacity:0; }
 
-/* 恢复 */
-.tag-inner.restoring .shard-L { animation: backL .4s ease forwards; }
-.tag-inner.restoring .shard-R { animation: backR .4s ease forwards; }
-.tag-inner.restoring .tag-orig { opacity:0; }
-.tag-inner:not(.tearing):not(.restoring):not(.torn) .tag-orig { opacity:1; }
+/* 撕完后框消失 */
+.tag-inner.torn {
+  border-color:transparent!important;
+  background:transparent!important;
+}
+.tag-inner.torn .shard-L,
+.tag-inner.torn .shard-R { display:none; }
 
 @keyframes ripL {
   0%   { transform:translate(0,0) rotate(0deg); opacity:1; }
-  100% { transform:translate(-12px,4px) rotate(-8deg); opacity:0; }
+  40%  { transform:translate(-5px,20px) rotate(-4deg); opacity:.9; }
+  100% { transform:translate(-16px,60px) rotate(-15deg); opacity:0; }
 }
 @keyframes ripR {
   0%   { transform:translate(0,0) rotate(0deg); opacity:1; }
-  100% { transform:translate(12px,-3px) rotate(8deg); opacity:0; }
-}
-@keyframes backL {
-  0%   { transform:translate(-12px,4px) rotate(-8deg); opacity:0; }
-  100% { transform:translate(0,0) rotate(0deg); opacity:1; }
-}
-@keyframes backR {
-  0%   { transform:translate(12px,-3px) rotate(8deg); opacity:0; }
-  100% { transform:translate(0,0) rotate(0deg); opacity:1; }
+  40%  { transform:translate(6px,18px) rotate(5deg); opacity:.9; }
+  100% { transform:translate(18px,55px) rotate(16deg); opacity:0; }
 }
 
 /* ===== 底部 ===== */

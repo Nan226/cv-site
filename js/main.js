@@ -78,21 +78,11 @@
     tag.textContent = '';
     tag.appendChild(inner);
 
-    let torn = false;
-
     tag.addEventListener('click', (e) => {
       e.stopPropagation();
-      if (torn) {
-        inner.classList.remove('torn');
-        inner.classList.add('restoring');
-        setTimeout(() => inner.classList.remove('restoring'), 450);
-        torn = false;
-      } else {
-        inner.classList.remove('restoring');
-        inner.classList.add('tearing');
-        setTimeout(() => inner.classList.add('torn'), 450);
-        torn = true;
-      }
+      if (inner.classList.contains('torn')) return;
+      inner.classList.add('tearing');
+      setTimeout(() => inner.classList.add('torn'), 500);
     });
   });
 })();
