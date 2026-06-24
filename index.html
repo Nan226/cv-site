@@ -42,6 +42,9 @@
 
       <!-- Three.js 3D 画布 -->
       <canvas id="threeCanvas" class="three-canvas"></canvas>
+
+      <!-- 倒计时（在人物背后） -->
+      <div class="countdown-display" id="countdownDisplay"></div>
       <p class="model-status" id="modelStatus" role="status" aria-live="polite">
         Preparing 3D character...
       </p>
@@ -76,8 +79,6 @@
     <!-- 上下 blink 眼睑 -->
     <div class="blink-lid blink-lid-top" id="blinkLidTop"></div>
     <div class="blink-lid blink-lid-bottom" id="blinkLidBottom"></div>
-    <!-- 倒计时 -->
-    <div class="countdown-display" id="countdownDisplay"></div>
     <!-- 中央 Slogan -->
     <div class="easter-egg-slogan" id="easterEggSlogan">
       SHATTER THE LABELS.<br>BEYOND DEFINITION.

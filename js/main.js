@@ -1355,26 +1355,77 @@ function triggerEasterEgg() {
   var pullChain = document.getElementById('pullChain');
   var canvas = document.getElementById('threeCanvas');
   var ribbons = document.getElementById('ribbonsContainer');
+  var charContainer = document.getElementById('characterContainer');
 
   if (!overlay || overlay.classList.contains('active')) return;
   overlay.classList.add('active');
 
+  // ---- 粉尘粒子 ----
+  var particleColors = [
+    '#c8b0f0', '#a78bfa', '#b99af5', '#d2b5f2', '#eca1ca',
+    '#e1c3e8', '#d4a8dd', '#f0b8d4', '#b890e8', '#c9a8f0',
+  ];
+
+  function burstParticles(callback) {
+    if (!charContainer) { if (callback) callback(); return; }
+    var rect = countdownDisplay.getBoundingClientRect();
+    var cx = rect.left + rect.width / 2;
+    var cy = rect.top + rect.height / 2;
+    var containerRect = charContainer.getBoundingClientRect();
+    var relX = cx - containerRect.left;
+    var relY = cy - containerRect.top;
+    var count = 50 + Math.floor(Math.random() * 20);
+
+    for (var i = 0; i < count; i++) {
+      var p = document.createElement('span');
+      p.className = 'countdown-particle';
+      var angle = Math.random() * Math.PI * 2;
+      var dist = 60 + Math.random() * 200;
+      var px = Math.cos(angle) * dist;
+      var py = Math.sin(angle) * dist;
+      var size = 2 + Math.random() * 8;
+      p.style.cssText =
+        'left:' + relX + 'px;' +
+        'top:' + relY + 'px;' +
+        'width:' + size + 'px;' +
+        'height:' + size + 'px;' +
+        'background:' + particleColors[Math.floor(Math.random() * particleColors.length)] + ';' +
+        '--px:' + px + 'px;' +
+        '--py:' + py + 'px;' +
+        'animation-duration:' + (0.55 + Math.random() * 0.5) + 's';
+      charContainer.appendChild(p);
+      p.addEventListener('animationend', function () { p.remove(); });
+    }
+    if (callback) setTimeout(callback, 150);
+  }
+
   // ---- 5秒倒计时 ----
   var count = 5;
   countdownDisplay.textContent = count;
-  countdownDisplay.classList.add('show');
+  countdownDisplay.classList.add('show', 'pop');
+  setTimeout(function () { countdownDisplay.classList.remove('pop'); }, 350);
 
-  var countdownInterval = setInterval(function () {
+  function nextCount() {
     count--;
     if (count <= 0) {
       clearInterval(countdownInterval);
-      countdownDisplay.textContent = '';
       countdownDisplay.classList.remove('show');
-      startBlinkAndDarkMode();
+      burstParticles(function () {
+        countdownDisplay.textContent = '';
+        startBlinkAndDarkMode();
+      });
     } else {
-      countdownDisplay.textContent = count;
+      burstParticles(function () {
+        countdownDisplay.textContent = count;
+        countdownDisplay.classList.remove('pop');
+        void countdownDisplay.offsetWidth;
+        countdownDisplay.classList.add('pop');
+        setTimeout(function () { countdownDisplay.classList.remove('pop'); }, 350);
+      });
     }
-  }, 1000);
+  }
+
+  var countdownInterval = setInterval(nextCount, 1000);
 
   function startBlinkAndDarkMode() {
     // 眨眼：上下眼睑闭合
