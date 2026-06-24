@@ -56,7 +56,25 @@
     const text = tag.textContent;
     const inner = document.createElement('span');
     inner.className = 'tag-inner';
-    inner.textContent = text;
+
+    // 原始文字
+    const orig = document.createElement('span');
+    orig.className = 'tag-orig';
+    orig.textContent = text;
+    inner.appendChild(orig);
+
+    // 左碎片
+    const left = document.createElement('span');
+    left.className = 'tag-shard shard-L';
+    left.textContent = text;
+    inner.appendChild(left);
+
+    // 右碎片
+    const right = document.createElement('span');
+    right.className = 'tag-shard shard-R';
+    right.textContent = text;
+    inner.appendChild(right);
+
     tag.textContent = '';
     tag.appendChild(inner);
 
@@ -64,18 +82,15 @@
 
     tag.addEventListener('click', (e) => {
       e.stopPropagation();
-
       if (torn) {
-        // 恢复
-        inner.classList.remove('torn', 'tearing-out');
-        inner.classList.add('restoring-in');
-        setTimeout(() => inner.classList.remove('restoring-in'), 500);
+        inner.classList.remove('torn');
+        inner.classList.add('restoring');
+        setTimeout(() => inner.classList.remove('restoring'), 450);
         torn = false;
       } else {
-        // 撕碎消失
-        inner.classList.remove('restoring-in');
-        inner.classList.add('tearing-out');
-        setTimeout(() => inner.classList.add('torn'), 400);
+        inner.classList.remove('restoring');
+        inner.classList.add('tearing');
+        setTimeout(() => inner.classList.add('torn'), 450);
         torn = true;
       }
     });

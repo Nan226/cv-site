@@ -103,25 +103,53 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
 .tags-right .tag:nth-child(5){right:7%;top:78%;--rot:5deg}
 
 /* ---- 撕碎 ---- */
-.tag-inner.tearing-out {
-  animation: tearOut .4s ease forwards;
+.tag-orig { display:inline-block; }
+.tag-shard {
+  position:absolute; top:0; left:0;
+  display:inline-block; white-space:nowrap;
+  font-family:var(--font-tag); font-size:inherit; font-weight:600;
+  letter-spacing:.04em;
+  padding:.4em .85em; border-radius:18px;
+  border:1.5px solid;
+  background:#fff;
+  pointer-events:none; opacity:0;
 }
-.tag-inner.torn {
-  border-color:transparent!important;
-  background:transparent!important;
-  opacity:0;
+
+/* 撕裂激活 */
+.tag-inner.tearing .tag-orig { opacity:0; }
+.tag-inner.tearing .shard-L {
+  clip-path: polygon(0% 0%,52% 0%,38% 10%,56% 22%,42% 34%,55% 46%,38% 58%,53% 70%,44% 82%,54% 94%,0% 100%);
+  animation: ripL .4s ease forwards;
 }
-.tag-inner.restoring-in {
-  animation: tearIn .4s ease forwards;
+.tag-inner.tearing .shard-R {
+  clip-path: polygon(100% 0%,52% 0%,68% 16%,48% 28%,62% 40%,49% 52%,64% 64%,46% 76%,58% 88%,50% 96%,100% 100%);
+  animation: ripR .4s ease forwards;
 }
-@keyframes tearOut {
-  0%   { transform:rotate(var(--rot)) scale(1); opacity:1; filter:blur(0); }
-  60%  { transform:rotate(var(--rot)) scale(1.06); opacity:.5; filter:blur(1px); }
-  100% { transform:rotate(var(--rot)) scale(.75); opacity:0; filter:blur(3px); }
+.tag-inner.torn { border-color:transparent!important; background:transparent!important; }
+.tag-inner.torn .shard-L,
+.tag-inner.torn .shard-R { opacity:0; }
+
+/* 恢复 */
+.tag-inner.restoring .shard-L { animation: backL .4s ease forwards; }
+.tag-inner.restoring .shard-R { animation: backR .4s ease forwards; }
+.tag-inner.restoring .tag-orig { opacity:0; }
+.tag-inner:not(.tearing):not(.restoring):not(.torn) .tag-orig { opacity:1; }
+
+@keyframes ripL {
+  0%   { transform:translate(0,0) rotate(0deg); opacity:1; }
+  100% { transform:translate(-12px,4px) rotate(-8deg); opacity:0; }
 }
-@keyframes tearIn {
-  0%   { transform:rotate(var(--rot)) scale(.75); opacity:0; filter:blur(3px); }
-  100% { transform:rotate(var(--rot)) scale(1); opacity:1; filter:blur(0); }
+@keyframes ripR {
+  0%   { transform:translate(0,0) rotate(0deg); opacity:1; }
+  100% { transform:translate(12px,-3px) rotate(8deg); opacity:0; }
+}
+@keyframes backL {
+  0%   { transform:translate(-12px,4px) rotate(-8deg); opacity:0; }
+  100% { transform:translate(0,0) rotate(0deg); opacity:1; }
+}
+@keyframes backR {
+  0%   { transform:translate(12px,-3px) rotate(8deg); opacity:0; }
+  100% { transform:translate(0,0) rotate(0deg); opacity:1; }
 }
 
 /* ===== 底部 ===== */
