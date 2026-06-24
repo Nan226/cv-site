@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YE NAN — Portfolio</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+</head>
+<body>
+
+  <!-- 背景飘浮彩带容器 -->
+  <div class="ribbons-container" id="ribbonsContainer" aria-hidden="true"></div>
+
+  <!-- ========== 顶部导航 ========== -->
+  <nav class="navbar">
+    <ul class="nav-list">
+      <li><a href="#" class="nav-item" data-text="About Me">About Me</a></li>
+      <li><a href="#" class="nav-item" data-text="Internship">Internship</a></li>
+      <li><a href="#" class="nav-item" data-text="Projects">Projects</a></li>
+      <li><a href="#" class="nav-item" data-text="Skills">Skills</a></li>
+      <li><a href="#" class="nav-item" data-text="Learning">Learning</a></li>
+    </ul>
+  </nav>
+
+  <!-- ========== Hero 区域 ========== -->
+  <section class="hero">
+    <h1 class="hero-name">YE NAN</h1>
+    <p class="hero-subtitle">Builder · Dreamer · Braver</p>
+  </section>
+
+  <!-- ========== 角色展示区（Three.js 3D人物） ========== -->
+  <section class="character-area">
+    <div class="character-container" id="characterContainer">
+
+      <!-- Three.js 3D 画布 -->
+      <canvas id="threeCanvas" class="three-canvas"></canvas>
+
+      <!-- 角色左右标签 -->
+      <div class="character-tags tags-left">
+        <span class="tag">PMO</span>
+        <span class="tag">ENFP</span>
+        <span class="tag">Metaverse</span>
+        <span class="tag">Cross-functional<br>Communicator</span>
+        <span class="tag">AI Enthusiast</span>
+      </div>
+      <div class="character-tags tags-right">
+        <span class="tag">Fast Learner</span>
+        <span class="tag">Creative</span>
+        <span class="tag">Strong Execution</span>
+        <span class="tag">Data-driven</span>
+        <span class="tag">CS Background</span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========== 底部 ========== -->
+  <footer class="footer">
+    <p class="footer-text">COURAGE MATTERS MORE THAN COMPETENCE</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

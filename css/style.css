@@ -1,0 +1,141 @@
+/* ========================================
+   CV-Site — HOME 页样式
+   ======================================== */
+
+:root {
+  --purple-deep:#6e2fd5; --purple:#8738e0; --purple-mid:#a66de6;
+  --purple-light:#d2b5f2; --pink-soft:#eca1ca; --pink-magenta:#b988c5;
+  --pink-deep:#a146b3; --text-dark:#2D3047; --text-mid:#5A5D72;
+  --text-light:#aca1c7; --white:#FFFFFF;
+  --font-heading:'Georgia','Times New Roman',serif;
+  --font-body:'Segoe UI','Helvetica Neue',Arial,sans-serif;
+  --font-tag:'SF Pro Display','Segoe UI',sans-serif;
+}
+
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100vh;overflow:hidden}
+html{font-size:clamp(13px,1.5vw,16px)}
+body{
+  display:flex;flex-direction:column;
+  font-family:var(--font-body);color:var(--text-dark);
+  background:
+    radial-gradient(ellipse 70% 50% at 25% 25%,rgba(210,181,242,.18) 0%,transparent 55%),
+    radial-gradient(ellipse 60% 45% at 72% 28%,rgba(236,161,202,.14) 0%,transparent 55%),
+    radial-gradient(ellipse 55% 40% at 50% 75%,rgba(210,181,242,.12) 0%,transparent 55%),
+    var(--white);
+  -webkit-font-smoothing:antialiased;line-height:1.6
+}
+a{text-decoration:none;color:inherit}ul{list-style:none}
+
+/* ===== 彩带 ===== */
+.ribbons-container{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:hidden}
+.ribbon{position:absolute;top:-8%;border-radius:2px;opacity:0;will-change:top,transform;animation:ribbonFloat linear infinite}
+@keyframes ribbonFloat{
+  0%{top:-8%;opacity:0;transform:translateX(0) rotate(0deg)}
+  8%{opacity:.4}
+  85%{opacity:.25}
+  100%{top:105%;opacity:0;transform:translateX(var(--drift)) rotate(var(--spin))}
+}
+
+/* ===== 导航 ===== */
+.navbar{flex:0 0 auto;z-index:1000;background:rgba(255,255,255,.85);backdrop-filter:blur(14px);border-bottom:1px solid rgba(135,56,224,.06);padding:0 3vw}
+.nav-list{display:flex;justify-content:flex-end;align-items:center;gap:2.5vw;max-width:1200px;margin:0 auto;height:6.5vh}
+.nav-item{position:relative;display:inline-block;font-size:.78rem;font-weight:500;color:var(--text-mid);letter-spacing:.06em;text-transform:uppercase;padding:.3em 0;transition:color .3s ease;cursor:pointer}
+.nav-item::after{content:'';position:absolute;bottom:0;left:0;width:0;height:2px;background:var(--purple);transition:width .3s ease}
+.nav-item:hover{color:var(--purple)}
+.nav-item:hover::after{width:100%}
+
+.nav-tear-wrap{position:relative;display:inline-block}
+.nav-tear-original{display:inline-block;transition:opacity .15s ease}
+.nav-tear-wrap:hover .nav-tear-original{opacity:.3}
+.nav-tear-half{position:absolute;top:0;left:0;display:inline-block;white-space:nowrap;color:var(--purple);pointer-events:none;opacity:0;transition:opacity .1s ease}
+.nav-tear-wrap:hover .nav-tear-half{opacity:1}
+.nav-tear-top{clip-path:polygon(0% 0%,4% 85%,8% 100%,12% 80%,16% 95%,20% 78%,24% 92%,28% 82%,32% 98%,36% 76%,40% 94%,44% 80%,48% 96%,52% 74%,56% 90%,60% 82%,64% 96%,68% 78%,72% 92%,76% 80%,80% 94%,84% 76%,88% 90%,92% 82%,96% 95%,100% 85%,100% 0%);animation:nv-up .35s cubic-bezier(.25,.46,.45,.94) forwards}
+.nav-tear-bottom{clip-path:polygon(0% 100%,4% 85%,8% 100%,12% 80%,16% 95%,20% 78%,24% 92%,28% 82%,32% 98%,36% 76%,40% 94%,44% 80%,48% 96%,52% 74%,56% 90%,60% 82%,64% 96%,68% 78%,72% 92%,76% 80%,80% 94%,84% 76%,88% 90%,92% 82%,96% 95%,100% 85%,100% 100%,0% 100%);animation:nv-down .35s cubic-bezier(.25,.46,.45,.94) forwards}
+@keyframes nv-up{from{transform:translateY(0);opacity:0}to{transform:translateY(-3px);opacity:1}}
+@keyframes nv-down{from{transform:translateY(0);opacity:0}to{transform:translateY(3px);opacity:1}}
+.nav-tear-wrap:not(:hover) .nav-tear-top{animation:nv-up-rev .25s ease forwards}
+.nav-tear-wrap:not(:hover) .nav-tear-bottom{animation:nv-down-rev .25s ease forwards}
+@keyframes nv-up-rev{from{transform:translateY(-3px);opacity:1}to{transform:translateY(0);opacity:0}}
+@keyframes nv-down-rev{from{transform:translateY(3px);opacity:1}to{transform:translateY(0);opacity:0}}
+
+/* ===== Hero ===== */
+.hero{flex:0 0 auto;text-align:center;padding:4vh 2rem 2vh;background:transparent}
+.hero-name{font-family:var(--font-heading);font-size:clamp(3rem,8vw,6rem);font-weight:800;letter-spacing:.06em;line-height:1.05;background:linear-gradient(180deg,#d2b5f2 0%,#8738e0 35%,#8939e0 55%,#ae70e8 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero-subtitle{margin-top:.5rem;font-size:clamp(.85rem,1.5vw,1.1rem);color:var(--text-light);font-weight:400;letter-spacing:.08em}
+
+/* ===== 角色区 ===== */
+.character-area{flex:1 1 auto;display:flex;justify-content:center;align-items:center;background:transparent;overflow:visible;position:relative}
+.character-container{position:relative;width:min(700px,75vw);height:min(520px,60vh)}
+.three-canvas{position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;cursor:grab}
+.three-canvas:active{cursor:grabbing}
+
+/* ===== 标签 ===== */
+.character-tags{position:absolute;z-index:5;top:0;left:0;width:100%;height:100%;pointer-events:none}
+.tag{position:absolute;pointer-events:auto;cursor:pointer;transition:filter .3s ease}
+.tag:hover{filter:drop-shadow(0 4px 14px rgba(135,56,224,.14))}
+
+.tag-inner{display:inline-block;font-family:var(--font-tag);font-size:clamp(.56rem,.9vw,.7rem);font-weight:600;letter-spacing:.04em;white-space:nowrap;padding:.4em .85em;border-radius:18px;border:1.5px solid;background:rgba(255,255,255,.78);backdrop-filter:blur(3px);transform:rotate(var(--rot));transition:transform .3s ease}
+.tag:hover .tag-inner{transform:rotate(var(--rot)) scale(1.12)}
+
+/* 颜色 */
+.tags-left .tag:nth-child(1) .tag-inner{color:#8c5be8;border-color:#8c5be8}
+.tags-left .tag:nth-child(2) .tag-inner{color:#652bd1;border-color:#652bd1}
+.tags-left .tag:nth-child(3) .tag-inner{color:#a146b3;border-color:#a146b3}
+.tags-left .tag:nth-child(4) .tag-inner{color:#976aeb;border-color:#976aeb}
+.tags-left .tag:nth-child(5) .tag-inner{color:#eca1ca;border-color:#eca1ca}
+.tags-right .tag:nth-child(1) .tag-inner{color:#834ae8;border-color:#834ae8}
+.tags-right .tag:nth-child(2) .tag-inner{color:#b988c5;border-color:#b988c5}
+.tags-right .tag:nth-child(3) .tag-inner{color:#8c5be8;border-color:#8c5be8}
+.tags-right .tag:nth-child(4) .tag-inner{color:#eca1ca;border-color:#eca1ca}
+.tags-right .tag:nth-child(5) .tag-inner{color:#a079ed;border-color:#a079ed}
+
+/* S 弧线位置 */
+.tags-left .tag:nth-child(1){left:8%;top:12%;--rot:-4deg}
+.tags-left .tag:nth-child(2){left:2%;top:28%;--rot:-1deg}
+.tags-left .tag:nth-child(3){left:5%;top:44%;--rot:-6deg}
+.tags-left .tag:nth-child(4){left:1%;top:60%;--rot:-2deg}
+.tags-left .tag:nth-child(5){left:7%;top:78%;--rot:-5deg}
+.tags-right .tag:nth-child(1){right:8%;top:12%;--rot:4deg}
+.tags-right .tag:nth-child(2){right:2%;top:28%;--rot:1deg}
+.tags-right .tag:nth-child(3){right:5%;top:44%;--rot:6deg}
+.tags-right .tag:nth-child(4){right:1%;top:60%;--rot:2deg}
+.tags-right .tag:nth-child(5){right:7%;top:78%;--rot:5deg}
+
+/* ---- 撕碎 ---- */
+.tag-inner.torn{border-color:transparent!important;background:transparent!important}
+
+/* JS 创建的掉落碎片（position:fixed） */
+.falling-shard {
+  display:inline-block; white-space:nowrap;
+  font-family:var(--font-tag); font-size:clamp(.56rem,.9vw,.7rem);
+  font-weight:600; letter-spacing:.04em;
+  padding:.4em .85em; border-radius:18px;
+  border:1.5px solid;
+  background:#fff;
+  cursor:pointer;
+  filter:drop-shadow(2px 2px 2px rgba(0,0,0,.12));
+  transition: none;
+}
+
+/* ===== 底部 ===== */
+.footer{flex:0 0 auto;background:transparent;text-align:center;padding:2vh 2rem;display:flex;align-items:center;justify-content:center}
+.footer-text{font-family:var(--font-heading);font-size:clamp(.65rem,.9vw,.8rem);font-weight:600;letter-spacing:.14em;color:var(--text-light);text-transform:uppercase}
+
+/* ===== 响应式 ===== */
+@media(max-width:768px){
+  .nav-list{gap:3vw;justify-content:center}
+  .nav-item{font-size:.62rem}
+  .character-container{width:92vw;height:50vh}
+  .tag-inner{font-size:.5rem;padding:.3em .6em}
+  .tags-left .tag:nth-child(1){left:6%;top:14%}
+  .tags-left .tag:nth-child(2){left:2%;top:30%}
+  .tags-left .tag:nth-child(3){left:3%;top:46%}
+  .tags-left .tag:nth-child(4){left:1%;top:62%}
+  .tags-left .tag:nth-child(5){left:5%;top:78%}
+  .tags-right .tag:nth-child(1){right:6%;top:14%}
+  .tags-right .tag:nth-child(2){right:2%;top:30%}
+  .tags-right .tag:nth-child(3){right:3%;top:46%}
+  .tags-right .tag:nth-child(4){right:1%;top:62%}
+  .tags-right .tag:nth-child(5){right:5%;top:78%}
+}
