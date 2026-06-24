@@ -44,12 +44,11 @@
 
 
 // ============================================================
-//  标签「撕碎」— 点击撕裂，自然掉落到 footer
+//  标签「撕碎」— 点击撕裂，碎片消失
 // ============================================================
 
 (function initTagTearEffect() {
   const tags = document.querySelectorAll('.character-tags .tag');
-  const footer = document.querySelector('.footer');
 
   tags.forEach(tag => {
     if (tag.querySelector('.tag-inner')) return;
@@ -63,134 +62,23 @@
 
     let torn = false;
 
-    // 点击触发
     tag.addEventListener('click', (e) => {
       e.stopPropagation();
+
       if (torn) {
-        // 已撕裂，点标签恢复
-        restoreShards();
+        // 恢复
+        inner.classList.remove('torn', 'tearing-out');
+        inner.classList.add('restoring-in');
+        setTimeout(() => inner.classList.remove('restoring-in'), 500);
         torn = false;
       } else {
-        tearTag();
+        // 撕碎消失
+        inner.classList.remove('restoring-in');
+        inner.classList.add('tearing-out');
+        setTimeout(() => inner.classList.add('torn'), 400);
         torn = true;
       }
     });
-
-    function tearTag() {
-      const tagRect = tag.getBoundingClientRect();
-      const footerRect = footer ? footer.getBoundingClientRect() : null;
-      const targetY = footerRect
-        ? footerRect.top + footerRect.height * 0.35
-        : window.innerHeight * 0.88;
-      const fallDist = targetY - (tagRect.top + tagRect.height / 2);
-
-      const style = getComputedStyle(inner);
-      const color = style.color;
-      const borderColor = style.borderColor;
-
-      inner.classList.add('torn');
-
-      // 创建左右碎片（position:fixed 不受 overflow 裁切）
-      const shards = [];
-      ['left','right'].forEach((side, i) => {
-        const shard = document.createElement('div');
-        shard.className = 'falling-shard';
-        shard.textContent = text;
-        shard.style.cssText = `
-          position:fixed; z-index:999;
-          left:${tagRect.left}px; top:${tagRect.top}px;
-          width:${tagRect.width}px; height:${tagRect.height}px;
-          color:${color}; border-color:${borderColor};
-          clip-path:${side === 'left'
-            ? 'polygon(0% 0%,52% 0%,38% 10%,56% 22%,42% 34%,55% 46%,38% 58%,53% 70%,44% 82%,54% 94%,0% 100%)'
-            : 'polygon(100% 0%,52% 0%,68% 16%,48% 28%,62% 40%,49% 52%,64% 64%,46% 76%,58% 88%,50% 96%,100% 100%)'
-          };
-        `;
-        document.body.appendChild(shard);
-        shards.push({
-          el: shard,
-          startX: 0,
-          startY: 0,
-          driftX: (side === 'left' ? -1 : 1) * (10 + Math.random() * 25),
-          driftY: fallDist,
-          rotation: (side === 'left' ? -1 : 1) * (15 + Math.random() * 25),
-          delay: i * 40
-        });
-
-        // 点碎片贴回
-        shard.addEventListener('click', (ev) => {
-          ev.stopPropagation();
-          restoreShards();
-          torn = false;
-        });
-      });
-
-      // 动画
-      const startTime = performance.now();
-      const duration = 700;
-
-      function animate(now) {
-        shards.forEach(s => {
-          const elapsed = now - startTime - s.delay;
-          if (elapsed < 0) return;
-          const t = Math.min(elapsed / (duration - s.delay), 1);
-          // 重力加速：先慢后快
-          const ease = t < 0.2 ? t * t * 10 : 1 - Math.pow(1 - t, 3);
-          s.el.style.transform =
-            `translate(${s.driftX * ease}px, ${s.driftY * ease}px) rotate(${s.rotation * ease}deg)`;
-          s.el.style.opacity = 1 - t * 0.55;
-        });
-
-        if (shards.every(s => (now - startTime - s.delay) / (duration - s.delay) >= 1)) {
-          // 动画结束，碎片留在底部
-          shards.forEach(s => { s.el.style.opacity = '0.45'; });
-          window._activeShards = shards;
-          return;
-        }
-        requestAnimationFrame(animate);
-      }
-
-      requestAnimationFrame(animate);
-      window._activeShards = null;
-    }
-
-    function restoreShards() {
-      const shards = window._activeShards;
-      if (!shards || !shards.length) { inner.classList.remove('torn'); return; }
-
-      inner.classList.remove('torn');
-      const startTime = performance.now();
-      const duration = 400;
-
-      // 记录当前状态
-      const states = shards.map(s => {
-        const m = s.el.style.transform.match(/translate\(([^)]+)\)/);
-        const tx = m ? parseFloat(m[1]) : s.driftX;
-        const ty = m ? m[1].split(',')[1] ? parseFloat(m[1].split(',')[1].trim().replace('px','')) : s.driftY : s.driftY;
-        return { el: s.el, startTx: tx || 0, startTy: ty || 0, startRot: s.rotation };
-      });
-
-      function animate(now) {
-        const elapsed = now - startTime;
-        const t = Math.min(elapsed / duration, 1);
-        const ease = 1 - Math.pow(1 - t, 3);
-
-        states.forEach(st => {
-          st.el.style.transform =
-            `translate(${st.startTx * (1 - ease)}px, ${st.startTy * (1 - ease)}px) rotate(${st.startRot * (1 - ease)}deg)`;
-          st.el.style.opacity = 1 - ease * 0.55;
-        });
-
-        if (t >= 1) {
-          shards.forEach(s => s.el.remove());
-          window._activeShards = null;
-          return;
-        }
-        requestAnimationFrame(animate);
-      }
-
-      requestAnimationFrame(animate);
-    }
   });
 })();
 

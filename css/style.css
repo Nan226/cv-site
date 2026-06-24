@@ -103,19 +103,25 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
 .tags-right .tag:nth-child(5){right:7%;top:78%;--rot:5deg}
 
 /* ---- 撕碎 ---- */
-.tag-inner.torn{border-color:transparent!important;background:transparent!important}
-
-/* JS 创建的掉落碎片（position:fixed） */
-.falling-shard {
-  display:inline-block; white-space:nowrap;
-  font-family:var(--font-tag); font-size:clamp(.56rem,.9vw,.7rem);
-  font-weight:600; letter-spacing:.04em;
-  padding:.4em .85em; border-radius:18px;
-  border:1.5px solid;
-  background:#fff;
-  cursor:pointer;
-  filter:drop-shadow(2px 2px 2px rgba(0,0,0,.12));
-  transition: none;
+.tag-inner.tearing-out {
+  animation: tearOut .4s ease forwards;
+}
+.tag-inner.torn {
+  border-color:transparent!important;
+  background:transparent!important;
+  opacity:0;
+}
+.tag-inner.restoring-in {
+  animation: tearIn .4s ease forwards;
+}
+@keyframes tearOut {
+  0%   { transform:rotate(var(--rot)) scale(1); opacity:1; filter:blur(0); }
+  60%  { transform:rotate(var(--rot)) scale(1.06); opacity:.5; filter:blur(1px); }
+  100% { transform:rotate(var(--rot)) scale(.75); opacity:0; filter:blur(3px); }
+}
+@keyframes tearIn {
+  0%   { transform:rotate(var(--rot)) scale(.75); opacity:0; filter:blur(3px); }
+  100% { transform:rotate(var(--rot)) scale(1); opacity:1; filter:blur(0); }
 }
 
 /* ===== 底部 ===== */
