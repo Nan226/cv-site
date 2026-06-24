@@ -202,7 +202,27 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
    彩蛋系统 — 撕碎所有标签触发
    ======================================== */
 
-/* ---- 右侧提示文字 ---- */
+/* ---- 左侧交互提示 ---- */
+.interact-hint {
+  position: fixed;
+  left: 1.5vw;
+  top: 42%;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-family: var(--font-tag);
+  font-size: .55rem;
+  font-weight: 500;
+  color: var(--text-light);
+  letter-spacing: .06em;
+  opacity: .65;
+  pointer-events: none;
+  transition: opacity .6s ease;
+}
+
+/* ---- 右侧彩蛋提示 ---- */
 .easter-egg-hint {
   position: fixed;
   right: 1.5vw;
