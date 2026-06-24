@@ -75,20 +75,20 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
 .tag{position:absolute;pointer-events:auto;cursor:pointer;transition:filter .3s ease}
 .tag:hover{filter:drop-shadow(0 4px 14px rgba(135,56,224,.14))}
 
-.tag-inner{display:inline-block;font-family:var(--font-tag);font-size:clamp(.56rem,.9vw,.7rem);font-weight:600;letter-spacing:.04em;white-space:nowrap;padding:.4em .85em;border-radius:18px;border:1.5px solid;background:rgba(255,255,255,.78);backdrop-filter:blur(3px);transform:rotate(var(--rot));transition:transform .3s ease}
+.tag-inner{display:inline-block;font-family:var(--font-tag);font-size:clamp(.56rem,.9vw,.7rem);font-weight:600;letter-spacing:.04em;white-space:nowrap;padding:.4em .85em;border-radius:18px;border:1.5px solid;backdrop-filter:blur(3px);transform:rotate(var(--rot));transition:transform .3s ease}
 .tag:hover .tag-inner{transform:rotate(var(--rot)) scale(1.12)}
 
 /* 颜色 */
-.tags-left .tag:nth-child(1) .tag-inner{color:#8c5be8;border-color:#8c5be8}
-.tags-left .tag:nth-child(2) .tag-inner{color:#652bd1;border-color:#652bd1}
-.tags-left .tag:nth-child(3) .tag-inner{color:#a146b3;border-color:#a146b3}
-.tags-left .tag:nth-child(4) .tag-inner{color:#976aeb;border-color:#976aeb}
-.tags-left .tag:nth-child(5) .tag-inner{color:#eca1ca;border-color:#eca1ca}
-.tags-right .tag:nth-child(1) .tag-inner{color:#834ae8;border-color:#834ae8}
-.tags-right .tag:nth-child(2) .tag-inner{color:#b988c5;border-color:#b988c5}
-.tags-right .tag:nth-child(3) .tag-inner{color:#8c5be8;border-color:#8c5be8}
-.tags-right .tag:nth-child(4) .tag-inner{color:#eca1ca;border-color:#eca1ca}
-.tags-right .tag:nth-child(5) .tag-inner{color:#a079ed;border-color:#a079ed}
+.tags-left .tag:nth-child(1) .tag-inner{color:#8c5be8;border-color:#8c5be8;background:#e0d4f8}
+.tags-left .tag:nth-child(2) .tag-inner{color:#652bd1;border-color:#652bd1;background:#d5c8f5}
+.tags-left .tag:nth-child(3) .tag-inner{color:#a146b3;border-color:#a146b3;background:#e8cceb}
+.tags-left .tag:nth-child(4) .tag-inner{color:#976aeb;border-color:#976aeb;background:#e2d7fa}
+.tags-left .tag:nth-child(5) .tag-inner{color:#eca1ca;border-color:#eca1ca;background:#fbe3ed}
+.tags-right .tag:nth-child(1) .tag-inner{color:#834ae8;border-color:#834ae8;background:#ddd0f8}
+.tags-right .tag:nth-child(2) .tag-inner{color:#b988c5;border-color:#b988c5;background:#eedded}
+.tags-right .tag:nth-child(3) .tag-inner{color:#8c5be8;border-color:#8c5be8;background:#e0d4f8}
+.tags-right .tag:nth-child(4) .tag-inner{color:#eca1ca;border-color:#eca1ca;background:#fbe3ed}
+.tags-right .tag:nth-child(5) .tag-inner{color:#a079ed;border-color:#a079ed;background:#e4d9fb}
 
 /* S 弧线位置 */
 .tags-left .tag:nth-child(1){left:8%;top:12%;--rot:-4deg}
