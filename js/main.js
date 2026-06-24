@@ -2,7 +2,8 @@
    CV-Site — 交互脚本
    导航撕碎效果 + Three.js 3D人物
    ======================================== */
-/* global THREE */
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 // ============================================================
 //  导航栏「撕碎」效果
@@ -121,19 +122,22 @@
   renderer.setSize(container.clientWidth, container.clientHeight, false);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 0.86;
 
   // 透视相机：与人眼接近
   const camera = new THREE.PerspectiveCamera(35, container.clientWidth / container.clientHeight, 0.1, 50);
-  camera.position.set(0, 0.3, 6);
-  camera.lookAt(0, 0.1, 0);
+  camera.position.set(0, 0.15, 7.2);
+  camera.lookAt(0, -0.15, 0);
 
   // ---- 光照 ----
   // 环境光
-  const ambient = new THREE.AmbientLight('#f8f4fc', 2.5);
+  const ambient = new THREE.AmbientLight('#f8f4fc', 1.55);
   scene.add(ambient);
 
   // 主方向光（模拟柔光）
-  const keyLight = new THREE.DirectionalLight('#ffffff', 4);
+  const keyLight = new THREE.DirectionalLight('#ffffff', 2.35);
   keyLight.position.set(3, 2, 5);
   keyLight.castShadow = true;
   keyLight.shadow.mapSize.set(512, 512);
@@ -142,12 +146,12 @@
   scene.add(keyLight);
 
   // 补光
-  const fillLight = new THREE.DirectionalLight('#e8ddf5', 2);
+  const fillLight = new THREE.DirectionalLight('#e8ddf5', 1.25);
   fillLight.position.set(-2, 1, 1);
   scene.add(fillLight);
 
   // 底部柔光
-  const rimLight = new THREE.DirectionalLight('#f0d8e0', 1.8);
+  const rimLight = new THREE.DirectionalLight('#f0d8e0', 0.9);
   rimLight.position.set(0, -1, 2);
   scene.add(rimLight);
 
@@ -183,66 +187,266 @@
   });
 
   const clothesMat = new THREE.MeshStandardMaterial({
-    color: '#b8a0e8',
-    roughness: 0.4,
-    metalness: 0.08,
+    color: '#aeb0b8',
+    roughness: 0.72,
+    metalness: 0.02,
   });
 
   const accentMat = new THREE.MeshStandardMaterial({
-    color: '#d4b8f0',
-    roughness: 0.35,
+    color: '#f4f1f5',
+    roughness: 0.65,
     metalness: 0.05,
+  });
+
+  const shirtMat = new THREE.MeshStandardMaterial({
+    color: '#fbfafc',
+    roughness: 0.72,
+  });
+
+  const denimMat = new THREE.MeshStandardMaterial({
+    color: '#8faed2',
+    roughness: 0.74,
+  });
+
+  const shoeMat = new THREE.MeshStandardMaterial({
+    color: '#f7f5f4',
+    roughness: 0.62,
+  });
+
+  const clipMat = new THREE.MeshStandardMaterial({
+    color: '#ff7a22',
+    roughness: 0.38,
   });
 
   // ---- 构建人物 ----
   const character = new THREE.Group();
   const bodyParts = {};   // 记录各部位，用于点击检测
+  const fallbackExpression = {
+    brows: [],
+    mouth: null,
+    cheeks: [],
+  };
+  character.position.y = 0.68;
+  character.scale.setScalar(0.84);
 
   // 颈部
   const neck = new THREE.Mesh(
     new THREE.CylinderGeometry(0.17, 0.2, 0.25, 24),
     skinDarkMat
   );
-  neck.position.y = -0.05;
+  neck.position.y = 0.5;
   neck.castShadow = true;
   character.add(neck);
 
   // 躯干（上半身）
-  const torsoGeo = new THREE.SphereGeometry(0.65, 32, 24, 0, Math.PI * 2, 0, Math.PI * 0.55);
+  const torsoGeo = new THREE.CapsuleGeometry(0.46, 0.58, 10, 24);
   const torso = new THREE.Mesh(torsoGeo, clothesMat);
-  torso.position.y = -0.68;
-  torso.scale.set(0.85, 0.7, 0.55);
+  torso.position.y = -0.02;
+  torso.scale.set(0.92, 1, 0.68);
   torso.castShadow = true;
   torso.name = 'body';
   bodyParts.body = torso;
+  bodyParts.stomach = torso;
   character.add(torso);
+
+  // 白色内搭
+  const shirt = new THREE.Mesh(
+    new THREE.CapsuleGeometry(0.31, 0.42, 8, 20),
+    shirtMat
+  );
+  shirt.position.set(0, -0.04, 0.31);
+  shirt.scale.set(0.72, 0.94, 0.2);
+  character.add(shirt);
+
+  // 外套左右前襟
+  for (const side of [-1, 1]) {
+    const jacketPanel = new THREE.Mesh(
+      new THREE.CapsuleGeometry(0.18, 0.48, 8, 18),
+      clothesMat
+    );
+    jacketPanel.position.set(side * 0.3, -0.03, 0.3);
+    jacketPanel.scale.set(0.82, 1, 0.2);
+    jacketPanel.rotation.z = side * -0.035;
+    jacketPanel.castShadow = true;
+    character.add(jacketPanel);
+  }
+
+  const zipper = new THREE.Mesh(
+    new THREE.BoxGeometry(0.026, 0.75, 0.025),
+    new THREE.MeshStandardMaterial({ color: '#d8d8dd', roughness: 0.42 })
+  );
+  zipper.position.set(0, -0.04, 0.43);
+  character.add(zipper);
+
+  function createStarGeometry(outerRadius = 0.05, innerRadius = 0.022) {
+    const shape = new THREE.Shape();
+    for (let index = 0; index < 10; index++) {
+      const angle = -Math.PI / 2 + index * Math.PI / 5;
+      const radius = index % 2 === 0 ? outerRadius : innerRadius;
+      const x = Math.cos(angle) * radius;
+      const y = Math.sin(angle) * radius;
+      if (index === 0) shape.moveTo(x, y);
+      else shape.lineTo(x, y);
+    }
+    shape.closePath();
+    return new THREE.ShapeGeometry(shape);
+  }
+
+  const starMat = new THREE.MeshBasicMaterial({
+    color: '#5f5b68',
+    transparent: true,
+    opacity: 0.76,
+    side: THREE.DoubleSide,
+  });
+  [
+    [-0.31, 0.18, 0.43, 0.15],
+    [0.29, -0.13, 0.43, -0.1],
+    [-0.27, -0.35, 0.42, 0.18],
+  ].forEach(([x, y, z, rotation]) => {
+    const star = new THREE.Mesh(createStarGeometry(), starMat);
+    star.position.set(x, y, z);
+    star.rotation.z = rotation;
+    character.add(star);
+  });
 
   // 肩膀
   const shoulderGeo = new THREE.SphereGeometry(0.28, 20, 16);
   const leftShoulder = new THREE.Mesh(shoulderGeo, clothesMat);
-  leftShoulder.position.set(-0.52, -0.2, 0);
+  leftShoulder.position.set(-0.53, 0.22, 0);
   leftShoulder.scale.set(0.8, 0.7, 0.6);
   leftShoulder.name = 'left-shoulder';
-  bodyParts['left-shoulder'] = leftShoulder;
   character.add(leftShoulder);
 
   const rightShoulder = new THREE.Mesh(shoulderGeo, clothesMat);
-  rightShoulder.position.set(0.52, -0.2, 0);
+  rightShoulder.position.set(0.53, 0.22, 0);
   rightShoulder.scale.set(0.8, 0.7, 0.6);
   rightShoulder.name = 'right-shoulder';
-  bodyParts['right-shoulder'] = rightShoulder;
   character.add(rightShoulder);
 
-  // 衣领装饰
-  const collarGeo = new THREE.TorusGeometry(0.22, 0.04, 8, 24);
+  // 毛绒衣领
+  const collarGeo = new THREE.TorusGeometry(0.38, 0.105, 10, 30);
   const collar = new THREE.Mesh(collarGeo, accentMat);
-  collar.position.y = 0.0;
+  collar.position.set(0, 0.42, 0.02);
   collar.rotation.x = Math.PI * 0.5;
+  collar.scale.y = 0.72;
   character.add(collar);
+
+  const hoodBack = new THREE.Mesh(
+    new THREE.TorusGeometry(0.43, 0.13, 10, 30, Math.PI * 1.25),
+    accentMat
+  );
+  hoodBack.position.set(0, 0.44, -0.1);
+  hoodBack.rotation.set(Math.PI * 0.5, 0, -Math.PI * 0.12);
+  character.add(hoodBack);
+
+  // 手臂关节
+  function createArm(side) {
+    const sign = side === 'left' ? -1 : 1;
+    const shoulderPivot = new THREE.Group();
+    shoulderPivot.position.set(sign * 0.53, 0.23, 0);
+    shoulderPivot.name = `${side}-shoulder`;
+
+    const upperArm = new THREE.Mesh(
+      new THREE.CapsuleGeometry(0.12, 0.48, 8, 16),
+      clothesMat
+    );
+    upperArm.position.y = -0.35;
+    upperArm.castShadow = true;
+    shoulderPivot.add(upperArm);
+
+    const elbowPivot = new THREE.Group();
+    elbowPivot.position.y = -0.68;
+    shoulderPivot.add(elbowPivot);
+
+    const lowerArm = new THREE.Mesh(
+      new THREE.CapsuleGeometry(0.105, 0.44, 8, 16),
+      clothesMat
+    );
+    lowerArm.position.y = -0.3;
+    lowerArm.castShadow = true;
+    elbowPivot.add(lowerArm);
+
+    const hand = new THREE.Mesh(
+      new THREE.SphereGeometry(0.14, 18, 14),
+      skinMat
+    );
+    hand.position.y = -0.61;
+    hand.scale.set(0.82, 1.08, 0.58);
+    hand.name = `${side}-hand`;
+    hand.castShadow = true;
+    elbowPivot.add(hand);
+
+    character.add(shoulderPivot);
+    bodyParts[`${side}-shoulder`] = shoulderPivot;
+    bodyParts[`${side}-elbow`] = elbowPivot;
+    bodyParts[`${side}-hand`] = hand;
+    return { shoulder: shoulderPivot, elbow: elbowPivot, hand };
+  }
+
+  const leftArm = createArm('left');
+  const rightArm = createArm('right');
+
+  // 腰部和牛仔裤
+  const hips = new THREE.Mesh(
+    new THREE.CapsuleGeometry(0.38, 0.24, 8, 22),
+    denimMat
+  );
+  hips.position.y = -0.78;
+  hips.scale.set(1.05, 0.85, 0.7);
+  hips.name = 'hips';
+  hips.castShadow = true;
+  character.add(hips);
+  bodyParts.hips = hips;
+
+  function createLeg(side) {
+    const sign = side === 'left' ? -1 : 1;
+    const hipPivot = new THREE.Group();
+    hipPivot.position.set(sign * 0.24, -0.88, 0);
+
+    const upperLeg = new THREE.Mesh(
+      new THREE.CapsuleGeometry(0.19, 0.7, 8, 18),
+      denimMat
+    );
+    upperLeg.position.y = -0.48;
+    upperLeg.castShadow = true;
+    hipPivot.add(upperLeg);
+
+    const kneePivot = new THREE.Group();
+    kneePivot.position.y = -0.95;
+    hipPivot.add(kneePivot);
+
+    const lowerLeg = new THREE.Mesh(
+      new THREE.CapsuleGeometry(0.17, 0.66, 8, 18),
+      denimMat
+    );
+    lowerLeg.position.y = -0.45;
+    lowerLeg.castShadow = true;
+    kneePivot.add(lowerLeg);
+
+    const foot = new THREE.Mesh(
+      new THREE.CapsuleGeometry(0.17, 0.28, 8, 18),
+      shoeMat
+    );
+    foot.position.set(0, -0.89, 0.13);
+    foot.rotation.x = Math.PI * 0.5;
+    foot.scale.set(1.05, 1, 0.85);
+    foot.name = `${side}-foot`;
+    foot.castShadow = true;
+    kneePivot.add(foot);
+
+    character.add(hipPivot);
+    bodyParts[`${side}-hip`] = hipPivot;
+    bodyParts[`${side}-knee`] = kneePivot;
+    bodyParts[`${side}-foot`] = foot;
+    return { hip: hipPivot, knee: kneePivot, foot };
+  }
+
+  const leftLeg = createLeg('left');
+  const rightLeg = createLeg('right');
 
   // 头部
   const headGroup = new THREE.Group();
-  headGroup.position.y = 0.28;
+  headGroup.position.y = 1.02;
   headGroup.name = 'head';
   bodyParts.head = headGroup;
 
@@ -258,10 +462,18 @@
     new THREE.SphereGeometry(0.38, 32, 24),
     hairMat
   );
-  hairMain.position.y = 0.06;
+  hairMain.position.y = 0.08;
   hairMain.position.z = -0.06;
   hairMain.scale.set(1.05, 1.1, 1.0);
   headGroup.add(hairMain);
+
+  const hairBack = new THREE.Mesh(
+    new THREE.CapsuleGeometry(0.31, 0.7, 10, 22),
+    hairMat
+  );
+  hairBack.position.set(0, -0.28, -0.14);
+  hairBack.scale.set(1.08, 1, 0.7);
+  headGroup.add(hairBack);
 
   // 刘海
   const bangsGeo = new THREE.SphereGeometry(0.28, 20, 12, 0, Math.PI * 2, 0, Math.PI * 0.45);
@@ -272,15 +484,26 @@
   bangs.scale.set(1.05, 0.85, 0.3);
   headGroup.add(bangs);
 
-  // 侧发
+  // 长侧发
   for (const side of [-1, 1]) {
     const sideHair = new THREE.Mesh(
-      new THREE.SphereGeometry(0.15, 16, 12),
+      new THREE.CapsuleGeometry(0.13, 0.62, 8, 16),
       hairMat
     );
-    sideHair.position.set(side * 0.33, 0.0, 0.05);
-    sideHair.scale.set(0.5, 1.3, 0.35);
+    sideHair.position.set(side * 0.31, -0.27, -0.02);
+    sideHair.rotation.z = side * -0.08;
+    sideHair.scale.set(0.72, 1.05, 0.62);
     headGroup.add(sideHair);
+  }
+
+  // 橙色发夹
+  for (const offset of [0, 0.09]) {
+    const clip = new THREE.Mesh(
+      new THREE.SphereGeometry(0.038, 12, 10),
+      clipMat
+    );
+    clip.position.set(-0.31, 0.23 - offset, 0.18);
+    headGroup.add(clip);
   }
 
   // 眼睛
@@ -322,6 +545,7 @@
     brow.position.set(side * 0.12, 0.17, 0.29);
     brow.rotation.z = side * 0.08;
     headGroup.add(brow);
+    fallbackExpression.brows.push(brow);
   }
 
   // 鼻子
@@ -345,6 +569,22 @@
   mouth.rotation.y = Math.PI;
   mouth.scale.set(1.2, 0.5, 1);
   headGroup.add(mouth);
+  fallbackExpression.mouth = mouth;
+
+  // 腮红
+  for (const side of [-1, 1]) {
+    const cheek = new THREE.Mesh(
+      new THREE.CircleGeometry(0.055, 16),
+      new THREE.MeshBasicMaterial({
+        color: '#f58fa0',
+        transparent: true,
+        opacity: 0.24,
+      })
+    );
+    cheek.position.set(side * 0.22, 0.015, 0.337);
+    headGroup.add(cheek);
+    fallbackExpression.cheeks.push(cheek);
+  }
 
   character.add(headGroup);
   scene.add(character);
@@ -372,6 +612,219 @@
   const particles = new THREE.Points(particlesGeo, particlesMat);
   scene.add(particles);
 
+  // ---- 正式 GLB 模型状态 ----
+  const modelStatus = document.getElementById('modelStatus');
+  let activeCharacter = character;
+  let activeBodyParts = bodyParts;
+  let clickTargets = Object.values(bodyParts);
+  let activeEyePairs = eyePairs;
+  let activeMorphTargets = [];
+  let animationMixer = null;
+  let stopActiveReaction = null;
+  const clock = new THREE.Clock();
+
+  Object.values(activeBodyParts).forEach((part) => {
+    part.userData.followBaseRotation = part.rotation.clone();
+  });
+
+  function updateModelStatus(message, state = '') {
+    if (!modelStatus) return;
+    modelStatus.textContent = message;
+    modelStatus.classList.toggle('is-error', state === 'error');
+    modelStatus.classList.remove('is-hidden');
+  }
+
+  function hideModelStatus(delay = 900) {
+    if (!modelStatus) return;
+    window.setTimeout(() => modelStatus.classList.add('is-hidden'), delay);
+  }
+
+  function findModelNode(root, patterns) {
+    let match = null;
+    root.traverse((node) => {
+      if (match) return;
+      const normalizedName = node.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (patterns.some((pattern) => pattern.test(normalizedName))) {
+        match = node;
+      }
+    });
+    return match;
+  }
+
+  function collectMorphTargets(root) {
+    const targets = [];
+    root.traverse((node) => {
+      if (!node.isMesh || !node.morphTargetDictionary || !node.morphTargetInfluences) return;
+      Object.entries(node.morphTargetDictionary).forEach(([name, index]) => {
+        targets.push({ mesh: node, index, name: name.toLowerCase() });
+      });
+    });
+    return targets;
+  }
+
+  function setMorphInfluence(patterns, value) {
+    activeMorphTargets.forEach((target) => {
+      if (patterns.some((pattern) => pattern.test(target.name))) {
+        target.mesh.morphTargetInfluences[target.index] = value;
+      }
+    });
+  }
+
+  function createHitProxy(group, name, geometry, position) {
+    const proxy = new THREE.Mesh(
+      geometry,
+      new THREE.MeshBasicMaterial({
+        transparent: true,
+        opacity: 0,
+        depthWrite: false,
+      })
+    );
+    proxy.position.copy(position);
+    proxy.name = name;
+    proxy.userData.interactionPart = name;
+    proxy.renderOrder = -1;
+    group.add(proxy);
+    return proxy;
+  }
+
+  function buildInteractionRig(pivot, avatarRoot) {
+    const mappedParts = {
+      head: findModelNode(avatarRoot, [/^head$/, /head/, /neck/]) || avatarRoot,
+      face: findModelNode(avatarRoot, [/face/, /head/]) || avatarRoot,
+      body: findModelNode(avatarRoot, [/upperchest/, /chest/, /spine2/, /spine1/, /spine/, /hips/]) || avatarRoot,
+      stomach: findModelNode(avatarRoot, [/spine1/, /spine/, /abdomen/, /belly/, /hips/]) || avatarRoot,
+      'left-shoulder': findModelNode(avatarRoot, [/leftshoulder/, /shoulderl/, /leftupperarm/, /upperarml/]) || avatarRoot,
+      'right-shoulder': findModelNode(avatarRoot, [/rightshoulder/, /shoulderr/, /rightupperarm/, /upperarmr/]) || avatarRoot,
+      'left-elbow': findModelNode(avatarRoot, [/leftlowerarm/, /lowerarml/, /leftforearm/, /forearml/]) || avatarRoot,
+      'right-elbow': findModelNode(avatarRoot, [/rightlowerarm/, /lowerarmr/, /rightforearm/, /forearmr/]) || avatarRoot,
+      'left-hand': findModelNode(avatarRoot, [/lefthand/, /handl/]) || avatarRoot,
+      'right-hand': findModelNode(avatarRoot, [/righthand/, /handr/]) || avatarRoot,
+      hips: findModelNode(avatarRoot, [/^hips$/, /pelvis/]) || avatarRoot,
+      'left-hip': findModelNode(avatarRoot, [/leftupperleg/, /upperlegl/, /leftthigh/, /thighl/]) || avatarRoot,
+      'right-hip': findModelNode(avatarRoot, [/rightupperleg/, /upperlegr/, /rightthigh/, /thighr/]) || avatarRoot,
+      'left-knee': findModelNode(avatarRoot, [/leftlowerleg/, /lowerlegl/, /leftshin/, /shinl/]) || avatarRoot,
+      'right-knee': findModelNode(avatarRoot, [/rightlowerleg/, /lowerlegr/, /rightshin/, /shinr/]) || avatarRoot,
+      'left-foot': findModelNode(avatarRoot, [/leftfoot/, /footl/, /lefttoe/]) || avatarRoot,
+      'right-foot': findModelNode(avatarRoot, [/rightfoot/, /footr/, /righttoe/]) || avatarRoot,
+    };
+
+    Object.values(mappedParts).forEach((part) => {
+      if (!part.userData.followBaseRotation) {
+        part.userData.followBaseRotation = part.rotation.clone();
+      }
+    });
+
+    const hitAreaGroup = new THREE.Group();
+    hitAreaGroup.name = 'interaction-hit-areas';
+    pivot.add(hitAreaGroup);
+
+    const proxies = [
+      createHitProxy(hitAreaGroup, 'head', new THREE.SphereGeometry(0.3, 16, 12), new THREE.Vector3(0, 1.76, 0.24)),
+      createHitProxy(hitAreaGroup, 'face', new THREE.SphereGeometry(0.23, 16, 12), new THREE.Vector3(0, 1.43, 0.43)),
+      createHitProxy(hitAreaGroup, 'left-shoulder', new THREE.SphereGeometry(0.28, 14, 10), new THREE.Vector3(-0.52, 0.72, 0)),
+      createHitProxy(hitAreaGroup, 'right-shoulder', new THREE.SphereGeometry(0.28, 14, 10), new THREE.Vector3(0.52, 0.72, 0)),
+      createHitProxy(hitAreaGroup, 'left-hand', new THREE.SphereGeometry(0.24, 14, 10), new THREE.Vector3(-0.68, -0.22, 0.08)),
+      createHitProxy(hitAreaGroup, 'right-hand', new THREE.SphereGeometry(0.24, 14, 10), new THREE.Vector3(0.68, -0.22, 0.08)),
+      createHitProxy(hitAreaGroup, 'body', new THREE.BoxGeometry(0.88, 0.62, 0.58), new THREE.Vector3(0, 0.42, 0)),
+      createHitProxy(hitAreaGroup, 'stomach', new THREE.SphereGeometry(0.42, 14, 10), new THREE.Vector3(0, -0.18, 0.08)),
+      createHitProxy(hitAreaGroup, 'left-leg', new THREE.CapsuleGeometry(0.2, 0.78, 6, 12), new THREE.Vector3(-0.22, -1.13, 0.06)),
+      createHitProxy(hitAreaGroup, 'right-leg', new THREE.CapsuleGeometry(0.2, 0.78, 6, 12), new THREE.Vector3(0.22, -1.13, 0.06)),
+      createHitProxy(hitAreaGroup, 'left-foot', new THREE.SphereGeometry(0.34, 14, 10), new THREE.Vector3(-0.22, -2.02, 0.34)),
+      createHitProxy(hitAreaGroup, 'right-foot', new THREE.SphereGeometry(0.34, 14, 10), new THREE.Vector3(0.22, -2.02, 0.34)),
+    ];
+
+    return { mappedParts, proxies };
+  }
+
+  function fitAvatarToFullBody(avatarRoot) {
+    const initialBox = new THREE.Box3().setFromObject(avatarRoot);
+    const initialSize = initialBox.getSize(new THREE.Vector3());
+    const initialCenter = initialBox.getCenter(new THREE.Vector3());
+    const targetFullHeight = 3.75;
+    const scale = targetFullHeight / Math.max(initialSize.y, 0.001);
+
+    avatarRoot.scale.setScalar(scale);
+    avatarRoot.position.x = -initialCenter.x * scale;
+    avatarRoot.position.z = -initialCenter.z * scale;
+    avatarRoot.position.y = -initialCenter.y * scale - 0.12;
+  }
+
+  function loadProductionAvatar() {
+    const loader = new GLTFLoader();
+    updateModelStatus('Loading 3D character...');
+
+    loader.load(
+      'models/yenan-avatar.glb',
+      (gltf) => {
+        const pivot = new THREE.Group();
+        pivot.name = 'yenan-avatar-pivot';
+
+        const avatarRoot = gltf.scene;
+        avatarRoot.name = avatarRoot.name || 'yenan-avatar';
+        fitAvatarToFullBody(avatarRoot);
+        avatarRoot.traverse((node) => {
+          if (!node.isMesh) return;
+          node.castShadow = true;
+          node.receiveShadow = true;
+          const materials = Array.isArray(node.material) ? node.material : [node.material];
+          materials.filter(Boolean).forEach((material) => {
+            material.transparent = false;
+            material.needsUpdate = true;
+          });
+        });
+
+        pivot.add(avatarRoot);
+        scene.add(pivot);
+
+        const rig = buildInteractionRig(pivot, avatarRoot);
+        activeCharacter = pivot;
+        activeBodyParts = rig.mappedParts;
+        clickTargets = rig.proxies;
+        activeEyePairs = [];
+        activeMorphTargets = collectMorphTargets(avatarRoot);
+
+        if (gltf.animations.length > 0) {
+          animationMixer = new THREE.AnimationMixer(avatarRoot);
+          const idleClip = gltf.animations.find((clip) => /idle/i.test(clip.name)) || gltf.animations[0];
+          animationMixer.clipAction(idleClip).play();
+        }
+
+        character.visible = false;
+        updateModelStatus('3D character ready');
+        hideModelStatus();
+      },
+      undefined,
+      () => {
+        updateModelStatus('Preview character ready');
+        hideModelStatus(1200);
+      }
+    );
+  }
+
+  function buildFallbackHitRig() {
+    const hitAreaGroup = new THREE.Group();
+    hitAreaGroup.name = 'fallback-interaction-hit-areas';
+    character.add(hitAreaGroup);
+
+    return [
+      createHitProxy(hitAreaGroup, 'head', new THREE.SphereGeometry(0.28, 16, 12), new THREE.Vector3(0, 1.34, 0.24)),
+      createHitProxy(hitAreaGroup, 'face', new THREE.SphereGeometry(0.22, 16, 12), new THREE.Vector3(0, 1.0, 0.4)),
+      createHitProxy(hitAreaGroup, 'left-shoulder', new THREE.SphereGeometry(0.28, 14, 10), new THREE.Vector3(-0.54, 0.22, 0)),
+      createHitProxy(hitAreaGroup, 'right-shoulder', new THREE.SphereGeometry(0.28, 14, 10), new THREE.Vector3(0.54, 0.22, 0)),
+      createHitProxy(hitAreaGroup, 'left-hand', new THREE.SphereGeometry(0.22, 14, 10), new THREE.Vector3(-0.54, -0.96, 0.02)),
+      createHitProxy(hitAreaGroup, 'right-hand', new THREE.SphereGeometry(0.22, 14, 10), new THREE.Vector3(0.54, -0.96, 0.02)),
+      createHitProxy(hitAreaGroup, 'body', new THREE.BoxGeometry(0.9, 0.56, 0.62), new THREE.Vector3(0, 0.18, 0)),
+      createHitProxy(hitAreaGroup, 'stomach', new THREE.SphereGeometry(0.4, 14, 10), new THREE.Vector3(0, -0.36, 0.06)),
+      createHitProxy(hitAreaGroup, 'left-leg', new THREE.CapsuleGeometry(0.19, 0.75, 6, 12), new THREE.Vector3(-0.24, -1.38, 0.06)),
+      createHitProxy(hitAreaGroup, 'right-leg', new THREE.CapsuleGeometry(0.19, 0.75, 6, 12), new THREE.Vector3(0.24, -1.38, 0.06)),
+      createHitProxy(hitAreaGroup, 'left-foot', new THREE.SphereGeometry(0.34, 14, 10), new THREE.Vector3(-0.24, -2.12, 0.34)),
+      createHitProxy(hitAreaGroup, 'right-foot', new THREE.SphereGeometry(0.34, 14, 10), new THREE.Vector3(0.24, -2.12, 0.34)),
+    ];
+  }
+
+  clickTargets = buildFallbackHitRig();
+  loadProductionAvatar();
+
   // ---- 鼠标交互 ----
   const mouse = new THREE.Vector2();
   const mouseTarget = new THREE.Vector2();  // 平滑跟随
@@ -386,11 +839,16 @@
     mouseTarget.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
     mouseTarget.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
     mouseOnCharacter = true;
+
+    raycaster.setFromCamera(mouseTarget, camera);
+    const hoveredPart = raycaster.intersectObjects(clickTargets, true)[0];
+    canvas.style.cursor = hoveredPart ? 'pointer' : 'grab';
   });
 
   container.addEventListener('mouseleave', () => {
     mouseTarget.set(0, 0);
     mouseOnCharacter = false;
+    canvas.style.cursor = 'grab';
   });
 
   // 点击检测
@@ -402,16 +860,14 @@
     raycaster.setFromCamera(new THREE.Vector2(mx, my), camera);
 
     // 检测身体部位
-    const parts = Object.values(bodyParts);
-    const intersects = raycaster.intersectObjects(parts, true);
+    const intersects = raycaster.intersectObjects(clickTargets, true);
 
     if (intersects.length > 0) {
       let obj = intersects[0].object;
-      // 向上查找命名的 body part
-      while (obj && !obj.name) {
+      while (obj && !obj.userData.interactionPart && !obj.name) {
         obj = obj.parent;
       }
-      const partName = obj ? obj.name : null;
+      const partName = obj ? (obj.userData.interactionPart || obj.name) : null;
       if (partName) {
         triggerReaction(partName);
       }
@@ -419,54 +875,342 @@
   });
 
   // 反应动画
+  function aimFallbackArm(side, elbowTarget, handTarget, amount) {
+    if (activeCharacter !== character) return false;
+
+    const shoulder = bodyParts[`${side}-shoulder`];
+    const elbow = bodyParts[`${side}-elbow`];
+    if (!shoulder || !elbow) return false;
+
+    character.updateMatrixWorld(true);
+
+    const elbowTargetWorld = character.localToWorld(elbowTarget.clone());
+    const elbowTargetLocal = shoulder.parent.worldToLocal(elbowTargetWorld.clone());
+    const upperDirection = elbowTargetLocal.sub(shoulder.position).normalize();
+    const shoulderTarget = new THREE.Quaternion().setFromUnitVectors(
+      new THREE.Vector3(0, -1, 0),
+      upperDirection
+    );
+    shoulder.quaternion.slerp(shoulderTarget, amount);
+    shoulder.updateMatrixWorld(true);
+
+    const handTargetWorld = character.localToWorld(handTarget.clone());
+    const handTargetLocal = elbow.parent.worldToLocal(handTargetWorld.clone());
+    const lowerDirection = handTargetLocal.sub(elbow.position).normalize();
+    const elbowTargetRotation = new THREE.Quaternion().setFromUnitVectors(
+      new THREE.Vector3(0, -1, 0),
+      lowerDirection
+    );
+    elbow.quaternion.slerp(elbowTargetRotation, amount);
+    return true;
+  }
+
   function triggerReaction(partName) {
-    const head = bodyParts.head;
-    const body = bodyParts.body;
+    if (stopActiveReaction) stopActiveReaction();
 
-    // 清除之前的动画
-    if (head._animTimer) clearTimeout(head._animTimer);
-
+    const head = activeBodyParts.head;
+    const body = activeBodyParts.body;
+    const stomach = activeBodyParts.stomach || body;
+    const leftShoulder = activeBodyParts['left-shoulder'];
+    const rightShoulder = activeBodyParts['right-shoulder'];
+    const leftElbow = activeBodyParts['left-elbow'];
+    const rightElbow = activeBodyParts['right-elbow'];
+    const leftHand = activeBodyParts['left-hand'];
+    const rightHand = activeBodyParts['right-hand'];
+    const hips = activeBodyParts.hips;
+    const leftHip = activeBodyParts['left-hip'];
+    const rightHip = activeBodyParts['right-hip'];
+    const leftKnee = activeBodyParts['left-knee'];
+    const rightKnee = activeBodyParts['right-knee'];
+    const leftFoot = activeBodyParts['left-foot'];
+    const rightFoot = activeBodyParts['right-foot'];
+    const affectedNodes = [...new Set([
+      activeCharacter,
+      head,
+      body,
+      stomach,
+      leftShoulder,
+      rightShoulder,
+      leftElbow,
+      rightElbow,
+      leftHand,
+      rightHand,
+      hips,
+      leftHip,
+      rightHip,
+      leftKnee,
+      rightKnee,
+      leftFoot,
+      rightFoot,
+      ...fallbackExpression.brows,
+      fallbackExpression.mouth,
+    ].filter(Boolean))];
+    const snapshots = affectedNodes.map((node) => ({
+      node,
+      position: node.position.clone(),
+      rotation: node.rotation.clone(),
+      scale: node.scale.clone(),
+    }));
     const startTime = performance.now();
-    const duration = 600;
-    const origRotX = head.rotation.x;
-    const origRotY = head.rotation.y;
-    const origRotZ = head.rotation.z;
+    const durationByPart = {
+      head: 1750,
+      face: 1100,
+      stomach: 1900,
+      'left-foot': 1850,
+      'right-foot': 1850,
+      'left-hand': 1550,
+      'right-hand': 1550,
+      'left-leg': 1250,
+      'right-leg': 1250,
+      body: 1200,
+    };
+    const duration = durationByPart[partName] || 1050;
+    let frameId = 0;
+
+    function setFallbackExpression(type, amount) {
+      if (activeCharacter !== character) return;
+
+      fallbackExpression.cheeks.forEach((cheek) => {
+        cheek.material.opacity = 0.24;
+      });
+
+      if (type === 'angry') {
+        if (fallbackExpression.brows[0]) fallbackExpression.brows[0].rotation.z += 0.44 * amount;
+        if (fallbackExpression.brows[1]) fallbackExpression.brows[1].rotation.z -= 0.44 * amount;
+        if (fallbackExpression.mouth) {
+          fallbackExpression.mouth.rotation.z += Math.PI * amount;
+          fallbackExpression.mouth.scale.x *= 0.72;
+          fallbackExpression.mouth.scale.y *= 0.82;
+        }
+        fallbackExpression.cheeks.forEach((cheek) => {
+          cheek.material.opacity = 0.24 + amount * 0.52;
+        });
+      } else if (type === 'happy') {
+        if (fallbackExpression.mouth) fallbackExpression.mouth.scale.x *= 1 + amount * 0.35;
+        fallbackExpression.cheeks.forEach((cheek) => {
+          cheek.material.opacity = 0.24 + amount * 0.24;
+        });
+      } else if (type === 'surprised') {
+        if (fallbackExpression.brows[0]) fallbackExpression.brows[0].position.y += amount * 0.05;
+        if (fallbackExpression.brows[1]) fallbackExpression.brows[1].position.y += amount * 0.05;
+        if (fallbackExpression.mouth) {
+          fallbackExpression.mouth.scale.x *= 0.55;
+          fallbackExpression.mouth.scale.y *= 1 + amount * 0.85;
+        }
+      }
+    }
+
+    function restoreReaction() {
+      cancelAnimationFrame(frameId);
+      snapshots.forEach(({ node, position, rotation, scale }) => {
+        node.position.copy(position);
+        node.rotation.copy(rotation);
+        node.scale.copy(scale);
+      });
+      fallbackExpression.cheeks.forEach((cheek) => {
+        cheek.material.opacity = 0.24;
+      });
+      setMorphInfluence([/blink/, /smile/, /happy/, /joy/, /angry/, /puff/, /frown/], 0);
+      stopActiveReaction = null;
+    }
+
+    stopActiveReaction = restoreReaction;
 
     function animateReaction(now) {
       const elapsed = now - startTime;
       const t = Math.min(elapsed / duration, 1);
-      // easeOutElastic-ish
-      const p = 1 - Math.pow(1 - t, 3);
-      const bounce = Math.sin(t * Math.PI * 3) * (1 - t) * 0.3;
+      const wave = Math.sin(t * Math.PI);
+      const bounce = Math.sin(t * Math.PI * 3) * (1 - t);
 
-      head.rotation.x = origRotX;
-      head.rotation.y = origRotY;
-      head.rotation.z = origRotZ;
+      snapshots.forEach(({ node, position, rotation, scale }) => {
+        node.position.copy(position);
+        node.rotation.copy(rotation);
+        node.scale.copy(scale);
+      });
+      setMorphInfluence([/blink/, /smile/, /happy/, /joy/, /angry/, /puff/, /frown/], 0);
 
       switch (partName) {
         case 'head':
-          head.rotation.x = origRotX + bounce * 0.5;
+          if (!aimFallbackArm(
+            'right',
+            new THREE.Vector3(0.72, 0.82, 0.36),
+            new THREE.Vector3(0.02, 1.38, 0.44),
+            wave
+          )) {
+            if (rightShoulder) {
+              rightShoulder.rotation.z -= wave * 2.18;
+              rightShoulder.rotation.x -= wave * 0.36;
+              rightShoulder.position.z += wave * 0.48;
+            }
+            if (rightElbow) {
+              rightElbow.rotation.z -= wave * 0.96;
+              rightElbow.rotation.x -= wave * 0.18;
+            }
+            if (rightHand) {
+              rightHand.rotation.z += wave * 0.22;
+              rightHand.position.z += wave * 0.16;
+            }
+          }
+          if (head) {
+            head.rotation.z -= wave * 0.11;
+            head.rotation.x += Math.sin(t * Math.PI * 2) * (1 - t) * 0.08;
+          }
+          setMorphInfluence([/smile/, /happy/, /joy/], wave * 0.45);
+          setFallbackExpression('happy', wave * 0.7);
+          break;
+        case 'face':
+          if (head) head.rotation.z += Math.sin(t * Math.PI * 2) * (1 - t) * 0.12;
+          setMorphInfluence([/blink/], Math.min(1, wave * 1.8));
+          setMorphInfluence([/smile/, /happy/, /joy/], wave * 0.85);
+          setFallbackExpression('happy', wave);
+          break;
+        case 'stomach':
+          if (activeCharacter === character) {
+            aimFallbackArm(
+              'left',
+              new THREE.Vector3(-0.64, -0.02, 0.34),
+              new THREE.Vector3(-0.17, -0.32, 0.5),
+              wave
+            );
+            aimFallbackArm(
+              'right',
+              new THREE.Vector3(0.64, -0.02, 0.34),
+              new THREE.Vector3(0.17, -0.32, 0.5),
+              wave
+            );
+          } else {
+            if (leftShoulder) {
+              leftShoulder.rotation.z += wave * 1.52;
+              leftShoulder.rotation.x -= wave * 0.72;
+              leftShoulder.position.z += wave * 0.18;
+            }
+            if (rightShoulder) {
+              rightShoulder.rotation.z -= wave * 1.52;
+              rightShoulder.rotation.x -= wave * 0.72;
+              rightShoulder.position.z += wave * 0.18;
+            }
+            if (leftElbow) {
+              leftElbow.rotation.z -= wave * 2.08;
+              leftElbow.rotation.x -= wave * 0.38;
+            }
+            if (rightElbow) {
+              rightElbow.rotation.z += wave * 2.08;
+              rightElbow.rotation.x -= wave * 0.38;
+            }
+            if (leftHand) leftHand.position.z += wave * 0.42;
+            if (rightHand) rightHand.position.z += wave * 0.42;
+          }
+          if (body) body.rotation.x += wave * 0.16;
+          if (head) {
+            head.rotation.x -= wave * 0.1;
+            head.rotation.z += Math.sin(t * Math.PI * 2) * (1 - t) * 0.06;
+          }
+          activeCharacter.position.y -= wave * 0.07;
+          setMorphInfluence([/angry/, /puff/, /frown/], wave);
+          setFallbackExpression('angry', wave);
           break;
         case 'left-shoulder':
-          head.rotation.z = origRotZ + Math.sin(t * Math.PI * 2) * (1 - t) * 0.25;
+          if (leftShoulder) leftShoulder.rotation.z -= wave * 0.24;
+          if (head) head.rotation.z += wave * 0.12;
+          setFallbackExpression('surprised', wave * 0.5);
           break;
         case 'right-shoulder':
-          head.rotation.z = origRotZ - Math.sin(t * Math.PI * 2) * (1 - t) * 0.25;
+          if (rightShoulder) rightShoulder.rotation.z += wave * 0.24;
+          if (head) head.rotation.z -= wave * 0.12;
+          setFallbackExpression('surprised', wave * 0.5);
+          break;
+        case 'left-hand':
+        case 'right-hand':
+          {
+            const isLeft = partName === 'left-hand';
+            const shoulder = isLeft ? leftShoulder : rightShoulder;
+            const elbow = isLeft ? leftElbow : rightElbow;
+            if (shoulder) {
+              shoulder.rotation.x -= wave * 1.35;
+              shoulder.rotation.z += (isLeft ? 1 : -1) * wave * 0.22;
+            }
+            if (elbow) elbow.rotation.x += wave * 0.22;
+            activeCharacter.position.z += wave * 0.34;
+            activeCharacter.rotation.x += wave * 0.09;
+            if (head) head.rotation.x -= wave * 0.08;
+            setMorphInfluence([/smile/, /happy/, /joy/], wave * 0.7);
+            setFallbackExpression('happy', wave);
+          }
+          break;
+        case 'left-foot':
+        case 'right-foot':
+          {
+            const isLeft = partName === 'left-foot';
+            const hip = isLeft ? leftHip : rightHip;
+            const knee = isLeft ? leftKnee : rightKnee;
+            const foot = isLeft ? leftFoot : rightFoot;
+            if (hip) hip.rotation.x -= wave * 0.9;
+            if (knee) knee.rotation.x += wave * 1.2;
+            if (foot) foot.rotation.x -= wave * 0.45;
+            if (activeCharacter === character) {
+              aimFallbackArm(
+                'left',
+                new THREE.Vector3(-0.78, -0.2, 0.2),
+                new THREE.Vector3(-0.42, -0.6, 0.3),
+                wave
+              );
+              aimFallbackArm(
+                'right',
+                new THREE.Vector3(0.78, -0.2, 0.2),
+                new THREE.Vector3(0.42, -0.6, 0.3),
+                wave
+              );
+            } else {
+              if (leftShoulder) leftShoulder.rotation.z -= wave * 0.82;
+              if (rightShoulder) rightShoulder.rotation.z += wave * 0.82;
+              if (leftElbow) leftElbow.rotation.z += wave * 1.46;
+              if (rightElbow) rightElbow.rotation.z -= wave * 1.46;
+            }
+            if (hips) hips.rotation.z += (isLeft ? -1 : 1) * wave * 0.06;
+            if (head) {
+              head.rotation.x -= wave * 0.08;
+              head.rotation.y += (isLeft ? -1 : 1) * wave * 0.05;
+            }
+            activeCharacter.position.y += wave * 0.06;
+            setMorphInfluence([/angry/, /puff/, /frown/], wave);
+            setFallbackExpression('angry', wave);
+          }
+          break;
+        case 'left-leg':
+        case 'right-leg':
+          {
+            const isLeft = partName === 'left-leg';
+            const hip = isLeft ? leftHip : rightHip;
+            const knee = isLeft ? leftKnee : rightKnee;
+            if (hip) hip.rotation.z += (isLeft ? 1 : -1) * wave * 0.2;
+            if (knee) knee.rotation.x += wave * 0.22;
+            activeCharacter.position.x += (isLeft ? 1 : -1) * wave * 0.06;
+            setFallbackExpression('surprised', wave * 0.65);
+          }
           break;
         case 'body':
-          body.position.y = -0.68 + bounce * 0.12;
+          activeCharacter.position.y += bounce * 0.12;
+          if (body) body.rotation.y += Math.sin(t * Math.PI * 2) * (1 - t) * 0.1;
+          if (leftShoulder) leftShoulder.rotation.z -= wave * 0.32;
+          if (rightShoulder) rightShoulder.rotation.z += wave * 0.32;
+          setMorphInfluence([/blink/], Math.min(1, wave * 1.4));
+          setFallbackExpression('surprised', wave);
+          break;
+        default:
+          activeCharacter.rotation.z += Math.sin(t * Math.PI * 2) * (1 - t) * 0.08;
+          if (head) head.rotation.z -= Math.sin(t * Math.PI * 2) * (1 - t) * 0.12;
+          setFallbackExpression('surprised', wave * 0.6);
           break;
       }
 
       if (t < 1) {
-        head._animTimer = requestAnimationFrame(animateReaction);
+        frameId = requestAnimationFrame(animateReaction);
       } else {
-        head.rotation.set(origRotX, origRotY, origRotZ);
-        body.position.y = -0.68;
+        restoreReaction();
       }
     }
 
-    head._animTimer = requestAnimationFrame(animateReaction);
+    frameId = requestAnimationFrame(animateReaction);
   }
 
   // ---- 渲染循环 ----
@@ -476,17 +1220,31 @@
     // 平滑鼠标
     mouse.lerp(mouseTarget, 0.08);
 
-    // 角色旋转跟随鼠标
-    const targetRotY = mouseOnCharacter ? mouse.x * 0.5 : 0;
-    const targetRotX = mouseOnCharacter ? -mouse.y * 0.25 : 0;
+    if (animationMixer) animationMixer.update(clock.getDelta());
 
-    character.rotation.y += (targetRotY - character.rotation.y) * 0.06;
-    character.rotation.x += (targetRotX - character.rotation.x) * 0.06;
+    // 角色上半身随鼠标轻微转向
+    const targetRotY = mouseOnCharacter ? mouse.x * 0.32 : 0;
+    const targetRotX = mouseOnCharacter ? -mouse.y * 0.12 : 0;
+
+    if (!stopActiveReaction) {
+      activeCharacter.rotation.y += (targetRotY - activeCharacter.rotation.y) * 0.06;
+      activeCharacter.rotation.x += (targetRotX - activeCharacter.rotation.x) * 0.06;
+    }
+
+    // 头部额外跟随，正式骨骼与简模共用
+    const activeHead = activeBodyParts.head;
+    if (activeHead && !stopActiveReaction) {
+      const baseRotation = activeHead.userData.followBaseRotation || new THREE.Euler();
+      const headTargetY = baseRotation.y + (mouseOnCharacter ? mouse.x * 0.16 : 0);
+      const headTargetX = baseRotation.x + (mouseOnCharacter ? -mouse.y * 0.08 : 0);
+      activeHead.rotation.y += (headTargetY - activeHead.rotation.y) * 0.08;
+      activeHead.rotation.x += (headTargetX - activeHead.rotation.x) * 0.08;
+    }
 
     // 眼睛瞳孔跟随鼠标
     const lookX = mouseOnCharacter ? mouse.x * 0.04 : 0;
     const lookY = mouseOnCharacter ? mouse.y * 0.03 : 0;
-    eyePairs.forEach(({ group }) => {
+    activeEyePairs.forEach(({ group }) => {
       // 瞳孔偏移（限制范围）
       group.children.forEach(child => {
         if (child.name && child.name.startsWith('pupil')) {
@@ -515,7 +1273,13 @@
   });
 
   // 暴露引用
-  window.__threeCharacter = { character, bodyParts, scene, camera };
+  window.__threeCharacter = {
+    get character() { return activeCharacter; },
+    get bodyParts() { return activeBodyParts; },
+    scene,
+    camera,
+    triggerReaction,
+  };
 })();
 
 
