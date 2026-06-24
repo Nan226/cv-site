@@ -147,6 +147,186 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
 .footer{flex:0 0 auto;background:transparent;text-align:center;padding:2vh 2rem;display:flex;align-items:center;justify-content:center}
 .footer-text{font-family:var(--font-heading);font-size:clamp(.65rem,.9vw,.8rem);font-weight:600;letter-spacing:.14em;color:var(--text-light);text-transform:uppercase}
 
+/* ========================================
+   彩蛋系统 — 撕碎所有标签触发
+   ======================================== */
+
+/* ---- 右侧提示文字 ---- */
+.easter-egg-hint {
+  position: fixed;
+  right: 1.5vw;
+  top: 42%;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-family: var(--font-tag);
+  font-size: .55rem;
+  font-weight: 500;
+  color: var(--text-light);
+  letter-spacing: .06em;
+  writing-mode: horizontal-tb;
+  opacity: .65;
+  pointer-events: none;
+  transition: opacity .6s ease;
+}
+/* 所有标签撕完后提示消失 */
+.easter-egg-hint.all-torn {
+  opacity: 0;
+  transition: opacity .3s ease;
+}
+
+/* ---- 全屏遮罩层 ---- */
+.easter-egg-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.easter-egg-overlay.active {
+  pointer-events: auto;
+}
+
+/* ---- Blink 眼睑 ---- */
+.blink-lid {
+  position: fixed;
+  left: 0;
+  width: 100%;
+  height: 52vh;
+  z-index: 10001;
+  pointer-events: none;
+  transition: transform .35s cubic-bezier(.4,0,.2,1);
+}
+.blink-lid-top {
+  top: 0;
+  transform: translateY(-105%);
+}
+.blink-lid-bottom {
+  bottom: 0;
+  transform: translateY(105%);
+}
+.blink-lid.closed .blink-lid-top,
+.blink-lid-top.closing {
+  transform: translateY(0);
+}
+.blink-lid.closed .blink-lid-bottom,
+.blink-lid-bottom.closing {
+  transform: translateY(0);
+}
+.blink-lid-top::after,
+.blink-lid-bottom::after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #07050f;
+}
+
+/* ---- 倒计时 ---- */
+.countdown-display {
+  position: fixed;
+  z-index: 10002;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  font-family: var(--font-heading);
+  font-size: 8rem;
+  font-weight: 900;
+  color: #c8b0f0;
+  text-shadow: 0 0 60px rgba(160,120,220,.5);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .2s ease;
+}
+.countdown-display.show {
+  opacity: 1;
+}
+
+/* ---- Slogan ---- */
+.easter-egg-slogan {
+  position: fixed;
+  z-index: 10002;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  font-family: var(--font-heading);
+  font-size: clamp(1.4rem,2.5vw,2.2rem);
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.5;
+  letter-spacing: .08em;
+  color: #d4c0f8;
+  text-shadow: 0 0 40px rgba(180,140,240,.4), 0 0 80px rgba(160,120,220,.15);
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%,-50%) translateY(20px);
+  transition: opacity 1s ease .6s, transform 1s ease .6s;
+}
+.easter-egg-overlay.dark .easter-egg-slogan {
+  opacity: 1;
+  transform: translate(-50%,-50%) translateY(0);
+}
+
+/* ---- 拉绳开关 ---- */
+.pull-chain {
+  position: fixed;
+  z-index: 10003;
+  top: 18px;
+  right: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(-28px);
+  transition: opacity .5s ease .8s, transform .5s ease .8s;
+  animation: none;
+}
+.easter-egg-overlay.dark .pull-chain {
+  opacity: 1;
+  transform: translateY(0);
+  animation: chainSwing 4s ease-in-out infinite;
+  animation-delay: 1.5s;
+}
+/* 拉绳线 */
+.chain-line {
+  width: 2px;
+  height: 52px;
+  background: linear-gradient(to bottom, #c8b0f0, #a080d0 40%, #c8b0f0 70%, #a080d0);
+  border-radius: 1px;
+}
+/* 拉绳手柄 */
+.chain-handle {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #c8b0f0;
+  background: transparent;
+  margin-top: 4px;
+  box-shadow: 0 0 12px rgba(180,140,240,.3);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.pull-chain:hover .chain-handle {
+  transform: scale(1.25);
+  box-shadow: 0 0 22px rgba(200,170,250,.55);
+}
+.pull-chain:active .chain-handle {
+  transform: scale(.9) translateY(6px);
+}
+/* 拉绳微摆 */
+@keyframes chainSwing {
+  0%,100% { transform: translateY(0) rotate(0deg); }
+  15%     { transform: translateY(0) rotate(2.5deg); }
+  30%     { transform: translateY(0) rotate(-2deg); }
+  45%     { transform: translateY(0) rotate(1.5deg); }
+  60%     { transform: translateY(0) rotate(-.8deg); }
+  75%     { transform: translateY(0) rotate(0deg); }
+}
+
 /* ===== 响应式 ===== */
 @media(max-width:768px){
   .nav-list{gap:3vw;justify-content:center}

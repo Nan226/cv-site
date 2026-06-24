@@ -36,6 +36,12 @@
       <!-- Three.js 3D 画布 -->
       <canvas id="threeCanvas" class="three-canvas"></canvas>
 
+      <!-- 右侧彩蛋提示 -->
+      <div class="easter-egg-hint" id="easterEggHint">
+        <span>撕碎所有标签</span>
+        <span>有彩蛋 ✨</span>
+      </div>
+
       <!-- 角色左右标签 -->
       <div class="character-tags tags-left">
         <span class="tag">PMO</span>
@@ -54,6 +60,24 @@
 
     </div>
   </section>
+
+  <!-- ========== 彩蛋暗黑遮罩层 ========== -->
+  <div class="easter-egg-overlay" id="easterEggOverlay">
+    <!-- 上下 blink 眼睑 -->
+    <div class="blink-lid blink-lid-top" id="blinkLidTop"></div>
+    <div class="blink-lid blink-lid-bottom" id="blinkLidBottom"></div>
+    <!-- 倒计时 -->
+    <div class="countdown-display" id="countdownDisplay"></div>
+    <!-- 中央 Slogan -->
+    <div class="easter-egg-slogan" id="easterEggSlogan">
+      SHATTER THE LABELS.<br>BEYOND DEFINITION.
+    </div>
+    <!-- 右上角拉绳开关 -->
+    <div class="pull-chain" id="pullChain">
+      <div class="chain-line"></div>
+      <div class="chain-handle"></div>
+    </div>
+  </div>
 
   <!-- ========== 底部 ========== -->
   <footer class="footer">

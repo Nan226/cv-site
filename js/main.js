@@ -49,6 +49,8 @@
 
 (function initTagTearEffect() {
   const tags = document.querySelectorAll('.character-tags .tag');
+  let tornCount = 0;
+  const totalTags = tags.length;
 
   tags.forEach(tag => {
     if (tag.querySelector('.tag-inner')) return;
@@ -82,8 +84,23 @@
       e.stopPropagation();
       if (inner.classList.contains('torn')) return;
       inner.classList.add('tearing', 'torn');
+      // 动画播完后从布局中移除，防止暗黑模式切换后重现
+      setTimeout(function () { tag.style.display = 'none'; }, 650);
+
+      // 彩蛋计数器
+      tornCount++;
+      if (tornCount === totalTags) {
+        // 隐藏提示文字
+        const hint = document.getElementById('easterEggHint');
+        if (hint) hint.classList.add('all-torn');
+        // 触发彩蛋倒计时
+        setTimeout(() => triggerEasterEgg(), 500);
+      }
     });
   });
+
+  // 暴露计数（供调试）
+  window.__tornCount = () => tornCount;
 })();
 
 
@@ -560,3 +577,116 @@
     });
   }
 })();
+
+
+// ============================================================
+//  彩蛋系统 — 撕碎所有标签触发
+// ============================================================
+
+function triggerEasterEgg() {
+  var overlay = document.getElementById('easterEggOverlay');
+  var lidTop = document.getElementById('blinkLidTop');
+  var lidBottom = document.getElementById('blinkLidBottom');
+  var countdownDisplay = document.getElementById('countdownDisplay');
+  var pullChain = document.getElementById('pullChain');
+  var canvas = document.getElementById('threeCanvas');
+  var ribbons = document.getElementById('ribbonsContainer');
+
+  if (!overlay || overlay.classList.contains('active')) return;
+  overlay.classList.add('active');
+
+  // ---- 5秒倒计时 ----
+  var count = 5;
+  countdownDisplay.textContent = count;
+  countdownDisplay.classList.add('show');
+
+  var countdownInterval = setInterval(function () {
+    count--;
+    if (count <= 0) {
+      clearInterval(countdownInterval);
+      countdownDisplay.textContent = '';
+      countdownDisplay.classList.remove('show');
+      startBlinkAndDarkMode();
+    } else {
+      countdownDisplay.textContent = count;
+    }
+  }, 1000);
+
+  function startBlinkAndDarkMode() {
+    // 眨眼：上下眼睑闭合
+    lidTop.classList.add('closing');
+    lidBottom.classList.add('closing');
+
+    // 闭合后保持 .38s，进入暗黑模式
+    setTimeout(function () {
+      overlay.classList.add('dark');
+      overlay.style.setProperty('background',
+        'radial-gradient(circle 130px at 50% 50%, transparent 0%, rgba(2,2,8,.94) 100%)');
+      // 提升 canvas 到遮罩之上：改为 fixed 定位
+      if (canvas) {
+        var rect = canvas.getBoundingClientRect();
+        canvas._origPosition = canvas.style.position;
+        canvas._origZIndex = canvas.style.zIndex;
+        canvas._origTop = canvas.style.top;
+        canvas._origLeft = canvas.style.left;
+        canvas._origWidth = canvas.style.width;
+        canvas._origHeight = canvas.style.height;
+        canvas.style.position = 'fixed';
+        canvas.style.top = rect.top + 'px';
+        canvas.style.left = rect.left + 'px';
+        canvas.style.width = rect.width + 'px';
+        canvas.style.height = rect.height + 'px';
+        canvas.style.zIndex = '10000';
+      }
+      if (ribbons) ribbons.style.display = 'none';
+
+      // 眼睑重新拉开（移除 class，CSS transition 自动恢复）
+      lidTop.classList.remove('closing');
+      lidBottom.classList.remove('closing');
+    }, 380);
+  }
+
+  // ---- 鼠标聚光灯 ----
+  function updateSpotlight(e) {
+    if (!overlay.classList.contains('dark')) return;
+    var x = (e.clientX / window.innerWidth) * 100;
+    var y = (e.clientY / window.innerHeight) * 100;
+    overlay.style.setProperty('background',
+      'radial-gradient(circle 130px at ' + x + '% ' + y + '%, transparent 0%, rgba(2,2,8,.94) 100%)');
+  }
+  document.addEventListener('mousemove', updateSpotlight);
+
+  // ---- 拉绳开关 ----
+  if (pullChain) {
+    pullChain.addEventListener('click', function (e) {
+      e.stopPropagation();
+      restoreNormalMode();
+    });
+  }
+
+  function restoreNormalMode() {
+    // 反向 blink：眼睑闭合
+    lidTop.classList.add('closing');
+    lidBottom.classList.add('closing');
+
+    setTimeout(function () {
+      overlay.classList.remove('dark', 'active');
+      overlay.style.removeProperty('background');
+      // 还原 canvas 定位
+      if (canvas && canvas._origPosition !== undefined) {
+        canvas.style.position = canvas._origPosition;
+        canvas.style.zIndex = canvas._origZIndex;
+        canvas.style.top = canvas._origTop;
+        canvas.style.left = canvas._origLeft;
+        canvas.style.width = canvas._origWidth;
+        canvas.style.height = canvas._origHeight;
+      }
+      if (ribbons) ribbons.style.removeProperty('display');
+      document.removeEventListener('mousemove', updateSpotlight);
+
+      // 眼睑重新拉开
+      lidTop.classList.remove('closing');
+      lidBottom.classList.remove('closing');
+    }, 400);
+  }
+}
