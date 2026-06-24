@@ -110,7 +110,6 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   font-family:var(--font-tag); font-size:inherit; font-weight:600;
   letter-spacing:.04em;
   padding:.4em .85em; border-radius:18px;
-  border:1.5px solid;
   background:#fff;
   pointer-events:none; opacity:0;
 }
