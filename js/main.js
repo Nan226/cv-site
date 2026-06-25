@@ -672,12 +672,12 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
     geo.setAttribute('color', new THREE.BufferAttribute(clr, 3));
 
     var mat = new THREE.PointsMaterial({
-      size: 0.038,
+      size: 0.065,
       vertexColors: true,
-      blending: THREE.AdditiveBlending,
+      blending: THREE.NormalBlending,
       depthWrite: false,
       transparent: true,
-      opacity: 0.6,
+      opacity: 0.78,
     });
 
     var sil = new THREE.Points(geo, mat);
@@ -694,15 +694,10 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
   var statusEl = document.getElementById('modelStatus');
   if (statusEl) statusEl.classList.add('is-hidden');
 
-  // 用于鼠标与剪影粒子交互的不可见平面
-  var silhouettePlane = new THREE.Mesh(
-    new THREE.PlaneGeometry(12, 12),
-    new THREE.MeshBasicMaterial({ visible: false, depthWrite: false })
-  );
-  silhouettePlane.position.z = -0.3;
-  scene.add(silhouettePlane);
+  // 鼠标 3D 位置（用数学平面求交，不往场景加 mesh）
   var silhouetteCursor = new THREE.Vector3();
   var silhouetteCursorActive = false;
+  var cursorPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
 
   // ---- 正式 GLB 模型状态 ----
   const modelStatus = document.getElementById('modelStatus');
@@ -877,7 +872,6 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
         character.visible = false;
         // 移除加载剪影
         if (loadingSilhouette) { scene.remove(loadingSilhouette); loadingSilhouette = null; }
-        if (silhouettePlane) { scene.remove(silhouettePlane); silhouettePlane = null; }
         updateModelStatus('3D character ready');
         hideModelStatus();
       },
@@ -885,7 +879,6 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
       () => {
         // GLB 加载失败：移除剪影，显示简模兜底
         if (loadingSilhouette) { scene.remove(loadingSilhouette); loadingSilhouette = null; }
-        if (silhouettePlane) { scene.remove(silhouettePlane); silhouettePlane = null; }
         character.visible = true;
         updateModelStatus('Preview character ready');
         hideModelStatus(1200);
@@ -936,11 +929,16 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
     var hoveredPart = loadingSilhouette ? null : raycaster.intersectObjects(clickTargets, true)[0];
     canvas.style.cursor = hoveredPart ? 'pointer' : 'grab';
 
-    // 剪影粒子鼠标跟踪
-    if (loadingSilhouette && silhouettePlane) {
-      var planeHits = raycaster.intersectObject(silhouettePlane);
-      if (planeHits.length > 0) {
-        silhouetteCursor.copy(planeHits[0].point);
+    // 剪影粒子鼠标跟踪（纯数学平面求交，不往场景加 mesh）
+    if (loadingSilhouette) {
+      var rayOrigin = new THREE.Vector3();
+      var rayDir = new THREE.Vector3();
+      raycaster.ray.origin.clone(rayOrigin);
+      raycaster.ray.direction.clone(rayDir);
+      var hit = new THREE.Vector3();
+      var didHit = raycaster.ray.intersectPlane(cursorPlane, hit);
+      if (didHit) {
+        silhouetteCursor.copy(hit);
         silhouetteCursorActive = true;
       } else {
         silhouetteCursorActive = false;
