@@ -43,9 +43,15 @@
       <!-- Three.js 3D 画布 -->
       <canvas id="threeCanvas" class="three-canvas"></canvas>
 
+      <!-- Loading spinner -->
+      <div class="loading-spinner" id="loadingSpinner">
+        <div class="spinner-ring"></div>
+        <span class="spinner-text">loading</span>
+      </div>
+
       <!-- 倒计时（在人物背后） -->
       <div class="countdown-display" id="countdownDisplay"></div>
-      <p class="model-status is-hidden" id="modelStatus" role="status" aria-live="polite">
+      <p class="model-status" id="modelStatus" role="status" aria-live="polite">
         Preparing 3D character...
       </p>
 
