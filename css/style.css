@@ -536,6 +536,8 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
 @media(max-width:768px){
   .nav-list{gap:3vw;justify-content:center}
   .nav-item{font-size:.62rem}
+  .hero-name{font-size:clamp(2.4rem,8vw,3.6rem)}
+  .hero-subtitle{font-size:.72rem}
   .character-container{width:92vw;height:50vh}
   .tag-inner{font-size:.5rem;padding:.3em .6em}
   .tags-left .tag:nth-child(1){left:6%;top:14%}
@@ -548,4 +550,15 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   .tags-right .tag:nth-child(3){right:3%;top:46%}
   .tags-right .tag:nth-child(4){right:1%;top:62%}
   .tags-right .tag:nth-child(5){right:5%;top:78%}
+  /* 左右提示缩小 */
+  .interact-hint,.easter-egg-hint{font-size:.42rem;opacity:.5}
+  /* 暗黑模式 slogan 收窄 */
+  .slogan-left{left:3%;font-size:.85rem}
+  .slogan-right{right:3%;font-size:.85rem}
+  /* 拉绳提示调整 */
+  .pull-chain-hint{top:82px;right:16px;font-size:.5rem}
+  /* 倒计时适配 */
+  .countdown-display{left:4%;font-size:clamp(3.5rem,9vw,8rem)}
+  /* loading spinner */
+  .loading-spinner{top:30%}
 }
