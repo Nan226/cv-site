@@ -737,16 +737,16 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
     avatarRoot.position.set(0, -1.75, 0);
   }
 
-  function loadProductionAvatar() {
+  function loadProductionAvatar(attempt = 1) {
     const loader = new GLTFLoader();
     // Draco 解压支持
     var dracoLoader = new DRACOLoader();
     dracoLoader.setDecoderPath('./js/vendor/libs/draco/');
     loader.setDRACOLoader(dracoLoader);
-    updateModelStatus('Loading 3D character...');
+    updateModelStatus(attempt === 1 ? 'Loading 3D character...' : 'Retrying 3D character...');
 
     loader.load(
-      'images/HOME/完美娃娃-draco.glb',
+      'images/HOME/完美娃娃-web.glb',
       (gltf) => {
         const pivot = new THREE.Group();
         pivot.name = 'yenan-avatar-pivot';
@@ -789,12 +789,18 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
       },
       undefined,
       () => {
-        // GLB 加载失败：显示简模兜底
-        character.visible = true;
-        var spinner = document.getElementById('loadingSpinner');
+        dracoLoader.dispose();
+
+        if (attempt < 2) {
+          window.setTimeout(() => loadProductionAvatar(attempt + 1), 1200);
+          return;
+        }
+
+        // 正式模型加载失败时保持画布干净，不再展示简陋人偶。
+        character.visible = false;
+        const spinner = document.getElementById('loadingSpinner');
         if (spinner) spinner.classList.add('is-hidden');
-        updateModelStatus('Preview character ready');
-        hideModelStatus(1200);
+        updateModelStatus('3D character could not be loaded', 'error');
       }
     );
   }
@@ -820,17 +826,14 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
     ];
   }
 
-  clickTargets = buildFallbackHitRig();
+  clickTargets = [];
   loadProductionAvatar();
 
-  // 超时兜底：30s 后仍未加载完则显示简模（移动网络较慢）
+  // 慢速网络只更新提示，绝不切换到简陋人偶。
   setTimeout(function () {
     var spinner = document.getElementById('loadingSpinner');
     if (spinner && !spinner.classList.contains('is-hidden')) {
-      spinner.classList.add('is-hidden');
-      character.visible = true;
-      updateModelStatus('Preview character ready');
-      hideModelStatus(1200);
+      updateModelStatus('Still loading 3D character...');
     }
   }, 30000);
 

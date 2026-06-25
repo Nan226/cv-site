@@ -2,7 +2,11 @@
 
 当前正式模型文件：
 
-`images/HOME/完美娃娃-draco.glb`（Draco 压缩，~13 MB）
+`images/HOME/完美娃娃-web.glb`（网页轻量版，Draco 压缩，约 1.2 MB）
+
+原始高精度压缩模型：
+
+`images/HOME/完美娃娃-draco.glb`（约 12.5 MB，仅用于保留源质量）
 
 ## 视觉要求
 
@@ -19,8 +23,10 @@
 - 骨骼名称尽量包含 `Head`、`Neck`、`Spine`、`Shoulder`、`UpperArm`、`Hand`
 - 如需眨眼或微笑，模型应包含名称带 `blink`、`smile` 或 `happy` 的 morph target
 - 模型正面朝向摄像机，Y 轴向上
-- 建议压缩后不超过 8 MB
+- 首屏网页模型建议压缩后不超过 4 MB
+- 推荐控制在 8 万至 15 万三角形
+- 首屏角色贴图建议使用 2048 x 2048
 - 建议提供可控制的肩、肘、手、髋、膝、脚骨骼
 - 建议提供 `blink`、`smile`、`angry`、`puff` 或相近命名的表情 morph target
 
-模型缺失或加载失败时，页面会自动使用现有 Three.js 简模。
+模型缺失或加载失败时，页面保持人物区域干净并显示状态提示，不向访客展示旧 Three.js 简模。
