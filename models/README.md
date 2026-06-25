@@ -2,7 +2,7 @@
 
 当前正式模型文件：
 
-`images/HOME/有骨骼的娃娃.glb`
+`images/HOME/完美娃娃-draco.glb`（Draco 压缩，~13 MB）
 
 ## 视觉要求
 

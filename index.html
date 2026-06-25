@@ -16,10 +16,16 @@
 </head>
 <body>
 
-  <!-- 背景飘浮彩带容器 -->
+  <!-- 背景飘浮彩带容器 (fixed，跨 section 显示) -->
   <div class="ribbons-container" id="ribbonsContainer" aria-hidden="true"></div>
 
-  <!-- ========== 顶部导航 ========== -->
+  <!-- ========== 滚动容器 ========== -->
+  <main class="scroll-container" id="scrollContainer">
+
+  <!-- ========== HOME 页 ========== -->
+  <section id="home" class="page-section">
+
+  <!-- 顶部导航 -->
   <nav class="navbar">
     <ul class="nav-list">
       <li><a href="#" class="nav-item" data-text="About Me">About Me</a></li>
@@ -86,7 +92,24 @@
     </div>
   </section>
 
-  <!-- ========== 彩蛋暗黑遮罩层 ========== -->
+  <!-- ========== 底部 ========== -->
+  <footer class="footer">
+    <p class="footer-text">COURAGE MATTERS MORE THAN COMPETENCE</p>
+  </footer>
+
+  </section><!-- /#home -->
+
+  <!-- ========== About Me 页 ========== -->
+  <section id="about" class="page-section">
+    <div class="about-placeholder">
+      <h2 class="about-title">About Me</h2>
+      <p class="about-coming">Coming soon...</p>
+    </div>
+  </section>
+
+  </main><!-- /.scroll-container -->
+
+  <!-- ========== 彩蛋暗黑遮罩层 (fixed，覆盖全屏) ========== -->
   <div class="easter-egg-overlay" id="easterEggOverlay">
     <!-- 上下 blink 眼睑 -->
     <div class="blink-lid blink-lid-top" id="blinkLidTop"></div>
@@ -108,11 +131,6 @@
     <!-- 拉绳提示文字 -->
     <p class="pull-chain-hint">Pull the chain to bring back the light</p>
   </div>
-
-  <!-- ========== 底部 ========== -->
-  <footer class="footer">
-    <p class="footer-text">COURAGE MATTERS MORE THAN COMPETENCE</p>
-  </footer>
 
   <script type="module" src="js/main.js"></script>
 </body>

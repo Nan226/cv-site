@@ -44,6 +44,27 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
   });
 })();
 
+// ---- 导航点击：平滑滚动到对应分区 ----
+(function initNavClicks() {
+  var sectionMap = {
+    'About Me': 'about',
+    // Internship / Projects / Skills / Learning 分区待建，暂不绑定
+  };
+
+  document.querySelectorAll('.nav-item').forEach(function (link) {
+    link.addEventListener('click', function (e) {
+      var targetId = sectionMap[link.textContent.trim()];
+      if (!targetId) return; // 未绑定分区的标签保持默认行为（#）
+
+      e.preventDefault();
+      var target = document.getElementById(targetId);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  });
+})();
+
 
 // ============================================================
 //  标签「撕碎」— 点击撕裂，碎片消失
@@ -612,7 +633,6 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
   let activeBodyParts = bodyParts;
   let clickTargets = Object.values(bodyParts);
   let activeEyePairs = eyePairs;
-  let activeMorphTargets = [];
   let animationMixer = null;
   let stopActiveReaction = null;
   const clock = new THREE.Clock();
@@ -643,25 +663,6 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
       }
     });
     return match;
-  }
-
-  function collectMorphTargets(root) {
-    const targets = [];
-    root.traverse((node) => {
-      if (!node.isMesh || !node.morphTargetDictionary || !node.morphTargetInfluences) return;
-      Object.entries(node.morphTargetDictionary).forEach(([name, index]) => {
-        targets.push({ mesh: node, index, name: name.toLowerCase() });
-      });
-    });
-    return targets;
-  }
-
-  function setMorphInfluence(patterns, value) {
-    activeMorphTargets.forEach((target) => {
-      if (patterns.some((pattern) => pattern.test(target.name))) {
-        target.mesh.morphTargetInfluences[target.index] = value;
-      }
-    });
   }
 
   function createHitProxy(group, name, geometry, position) {
@@ -772,7 +773,6 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
         activeBodyParts = rig.mappedParts;
         clickTargets = rig.proxies;
         activeEyePairs = [];
-        activeMorphTargets = collectMorphTargets(avatarRoot);
 
         if (gltf.animations.length > 0) {
           animationMixer = new THREE.AnimationMixer(avatarRoot);
@@ -883,81 +883,6 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
       }
     }
   });
-
-  // 反应动画
-  function aimFallbackArm(side, elbowTarget, handTarget, amount) {
-    if (activeCharacter !== character) return false;
-
-    const shoulder = bodyParts[`${side}-shoulder`];
-    const elbow = bodyParts[`${side}-elbow`];
-    if (!shoulder || !elbow) return false;
-
-    character.updateMatrixWorld(true);
-
-    const elbowTargetWorld = character.localToWorld(elbowTarget.clone());
-    const elbowTargetLocal = shoulder.parent.worldToLocal(elbowTargetWorld.clone());
-    const upperDirection = elbowTargetLocal.sub(shoulder.position).normalize();
-    const shoulderTarget = new THREE.Quaternion().setFromUnitVectors(
-      new THREE.Vector3(0, -1, 0),
-      upperDirection
-    );
-    shoulder.quaternion.slerp(shoulderTarget, amount);
-    shoulder.updateMatrixWorld(true);
-
-    const handTargetWorld = character.localToWorld(handTarget.clone());
-    const handTargetLocal = elbow.parent.worldToLocal(handTargetWorld.clone());
-    const lowerDirection = handTargetLocal.sub(elbow.position).normalize();
-    const elbowTargetRotation = new THREE.Quaternion().setFromUnitVectors(
-      new THREE.Vector3(0, -1, 0),
-      lowerDirection
-    );
-    elbow.quaternion.slerp(elbowTargetRotation, amount);
-    return true;
-  }
-
-  function rotateBoneToward(bone, endBone, targetWorld, amount) {
-    if (!bone || !endBone || !bone.parent) return false;
-
-    bone.updateWorldMatrix(true, true);
-    endBone.updateWorldMatrix(true, true);
-
-    const origin = new THREE.Vector3();
-    const end = new THREE.Vector3();
-    bone.getWorldPosition(origin);
-    endBone.getWorldPosition(end);
-
-    const currentDirection = end.sub(origin).normalize();
-    const targetDirection = targetWorld.clone().sub(origin).normalize();
-    if (currentDirection.lengthSq() < 0.001 || targetDirection.lengthSq() < 0.001) return false;
-
-    const delta = new THREE.Quaternion().setFromUnitVectors(currentDirection, targetDirection);
-    const worldRotation = new THREE.Quaternion();
-    bone.getWorldQuaternion(worldRotation);
-    delta.multiply(worldRotation);
-
-    const parentRotation = new THREE.Quaternion();
-    bone.parent.getWorldQuaternion(parentRotation);
-    const localTarget = parentRotation.invert().multiply(delta);
-    bone.quaternion.slerp(localTarget, amount);
-    bone.updateWorldMatrix(true, true);
-    return true;
-  }
-
-  function aimRigArm(side, elbowTarget, handTarget, amount) {
-    if (activeCharacter === character) return false;
-
-    const upperArm = activeBodyParts[`${side}-shoulder`];
-    const forearm = activeBodyParts[`${side}-elbow`];
-    const hand = activeBodyParts[`${side}-hand`];
-    if (!upperArm || !forearm || !hand) return false;
-
-    activeCharacter.updateMatrixWorld(true);
-    const elbowTargetWorld = activeCharacter.localToWorld(elbowTarget.clone());
-    const handTargetWorld = activeCharacter.localToWorld(handTarget.clone());
-    rotateBoneToward(upperArm, forearm, elbowTargetWorld, amount);
-    rotateBoneToward(forearm, hand, handTargetWorld, amount);
-    return true;
-  }
 
   function triggerReaction(partName) {
     if (stopActiveReaction) stopActiveReaction();
@@ -1195,8 +1120,8 @@ function triggerEasterEgg() {
     var relY = cy - containerRect.top;
     var count = 50 + Math.floor(Math.random() * 20);
 
-    for (var i = 0; i < count; i++) {
-      var p = document.createElement('span');
+    for (let i = 0; i < count; i++) {
+      let p = document.createElement('span');
       p.className = 'countdown-particle';
       var angle = Math.random() * Math.PI * 2;
       var dist = 60 + Math.random() * 200;
@@ -1300,8 +1225,8 @@ function triggerEasterEgg() {
     var spreadX = charRect.width * 0.75;
     var spreadY = charRect.height * 0.7;
 
-    for (var i = 0; i < 45; i++) {
-      var p = document.createElement('span');
+    for (let i = 0; i < 45; i++) {
+      let p = document.createElement('span');
       p.className = 'dark-particle';
       var size = 2 + Math.random() * 5;
       var x = cx + (Math.random() - 0.5) * spreadX;
@@ -1366,6 +1291,14 @@ function triggerEasterEgg() {
       // 眼睑重新拉开
       lidTop.classList.remove('closing');
       lidBottom.classList.remove('closing');
+
+      // 开灯后自动下滑到 About Me
+      setTimeout(function () {
+        var aboutSection = document.getElementById('about');
+        if (aboutSection) {
+          aboutSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 600);
     }, 400);
   }
 }

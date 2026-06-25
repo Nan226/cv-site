@@ -13,10 +13,9 @@
 }
 
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100vh;overflow:hidden}
+html,body{height:100%;overflow:hidden}
 html{font-size:clamp(13px,1.5vw,16px)}
 body{
-  display:flex;flex-direction:column;
   font-family:var(--font-body);color:var(--text-dark);
   background:
     radial-gradient(ellipse 70% 50% at 25% 25%,rgba(210,181,242,.18) 0%,transparent 55%),
@@ -24,6 +23,56 @@ body{
     radial-gradient(ellipse 55% 40% at 50% 75%,rgba(210,181,242,.12) 0%,transparent 55%),
     var(--white);
   -webkit-font-smoothing:antialiased;line-height:1.6
+}
+
+/* ===== 全屏滚动容器 ===== */
+.scroll-container{
+  height:100vh;overflow-y:auto;overflow-x:hidden;
+  scroll-snap-type:y mandatory;
+  scroll-behavior:smooth;
+  -webkit-overflow-scrolling:touch;
+}
+.page-section{
+  height:100vh;overflow:hidden;
+  scroll-snap-align:start;
+  position:relative;
+}
+
+/* ===== HOME 页 ===== */
+#home{
+  display:flex;flex-direction:column;
+}
+
+/* ===== About Me 页 ===== */
+#about{
+  display:flex;align-items:center;justify-content:center;
+  background:
+    radial-gradient(ellipse 60% 40% at 35% 30%,rgba(210,181,242,.12) 0%,transparent 55%),
+    radial-gradient(ellipse 50% 35% at 65% 60%,rgba(236,161,202,.1) 0%,transparent 55%),
+    var(--white);
+}
+.about-placeholder{
+  text-align:center;
+  opacity:.6;
+}
+.about-title{
+  font-family:var(--font-heading);
+  font-size:clamp(2rem,4vw,3.2rem);
+  font-weight:800;
+  letter-spacing:.06em;
+  background:linear-gradient(102deg,#6533dd 0%,#9637e1 49%,#dd2fb6 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  color:#8738e0;
+}
+.about-coming{
+  margin-top:.8rem;
+  font-family:var(--font-tag);
+  font-size:.78rem;
+  color:var(--text-light);
+  letter-spacing:.1em;
+  text-transform:uppercase;
 }
 a{text-decoration:none;color:inherit}ul{list-style:none}
 
@@ -106,7 +155,6 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
 .model-status.is-hidden{opacity:0}
 .model-status.is-error{color:#bd3ec8}
 
-/* ---- Loading spinner ---- */
 /* ---- Loading spinner（人物头部高度，ENFP ↔ Creative 标签中间） ---- */
 .loading-spinner{
   position:absolute;
@@ -561,4 +609,7 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   .countdown-display{left:4%;font-size:clamp(3.5rem,9vw,8rem)}
   /* loading spinner */
   .loading-spinner{top:30%}
+  /* About Me */
+  .about-title{font-size:clamp(1.6rem,5vw,2.4rem)}
+  .about-coming{font-size:.65rem}
 }
