@@ -580,6 +580,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
   character.add(headGroup);
   scene.add(character);
+  character.visible = false;  // 加载期间隐藏简模，显示人影剪影
 
   // ---- 粒子装饰（角色周围淡紫微光） ----
   const particlesGeo = new THREE.BufferGeometry();
@@ -603,6 +604,105 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
   });
   const particles = new THREE.Points(particlesGeo, particlesMat);
   scene.add(particles);
+
+  // ---- 加载中人物剪影（白色粒子） ----
+  function createLoadingSilhouette() {
+    var pts = [];
+
+    function line(x1, y1, z1, x2, y2, z2, n) {
+      for (var i = 0; i <= n; i++) {
+        var t = i / n;
+        pts.push(x1 + (x2 - x1) * t, y1 + (y2 - y1) * t, (z1 + (z2 - z1) * t) * 0.35);
+      }
+    }
+
+    function ellipse(cx, cy, rx, ry, n) {
+      for (var i = 0; i < n; i++) {
+        var a = (i / n) * Math.PI * 2;
+        pts.push(cx + Math.cos(a) * rx, cy + Math.sin(a) * ry, Math.sin(a) * rx * 0.25);
+      }
+    }
+
+    // Head
+    ellipse(0, 1.55, 0.26, 0.3, 50);
+    // Neck
+    line(-0.11, 1.22, 0, -0.11, 1.05, 0, 6);
+    line(0.11, 1.22, 0, 0.11, 1.05, 0, 6);
+    // Shoulders
+    line(-0.5, 1.05, 0, 0.5, 1.05, 0, 20);
+    // Torso sides
+    line(-0.5, 1.05, 0, -0.27, 0.4, 0, 22);
+    line(0.5, 1.05, 0, 0.27, 0.4, 0, 22);
+    // Hips
+    line(-0.32, 0.38, 0, 0.32, 0.38, 0, 15);
+    // Arms
+    line(-0.5, 1.0, 0, -0.6, 0.55, 0, 14);
+    line(-0.6, 0.55, 0, -0.52, 0.18, 0, 10);
+    line(0.5, 1.0, 0, 0.6, 0.55, 0, 14);
+    line(0.6, 0.55, 0, 0.52, 0.18, 0, 10);
+    // Hands
+    ellipse(-0.52, 0.12, 0.06, 0.07, 10);
+    ellipse(0.52, 0.12, 0.06, 0.07, 10);
+    // Legs
+    line(-0.2, 0.35, 0, -0.17, -0.35, 0, 20);
+    line(-0.17, -0.35, 0, -0.14, -0.85, 0, 15);
+    line(0.2, 0.35, 0, 0.17, -0.35, 0, 20);
+    line(0.17, -0.35, 0, 0.14, -0.85, 0, 15);
+    // Feet
+    line(-0.22, -0.85, 0, -0.06, -0.85, 0, 8);
+    line(0.06, -0.85, 0, 0.22, -0.85, 0, 8);
+    // Body fill (sparse, for volume)
+    for (var i = 0; i < 50; i++) {
+      var fx = (Math.random() - 0.5) * 0.38;
+      var fy = 0.25 + Math.random() * 1.25;
+      if (Math.abs(fx) < 0.13 && fy > 1.2 && fy < 1.6) continue;
+      pts.push(fx, fy, (Math.random() - 0.5) * 0.08);
+    }
+
+    var geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pts), 3));
+
+    var clr = new Float32Array(pts.length);
+    for (var i = 0; i < pts.length / 3; i++) {
+      var s = 0.78 + Math.random() * 0.22;
+      clr[i * 3] = s;
+      clr[i * 3 + 1] = s;
+      clr[i * 3 + 2] = s * 1.06;
+    }
+    geo.setAttribute('color', new THREE.BufferAttribute(clr, 3));
+
+    var mat = new THREE.PointsMaterial({
+      size: 0.038,
+      vertexColors: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      transparent: true,
+      opacity: 0.6,
+    });
+
+    var sil = new THREE.Points(geo, mat);
+    sil.name = 'loading-silhouette';
+    sil.position.y = 0.68;
+    sil.scale.setScalar(0.84);
+    sil.renderOrder = 1;
+    return sil;
+  }
+
+  var loadingSilhouette = createLoadingSilhouette();
+  scene.add(loadingSilhouette);
+  // 剪影替代文字加载提示
+  var statusEl = document.getElementById('modelStatus');
+  if (statusEl) statusEl.classList.add('is-hidden');
+
+  // 用于鼠标与剪影粒子交互的不可见平面
+  var silhouettePlane = new THREE.Mesh(
+    new THREE.PlaneGeometry(12, 12),
+    new THREE.MeshBasicMaterial({ visible: false, depthWrite: false })
+  );
+  silhouettePlane.position.z = -0.3;
+  scene.add(silhouettePlane);
+  var silhouetteCursor = new THREE.Vector3();
+  var silhouetteCursorActive = false;
 
   // ---- 正式 GLB 模型状态 ----
   const modelStatus = document.getElementById('modelStatus');
@@ -775,11 +875,18 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
         }
 
         character.visible = false;
+        // 移除加载剪影
+        if (loadingSilhouette) { scene.remove(loadingSilhouette); loadingSilhouette = null; }
+        if (silhouettePlane) { scene.remove(silhouettePlane); silhouettePlane = null; }
         updateModelStatus('3D character ready');
         hideModelStatus();
       },
       undefined,
       () => {
+        // GLB 加载失败：移除剪影，显示简模兜底
+        if (loadingSilhouette) { scene.remove(loadingSilhouette); loadingSilhouette = null; }
+        if (silhouettePlane) { scene.remove(silhouettePlane); silhouettePlane = null; }
+        character.visible = true;
         updateModelStatus('Preview character ready');
         hideModelStatus(1200);
       }
@@ -826,18 +933,33 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
     mouseOnCharacter = true;
 
     raycaster.setFromCamera(mouseTarget, camera);
-    const hoveredPart = raycaster.intersectObjects(clickTargets, true)[0];
+    var hoveredPart = loadingSilhouette ? null : raycaster.intersectObjects(clickTargets, true)[0];
     canvas.style.cursor = hoveredPart ? 'pointer' : 'grab';
+
+    // 剪影粒子鼠标跟踪
+    if (loadingSilhouette && silhouettePlane) {
+      var planeHits = raycaster.intersectObject(silhouettePlane);
+      if (planeHits.length > 0) {
+        silhouetteCursor.copy(planeHits[0].point);
+        silhouetteCursorActive = true;
+      } else {
+        silhouetteCursorActive = false;
+      }
+    }
   });
 
   container.addEventListener('mouseleave', () => {
     mouseTarget.set(0, 0);
     mouseOnCharacter = false;
     canvas.style.cursor = 'grab';
+    silhouetteCursorActive = false;
   });
 
   // 点击检测
   container.addEventListener('click', (e) => {
+    // 加载中（剪影显示时）不响应点击
+    if (loadingSilhouette) return;
+
     const rect = container.getBoundingClientRect();
     const mx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
     const my = -((e.clientY - rect.top) / rect.height) * 2 + 1;
@@ -1030,6 +1152,33 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
         }
       });
     });
+
+    // 剪影粒子随鼠标变色
+    if (loadingSilhouette) {
+      var silPosAttr = loadingSilhouette.geometry.attributes.position;
+      var silColAttr = loadingSilhouette.geometry.attributes.color;
+      var baseColors = loadingSilhouette.userData.baseColors;
+      if (!baseColors) {
+        baseColors = new Float32Array(silColAttr.array);
+        loadingSilhouette.userData.baseColors = baseColors;
+      }
+      loadingSilhouette.updateMatrixWorld();
+
+      for (var si = 0; si < silPosAttr.count; si++) {
+        var wp = new THREE.Vector3(silPosAttr.getX(si), silPosAttr.getY(si), silPosAttr.getZ(si));
+        loadingSilhouette.localToWorld(wp);
+        var dist = silhouetteCursorActive ? wp.distanceTo(silhouetteCursor) : 999;
+        var influence = Math.max(0, 1 - dist / 0.38);
+
+        // White → accent purple when near cursor
+        var sr = baseColors[si * 3] + influence * (0.82 - baseColors[si * 3]);
+        var sg = baseColors[si * 3 + 1] - influence * 0.2;
+        var sb = baseColors[si * 3 + 2] + influence * (0.92 - baseColors[si * 3 + 2]);
+
+        silColAttr.setXYZ(si, sr, sg, sb);
+      }
+      silColAttr.needsUpdate = true;
+    }
 
     // 粒子缓慢旋转
     particles.rotation.y += 0.001;
