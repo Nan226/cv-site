@@ -4,6 +4,7 @@
    ======================================== */
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
 // ============================================================
 //  导航栏「撕碎」效果
@@ -737,6 +738,10 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
   function loadProductionAvatar() {
     const loader = new GLTFLoader();
+    // Draco 解压支持
+    var dracoLoader = new DRACOLoader();
+    dracoLoader.setDecoderPath('./js/vendor/libs/draco/');
+    loader.setDRACOLoader(dracoLoader);
     updateModelStatus('Loading 3D character...');
 
     loader.load(
