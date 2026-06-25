@@ -146,6 +146,8 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 (function initThreeJSCharacter() {
   const container = document.getElementById('characterContainer');
   const canvas = document.getElementById('threeCanvas');
+  const fallbackImage = document.getElementById('characterFallbackImage');
+  const interactHint = document.getElementById('interactHint');
   if (!container || !canvas) return;
 
   // ---- Scene / Camera / Renderer ----
@@ -760,6 +762,10 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
     loader.load(
       'images/HOME/完美娃娃-web.glb',
       (gltf) => {
+        if (fallbackImage) fallbackImage.classList.remove('is-visible');
+        canvas.classList.remove('is-hidden');
+        if (interactHint) interactHint.classList.remove('is-hidden');
+
         const pivot = new THREE.Group();
         pivot.name = 'yenan-avatar-pivot';
 
@@ -803,16 +809,20 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
       () => {
         dracoLoader.dispose();
 
-        if (attempt < 2) {
+        if (attempt < 3) {
           window.setTimeout(() => loadProductionAvatar(attempt + 1), 1200);
           return;
         }
 
-        // 正式模型加载失败时保持画布干净，不再展示简陋人偶。
+        // 连续加载失败后展示与正式角色一致的静态正面图。
         character.visible = false;
         const spinner = document.getElementById('loadingSpinner');
         if (spinner) spinner.classList.add('is-hidden');
-        updateModelStatus('3D character could not be loaded', 'error');
+        canvas.classList.add('is-hidden');
+        if (fallbackImage) fallbackImage.classList.add('is-visible');
+        if (interactHint) interactHint.classList.add('is-hidden');
+        updateModelStatus('Static character preview');
+        hideModelStatus(1600);
       }
     );
   }
@@ -1319,4 +1329,235 @@ function triggerEasterEgg() {
       }, 600);
     }, 400);
   }
+}
+
+
+// ============================================================
+//  About Me — 数据 + 静态渲染
+// ============================================================
+
+var ABOUT_CARDS = [
+  {
+    id: 'base-info',
+    period: 'FEB 2003',
+    location: 'Quanzhou, Fujian',
+    category: 'Base Info',
+    icon: 'id-card',
+    title: 'Base Information',
+    subtitle: '',
+    image: 'images/About me/照片1.JPEG',
+    logo: null,
+    items: [
+      { icon: 'cake-slice', label: 'Date of Birth', value: 'February 26, 2003' },
+      { icon: 'phone', label: 'Phone', value: '183 5056 5182' },
+      { icon: 'message-circle', label: 'WeChat', value: 'kunan0226' },
+      { icon: 'mail', label: 'Email', value: 'kunan0226@163.com' }
+    ],
+    tags: [],
+    action: { label: 'Download Resume', icon: 'download', disabled: true }
+  },
+  {
+    id: 'huaqiao',
+    period: 'SEP 2020 - JUN 2024',
+    location: 'Xiamen, Fujian',
+    category: 'Education',
+    icon: 'graduation-cap',
+    title: 'Huaqiao University',
+    subtitle: '',
+    image: 'images/About me/照片2.jpg',
+    logo: 'images/About me/华侨大学校徽.png',
+    items: [],
+    tags: ['Top 10% GPA', 'First-Class Scholarship', 'IELTS 6.5', 'CET-6', 'Class Life Committee', 'Sangzi WeAssistant', 'Plant Art Club Lead'],
+    action: null
+  },
+  {
+    id: 'keendata',
+    period: 'APR 2025 - AUG 2025',
+    location: 'Shenzhen, Guangdong',
+    category: 'Internship',
+    icon: 'briefcase-business',
+    title: 'Keendata',
+    subtitle: 'Project Management Intern',
+    image: 'images/About me/照片3.png',
+    logo: 'images/About me/Keendata.png',
+    items: [],
+    tags: ['Big Data Platform', 'Issue Tracking', 'Requirements Management', 'Custom Delivery'],
+    action: { label: 'View Details', icon: 'arrow-up-right', disabled: true }
+  },
+  {
+    id: 'polyu',
+    period: 'SEP 2025',
+    location: 'Hung Hom, Hong Kong',
+    category: 'Education',
+    icon: 'graduation-cap',
+    title: 'The Hong Kong Polytechnic University',
+    subtitle: '',
+    image: 'images/About me/照片4.png',
+    logo: 'images/About me/香港理工大学校徽.png',
+    items: [],
+    tags: ['QS Top 50', 'Metaverse', 'Top 10% GPA'],
+    action: null
+  },
+  {
+    id: 'xgrids',
+    period: 'JAN 2026 - MAY 2026',
+    location: 'Shenzhen, Guangdong',
+    category: 'Internship',
+    icon: 'scan-line',
+    title: 'XGRIDS',
+    subtitle: 'Project Management Intern',
+    image: 'images/About me/照片5.png',
+    logo: 'images/About me/XGRIDS.png',
+    items: [],
+    tags: ['Agile Iteration', 'Process SOPs', 'Software Delivery', '3D Reconstruction', 'Spatial Computing'],
+    action: { label: 'View Details', icon: 'arrow-up-right', disabled: true }
+  },
+  {
+    id: 'chery',
+    period: 'JUN 2026 - PRESENT',
+    location: 'Wuhu, Anhui',
+    category: 'Internship',
+    icon: 'car-front',
+    title: 'CHERY',
+    subtitle: 'Project Management Intern',
+    image: 'images/About me/照片6.png',
+    logo: 'images/About me/CHERY.png',
+    items: [],
+    tags: ['Intelligent Driving', 'ADSD', 'Jira Governance', 'Quality Management', 'Robotaxi', 'Cross-functional Communication'],
+    action: { label: 'View Details', icon: 'arrow-up-right', disabled: true }
+  }
+];
+
+var currentCardIndex = 0;
+
+function initAboutMe() {
+  var timelineTrack = document.getElementById('timelineTrack');
+  var cardsContainer = document.getElementById('aboutCards');
+  if (!timelineTrack || !cardsContainer) return;
+
+  // ---- 渲染时间线 ----
+  ABOUT_CARDS.forEach(function (card, i) {
+    var btn = document.createElement('button');
+    btn.className = 'timeline-node' + (i === 0 ? ' active' : '');
+    btn.setAttribute('type', 'button');
+    btn.setAttribute('aria-label', card.title);
+    if (i === 0) btn.setAttribute('aria-current', 'step');
+    btn.innerHTML =
+      '<span class="timeline-dot"></span>' +
+      '<span class="timeline-period">' + card.period + '</span>' +
+      '<span class="timeline-location">' + card.location + '</span>';
+    btn.addEventListener('click', function () { switchToCard(i); });
+    timelineTrack.appendChild(btn);
+  });
+
+  // ---- 渲染卡片 ----
+  ABOUT_CARDS.forEach(function (card, i) {
+    var el = document.createElement('div');
+    el.className = 'about-card' + (i === 0 ? ' active' : '');
+    el.setAttribute('aria-label', 'Slide ' + (i + 1) + ' of 6: ' + card.title);
+
+    // Image
+    var imgHTML =
+      '<div class="card-image-wrap">' +
+        '<img src="' + card.image + '" alt="' + card.title + '" loading="' + (i === 0 ? 'eager' : 'lazy') + '">' +
+        '<span class="card-category">' + card.category + '</span>' +
+      '</div>';
+
+    // Body — build head section
+    var headIconHTML = card.logo
+      ? '<img src="' + card.logo + '" alt="" class="card-logo">'
+      : '<i data-lucide="' + card.icon + '" class="card-head-icon"></i>';
+    var subtitleHTML = card.subtitle ? '<p class="card-subtitle">' + card.subtitle + '</p>' : '';
+
+    // Body — items: info list or tags
+    var itemsHTML = '';
+    if (card.items.length > 0) {
+      itemsHTML = '<div class="card-info-list">';
+      card.items.forEach(function (item) {
+        itemsHTML +=
+          '<div class="card-info-item">' +
+            '<i data-lucide="' + item.icon + '"></i>' +
+            '<span>' + item.label + '</span>' +
+            '<span style="margin-left:auto;color:var(--text-dark);font-weight:500">' + item.value + '</span>' +
+          '</div>';
+      });
+      itemsHTML += '</div>';
+    } else if (card.tags.length > 0) {
+      itemsHTML = '<div class="card-items">';
+      card.tags.forEach(function (tag) {
+        itemsHTML += '<span class="card-tag">' + tag + '</span>';
+      });
+      itemsHTML += '</div>';
+    }
+
+    // Action button
+    var actionHTML = '';
+    if (card.action) {
+      actionHTML =
+        '<div class="card-action">' +
+          '<button class="card-action-btn"' + (card.action.disabled ? ' disabled title="Coming Soon"' : '') + '>' +
+            '<i data-lucide="' + card.action.icon + '"></i>' +
+            '<span>' + (card.action.disabled ? 'Coming Soon' : card.action.label) + '</span>' +
+          '</button>' +
+        '</div>';
+    }
+
+    el.innerHTML = imgHTML +
+      '<div class="card-body">' +
+        '<div class="card-head">' + headIconHTML +
+          '<div><h3 class="card-title">' + card.title + '</h3>' + subtitleHTML + '</div>' +
+        '</div>' +
+        itemsHTML +
+        actionHTML +
+      '</div>';
+
+    cardsContainer.appendChild(el);
+  });
+
+  // ---- 初始化 Lucide 图标 ----
+  if (window.lucide) { lucide.createIcons(); }
+
+  // ---- 卡片点击切换 ----
+  var cards = cardsContainer.querySelectorAll('.about-card');
+  cards.forEach(function (cardEl, i) {
+    cardEl.addEventListener('click', function (e) {
+      // 不拦截按钮点击
+      if (e.target.closest('button')) return;
+      if (i !== currentCardIndex) switchToCard(i);
+    });
+  });
+}
+
+function switchToCard(index) {
+  if (index === currentCardIndex) return;
+  currentCardIndex = index;
+
+  // 更新卡片
+  var allCards = document.querySelectorAll('#aboutCards .about-card');
+  allCards.forEach(function (el, i) {
+    el.classList.toggle('active', i === index);
+  });
+
+  // 更新节点
+  var allNodes = document.querySelectorAll('#timelineTrack .timeline-node');
+  allNodes.forEach(function (el, i) {
+    el.classList.toggle('active', i === index);
+    if (i === index) {
+      el.setAttribute('aria-current', 'step');
+    } else {
+      el.removeAttribute('aria-current');
+    }
+  });
+
+  // 滚动当前卡片到可见位置
+  if (allCards[index]) {
+    allCards[index].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }
+}
+
+// 页面加载后初始化
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initAboutMe);
+} else {
+  initAboutMe();
 }
