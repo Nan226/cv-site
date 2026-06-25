@@ -740,7 +740,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
     updateModelStatus('Loading 3D character...');
 
     loader.load(
-      'images/HOME/有骨骼的娃娃.glb',
+      'images/HOME/完美娃娃.glb',
       (gltf) => {
         const pivot = new THREE.Group();
         pivot.name = 'yenan-avatar-pivot';
