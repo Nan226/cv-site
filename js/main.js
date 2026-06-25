@@ -745,7 +745,7 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
     updateModelStatus('Loading 3D character...');
 
     loader.load(
-      'images/HOME/完美娃娃.glb',
+      'images/HOME/完美娃娃-draco.glb',
       (gltf) => {
         const pivot = new THREE.Group();
         pivot.name = 'yenan-avatar-pivot';
