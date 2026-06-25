@@ -1269,10 +1269,54 @@ function triggerEasterEgg() {
       }
       if (ribbons) ribbons.style.display = 'none';
 
+      // 生成暗黑粒子
+      spawnDarkParticles();
+
       // 眼睑重新拉开（移除 class，CSS transition 自动恢复）
       lidTop.classList.remove('closing');
       lidBottom.classList.remove('closing');
     }, 380);
+  }
+
+  // ---- 暗黑粒子 ----
+  function spawnDarkParticles() {
+    var container = document.getElementById('darkParticles');
+    if (!container) return;
+    container.innerHTML = '';
+
+    var particleColors = [
+      '#c8b0f0', '#d4b8f0', '#b890e8', '#eca1ca',
+      '#f0b8d4', '#d2b5f2', '#e1c3e8', '#b99af5',
+    ];
+
+    var charRect = charContainer.getBoundingClientRect();
+    var cx = charRect.left + charRect.width / 2;
+    var cy = charRect.top + charRect.height / 2;
+    var spreadX = charRect.width * 0.75;
+    var spreadY = charRect.height * 0.7;
+
+    for (var i = 0; i < 45; i++) {
+      var p = document.createElement('span');
+      p.className = 'dark-particle';
+      var size = 2 + Math.random() * 5;
+      var x = cx + (Math.random() - 0.5) * spreadX;
+      var y = cy + (Math.random() - 0.5) * spreadY;
+      p.style.cssText =
+        'left:' + x + 'px;' +
+        'top:' + y + 'px;' +
+        'width:' + size + 'px;' +
+        'height:' + size + 'px;' +
+        'background:' + particleColors[Math.floor(Math.random() * particleColors.length)] + ';' +
+        'box-shadow: 0 0 ' + (3 + Math.random() * 6) + 'px ' + particleColors[Math.floor(Math.random() * particleColors.length)] + ';' +
+        'animation-delay:' + (Math.random() * 6) + 's;' +
+        'animation-duration:' + (5 + Math.random() * 7) + 's';
+      container.appendChild(p);
+    }
+  }
+
+  function clearDarkParticles() {
+    var container = document.getElementById('darkParticles');
+    if (container) container.innerHTML = '';
   }
 
   // ---- 鼠标聚光灯 ----
@@ -1312,6 +1356,7 @@ function triggerEasterEgg() {
       }
       if (ribbons) ribbons.style.removeProperty('display');
       document.removeEventListener('mousemove', updateSpotlight);
+      clearDarkParticles();
 
       // 眼睑重新拉开
       lidTop.classList.remove('closing');

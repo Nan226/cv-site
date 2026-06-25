@@ -374,14 +374,14 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
 .countdown-display {
   position: absolute;
   z-index: 1;
-  top: 58%;
+  top: 36%;
   left: 6%;
   transform: translate(0, -50%);
   font-family: var(--font-heading);
-  font-size: clamp(4rem, 8vw, 8rem);
+  font-size: clamp(5.5rem, 11vw, 13rem);
   font-weight: 900;
   color: #c8b0f0;
-  text-shadow: 0 0 40px rgba(160,120,220,.45), 0 0 80px rgba(160,120,220,.2);
+  text-shadow: 0 0 50px rgba(160,120,220,.5), 0 0 100px rgba(160,120,220,.25);
   pointer-events: none;
   opacity: 0;
   transition: opacity .15s ease;
@@ -413,28 +413,67 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
 }
 
 /* ---- Slogan ---- */
+/* Slogan — 左右分列，不被中间人物遮挡 */
 .easter-egg-slogan {
   position: fixed;
   z-index: 10002;
   top: 50%;
-  left: 50%;
-  transform: translate(-50%,-50%);
   font-family: var(--font-heading);
-  font-size: clamp(1.4rem,2.5vw,2.2rem);
+  font-size: clamp(1.2rem,2.2vw,1.9rem);
   font-weight: 700;
-  text-align: center;
-  line-height: 1.5;
-  letter-spacing: .08em;
+  line-height: 1.55;
+  letter-spacing: .07em;
   color: #d4c0f8;
   text-shadow: 0 0 40px rgba(180,140,240,.4), 0 0 80px rgba(160,120,220,.15);
   pointer-events: none;
   opacity: 0;
-  transform: translate(-50%,-50%) translateY(20px);
   transition: opacity 1s ease .6s, transform 1s ease .6s;
+}
+.slogan-left {
+  left: 5%;
+  text-align: left;
+  transform: translateY(-50%) translateX(-12px);
+}
+.slogan-right {
+  right: 5%;
+  text-align: right;
+  transform: translateY(-50%) translateX(12px);
 }
 .easter-egg-overlay.dark .easter-egg-slogan {
   opacity: 1;
-  transform: translate(-50%,-50%) translateY(0);
+}
+.easter-egg-overlay.dark .slogan-left {
+  transform: translateY(-50%) translateX(0);
+}
+.easter-egg-overlay.dark .slogan-right {
+  transform: translateY(-50%) translateX(0);
+}
+
+/* ---- 暗黑粒子特效 ---- */
+.dark-particles {
+  position: fixed;
+  z-index: 10001;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1s ease .8s;
+}
+.easter-egg-overlay.dark .dark-particles {
+  opacity: 1;
+}
+.dark-particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: darkParticleFloat 6s ease-in-out infinite;
+}
+@keyframes darkParticleFloat {
+  0%   { transform: translateY(0) scale(1); opacity: 0; }
+  15%  { opacity: .7; }
+  50%  { opacity: .5; transform: translateY(-60px) scale(1.3); }
+  85%  { opacity: .1; }
+  100% { transform: translateY(-120px) scale(.6); opacity: 0; }
 }
 
 /* ---- 拉绳开关 ---- */
