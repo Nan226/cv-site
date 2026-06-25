@@ -1433,7 +1433,7 @@ function initAboutMe() {
 
   var cardCount = ABOUT_CARDS.length;
   var angleStep = 360 / cardCount;
-  var radius = 480; // translateZ 距离
+  var radius = 360; // translateZ 距离
 
   ABOUT_CARDS.forEach(function (card, i) {
     var el = document.createElement('div');

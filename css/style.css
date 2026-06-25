@@ -144,7 +144,7 @@ body{
 .about-cards{
   flex:1 1 auto;
   display:flex;align-items:center;justify-content:center;
-  perspective:1400px;
+  perspective:1000px;
   perspective-origin:50% 45%;
   overflow:hidden;
   cursor:grab;
@@ -163,7 +163,7 @@ body{
 
 .about-card{
   position:absolute;
-  width:270px;min-height:360px;
+  width:230px;min-height:300px;
   border-radius:8px;
   background:rgba(255,255,255,.92);
   border:1px solid rgba(126,112,180,.1);
@@ -171,7 +171,6 @@ body{
   overflow:hidden;
   display:flex;flex-direction:column;
   transition:box-shadow .4s ease;
-  /* transform + opacity set via JS inline */
 }
 .about-card.front{
   box-shadow:0 6px 32px rgba(130,100,200,.14),0 0 0 1px rgba(180,150,220,.06);
@@ -180,7 +179,7 @@ body{
 /* 卡片图片 */
 .card-image-wrap{
   position:relative;
-  width:100%;height:195px;
+  width:100%;height:200px;
   overflow:hidden;
   background:linear-gradient(135deg,rgba(235,225,255,.4),rgba(250,235,245,.35));
   flex-shrink:0;
@@ -194,49 +193,49 @@ body{
 .card-image-wrap::after{
   content:'';
   position:absolute;bottom:0;left:0;right:0;
-  height:36px;
+  height:24px;
   background:linear-gradient(to bottom,transparent,rgba(255,255,255,.95));
 }
 /* 左上角分类标签 */
 .card-category{
   position:absolute;
-  top:10px;left:10px;
+  top:8px;left:8px;
   z-index:1;
   font-family:var(--font-tag);
-  font-size:.5rem;
+  font-size:.44rem;
   font-weight:600;
   letter-spacing:.06em;
   text-transform:uppercase;
   color:var(--white);
   background:rgba(0,0,0,.42);
   backdrop-filter:blur(6px);
-  padding:.22em .65em;
+  padding:.18em .55em;
   border-radius:999px;
 }
 
 /* 卡片内容区 */
 .card-body{
   flex:0 0 auto;
-  padding:.55rem .85rem .6rem;
+  padding:.4rem .7rem .45rem;
   display:flex;flex-direction:column;
-  gap:.3rem;
+  gap:.22rem;
 }
 .card-head{
   display:flex;align-items:center;gap:.4rem;
 }
 .card-head-icon{
-  width:1.1rem;height:1.1rem;
+  width:.9rem;height:.9rem;
   color:var(--purple);
   flex-shrink:0;
 }
 .card-logo{
-  width:auto;height:1.2rem;
-  max-width:3.2rem;
+  width:auto;height:1rem;
+  max-width:2.8rem;
   object-fit:contain;
 }
 .card-title{
   font-family:var(--font-heading);
-  font-size:.78rem;
+  font-size:.7rem;
   font-weight:700;
   letter-spacing:.02em;
   color:var(--text-dark);
@@ -244,34 +243,32 @@ body{
 }
 .card-subtitle{
   font-family:var(--font-tag);
-  font-size:.58rem;
+  font-size:.52rem;
   color:var(--text-mid);
 }
 .card-items{
-  display:flex;flex-wrap:wrap;gap:4px;
-  margin-top:.1rem;
+  display:flex;flex-wrap:wrap;gap:3px;
 }
 .card-tag{
   font-family:var(--font-tag);
-  font-size:.5rem;
+  font-size:.46rem;
   font-weight:500;
   color:var(--purple);
   background:rgba(210,185,250,.18);
-  padding:.15em .55em;
+  padding:.12em .5em;
   border-radius:999px;
   white-space:nowrap;
 }
 .card-info-list{
-  display:flex;flex-direction:column;gap:3px;
-  margin-top:.05rem;
+  display:flex;flex-direction:column;gap:2px;
 }
 .card-info-item{
-  display:flex;align-items:center;gap:5px;
-  font-size:.55rem;
+  display:flex;align-items:center;gap:4px;
+  font-size:.5rem;
   color:var(--text-mid);
 }
 .card-info-item i{
-  width:.72rem;height:.72rem;
+  width:.65rem;height:.65rem;
   color:var(--purple-light);
   flex-shrink:0;
 }
@@ -900,6 +897,6 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   .loading-spinner{top:30%}
   /* About Me */
   .about-main-title{font-size:clamp(1.4rem,5vw,2rem)}
-  .about-card{width:230px;min-height:300px}
-  .card-image-wrap{height:155px}
+  .about-card{width:200px;min-height:270px}
+  .card-image-wrap{height:160px}
 }
