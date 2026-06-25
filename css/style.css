@@ -57,17 +57,11 @@ body{
 .about-header{
   flex:0 0 auto;
   text-align:center;
-  padding-top:3vh;
-}
-.about-icon{
-  width:1.6rem;height:1.6rem;
-  color:var(--purple);
-  opacity:.7;
-  margin-bottom:.25rem;
+  padding-top:1.2vh;
 }
 .about-main-title{
   font-family:var(--font-heading);
-  font-size:clamp(2rem,4vw,3rem);
+  font-size:clamp(1.8rem,3.8vw,2.8rem);
   font-weight:800;
   letter-spacing:.06em;
   background:linear-gradient(102deg,#6533dd 0%,#9637e1 49%,#dd2fb6 100%);
@@ -77,35 +71,28 @@ body{
   color:#8738e0;
   line-height:1.15;
 }
-.about-main-subtitle{
-  margin-top:.3rem;
-  font-family:var(--font-tag);
-  font-size:.78rem;
-  color:var(--text-light);
-  letter-spacing:.04em;
-}
 
 /* ---- 时间线 ---- */
 .about-timeline{
-  flex:1 0 auto;
+  flex:0 1 auto;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:.6rem;
+  gap:.4rem;
   padding:0 2vw;
-  max-height:18vh;
+  max-height:15vh;
 }
 .timeline-label{
   font-family:var(--font-tag);
-  font-size:.58rem;
+  font-size:.65rem;
   font-weight:550;
-  letter-spacing:.12em;
+  letter-spacing:.14em;
   text-transform:uppercase;
-  color:var(--text-light);
+  color:var(--text-mid);
 }
 .timeline-track{
   position:relative;
   display:flex;align-items:flex-start;justify-content:space-between;
   width:100%;max-width:820px;
-  padding:1.1rem 0 .4rem;
+  padding:.8rem 0 .3rem;
 }
 /* 横向细线 */
 .timeline-track::before{
@@ -138,7 +125,7 @@ body{
   box-shadow:0 0 10px rgba(180,120,220,.35);
 }
 .timeline-period{
-  font-size:.48rem;
+  font-size:.58rem;
   font-weight:600;
   letter-spacing:.06em;
   color:var(--text-mid);
@@ -146,7 +133,7 @@ body{
 }
 .timeline-node.active .timeline-period{ color:var(--text-dark); }
 .timeline-location{
-  font-size:.44rem;
+  font-size:.52rem;
   font-weight:400;
   color:var(--text-light);
   white-space:nowrap;
@@ -176,18 +163,15 @@ body{
 
 .about-card{
   position:absolute;
-  width:290px;
-  max-height:85%;
+  width:290px;min-height:390px;
   border-radius:8px;
   background:rgba(255,255,255,.92);
   border:1px solid rgba(126,112,180,.1);
   box-shadow:0 3px 20px rgba(120,100,170,.07);
   overflow:hidden;
   display:flex;flex-direction:column;
-  backface-visibility:hidden;
-  -webkit-backface-visibility:hidden;
   transition:box-shadow .4s ease;
-  /* transform set via JS inline style */
+  /* transform + opacity set via JS inline */
 }
 .about-card.front{
   box-shadow:0 6px 32px rgba(130,100,200,.14),0 0 0 1px rgba(180,150,220,.06);
@@ -401,6 +385,7 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   max-width:46%;
   object-fit:contain;
   transform:translateX(-50%);
+  mix-blend-mode:multiply;
   opacity:0;
   visibility:hidden;
   pointer-events:none;
@@ -408,6 +393,7 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
 }
 .character-fallback-image.is-visible{opacity:1;visibility:visible}
 .interact-hint.is-hidden{opacity:0;visibility:hidden}
+.easter-egg-hint.is-hidden{opacity:0;visibility:hidden}
 .model-status{
   position:absolute;
   left:50%;
@@ -914,9 +900,7 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   /* loading spinner */
   .loading-spinner{top:30%}
   /* About Me */
-  .about-main-title{font-size:clamp(1.5rem,5vw,2.2rem)}
-  .about-main-subtitle{font-size:.65rem}
-  .about-icon{width:1.2rem;height:1.2rem}
-  .about-card{flex:0 0 240px}
-  .card-image-wrap{height:105px}
+  .about-main-title{font-size:clamp(1.4rem,5vw,2rem)}
+  .about-card{width:240px;min-height:340px}
+  .card-image-wrap{height:110px}
 }

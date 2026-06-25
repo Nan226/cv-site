@@ -148,6 +148,7 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
   const canvas = document.getElementById('threeCanvas');
   const fallbackImage = document.getElementById('characterFallbackImage');
   const interactHint = document.getElementById('interactHint');
+  const easterEggHint = document.getElementById('easterEggHint');
   if (!container || !canvas) return;
 
   // ---- Scene / Camera / Renderer ----
@@ -765,6 +766,7 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
         if (fallbackImage) fallbackImage.classList.remove('is-visible');
         canvas.classList.remove('is-hidden');
         if (interactHint) interactHint.classList.remove('is-hidden');
+        if (easterEggHint) easterEggHint.classList.remove('is-hidden');
 
         const pivot = new THREE.Group();
         pivot.name = 'yenan-avatar-pivot';
@@ -821,8 +823,9 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
         canvas.classList.add('is-hidden');
         if (fallbackImage) fallbackImage.classList.add('is-visible');
         if (interactHint) interactHint.classList.add('is-hidden');
+        if (easterEggHint) easterEggHint.classList.add('is-hidden');
         updateModelStatus('Static character preview');
-        hideModelStatus(1600);
+        hideModelStatus(0);
       }
     );
   }
