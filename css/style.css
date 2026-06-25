@@ -326,47 +326,77 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
 /* ---- 左侧交互提示 ---- */
 .interact-hint {
   position: fixed;
-  left: 1.5vw;
+  left: 2.2vw;
   top: 42%;
   z-index: 6;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 6px;
   font-family: var(--font-tag);
-  font-size: .55rem;
-  font-weight: 500;
-  color: var(--text-light);
+  font-size: .72rem;
+  font-weight: 550;
+  color: var(--text-mid);
   letter-spacing: .06em;
-  opacity: .65;
+  opacity: .78;
   pointer-events: none;
   transition: opacity .6s ease;
+}
+/* 右侧动态箭头 → 指向角色 */
+.interact-hint::after {
+  content: '';
+  width: 0; height: 0;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-left: 11px solid var(--purple-light);
+  animation: arrowBounceRight 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 4px rgba(160,120,220,.35));
 }
 
 /* ---- 右侧彩蛋提示 ---- */
 .easter-egg-hint {
   position: fixed;
-  right: 1.5vw;
+  right: 2.2vw;
   top: 42%;
   z-index: 6;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 6px;
   font-family: var(--font-tag);
-  font-size: .55rem;
-  font-weight: 500;
-  color: var(--text-light);
+  font-size: .72rem;
+  font-weight: 550;
+  color: var(--text-mid);
   letter-spacing: .06em;
   writing-mode: horizontal-tb;
-  opacity: .65;
+  opacity: .78;
   pointer-events: none;
   transition: opacity .6s ease;
+}
+/* 左侧动态箭头 ← 指向角色 */
+.easter-egg-hint::after {
+  content: '';
+  width: 0; height: 0;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-right: 11px solid var(--purple-light);
+  animation: arrowBounceLeft 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 4px rgba(160,120,220,.35));
 }
 /* 所有标签撕完后提示消失 */
 .easter-egg-hint.all-torn {
   opacity: 0;
   transition: opacity .3s ease;
+}
+
+/* ---- 箭头动画 ---- */
+@keyframes arrowBounceRight {
+  0%, 100% { transform: translateX(0); opacity: .5; }
+  50%      { transform: translateX(8px); opacity: 1; }
+}
+@keyframes arrowBounceLeft {
+  0%, 100% { transform: translateX(0); opacity: .5; }
+  50%      { transform: translateX(-8px); opacity: 1; }
 }
 
 /* ---- 全屏遮罩层 ---- */
@@ -599,7 +629,8 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   .tags-right .tag:nth-child(4){right:1%;top:62%}
   .tags-right .tag:nth-child(5){right:5%;top:78%}
   /* 左右提示缩小 */
-  .interact-hint,.easter-egg-hint{font-size:.42rem;opacity:.5}
+  .interact-hint,.easter-egg-hint{font-size:.56rem;opacity:.65;left:3vw;right:3vw}
+  .interact-hint::after,.easter-egg-hint::after{border-width:5px;border-left-width:8px;border-right-width:8px}
   /* 暗黑模式 slogan 收窄 */
   .slogan-left{left:3%;font-size:.85rem}
   .slogan-right{right:3%;font-size:.85rem}
