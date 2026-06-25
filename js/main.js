@@ -818,7 +818,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
   clickTargets = buildFallbackHitRig();
   loadProductionAvatar();
 
-  // 超时兜底：10s 后仍未加载完则隐藏 spinner，显示简模
+  // 超时兜底：30s 后仍未加载完则显示简模（移动网络较慢）
   setTimeout(function () {
     var spinner = document.getElementById('loadingSpinner');
     if (spinner && !spinner.classList.contains('is-hidden')) {
@@ -827,7 +827,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
       updateModelStatus('Preview character ready');
       hideModelStatus(1200);
     }
-  }, 10000);
+  }, 30000);
 
   // ---- 鼠标交互 ----
   const mouse = new THREE.Vector2();
