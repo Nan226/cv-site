@@ -107,36 +107,76 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
 .model-status.is-error{color:#bd3ec8}
 
 /* ---- Loading spinner ---- */
+/* ---- Loading spinner（人物头部高度，ENFP ↔ Creative 标签中间） ---- */
 .loading-spinner{
   position:absolute;
-  top:50%;left:50%;
+  top:27%;left:50%;
   transform:translate(-50%,-50%);
   z-index:5;
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:.6rem;
-  transition:opacity .3s ease;
+  gap:.55rem;
+  transition:opacity .35s ease;
+  pointer-events:none;
 }
 .loading-spinner.is-hidden{
   opacity:0;
-  pointer-events:none;
 }
 .spinner-ring{
-  width:30px;height:30px;
-  border:2.5px solid rgba(180,150,220,.22);
-  border-top-color:#b896e8;
+  position:relative;
+  width:28px;height:28px;
+}
+/* 外圈（静止光环） */
+.spinner-ring::before{
+  content:'';
+  position:absolute;
+  inset:-3px;
   border-radius:50%;
-  animation:spinnerSpin .7s linear infinite;
+  border:1.5px solid rgba(180,150,220,.18);
+}
+/* 内圈（旋转弧线） */
+.spinner-ring::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+  border:2px solid transparent;
+  border-top-color:#b896e8;
+  border-right-color:rgba(200,170,245,.5);
+  animation:spinnerSpin .75s linear infinite;
+  filter:drop-shadow(0 0 6px rgba(180,140,230,.35));
 }
 @keyframes spinnerSpin{ to{ transform:rotate(360deg); } }
 .spinner-text{
   font-family:var(--font-tag);
-  font-size:.65rem;
+  font-size:.6rem;
   font-weight:500;
-  letter-spacing:.14em;
-  color:#b896e8;
+  letter-spacing:.16em;
+  color:#a898d4;
   text-transform:uppercase;
+}
+
+/* ---- 拉绳提示（暗黑模式中） ---- */
+.pull-chain-hint{
+  position:fixed;
+  z-index:10003;
+  top:92px;
+  right:28px;
+  font-family:var(--font-tag);
+  font-size:.58rem;
+  font-weight:400;
+  letter-spacing:.08em;
+  color:rgba(200,175,240,.7);
+  text-align:right;
+  opacity:0;
+  transform:translateY(-10px);
+  transition:opacity .5s ease 1s, transform .5s ease 1s;
+  pointer-events:none;
+}
+.easter-egg-overlay.dark .pull-chain-hint{
+  opacity:1;
+  transform:translateY(0);
 }
 
 /* ===== 标签 ===== */

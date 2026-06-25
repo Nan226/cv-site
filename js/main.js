@@ -818,6 +818,17 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
   clickTargets = buildFallbackHitRig();
   loadProductionAvatar();
 
+  // 超时兜底：10s 后仍未加载完则隐藏 spinner，显示简模
+  setTimeout(function () {
+    var spinner = document.getElementById('loadingSpinner');
+    if (spinner && !spinner.classList.contains('is-hidden')) {
+      spinner.classList.add('is-hidden');
+      character.visible = true;
+      updateModelStatus('Preview character ready');
+      hideModelStatus(1200);
+    }
+  }, 10000);
+
   // ---- 鼠标交互 ----
   const mouse = new THREE.Vector2();
   const mouseTarget = new THREE.Vector2();  // 平滑跟随
@@ -946,6 +957,23 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
   function triggerReaction(partName) {
     if (stopActiveReaction) stopActiveReaction();
 
+    // GLB model has avatarRoot.rotation.y = -π/2, so visual left/right
+    // is swapped relative to the skeleton bone names. Compensate here.
+    var lookupName = partName;
+    if (activeCharacter !== character) {
+      var swapMap = {
+        'left-shoulder': 'right-shoulder',
+        'right-shoulder': 'left-shoulder',
+        'left-hand': 'right-hand',
+        'right-hand': 'left-hand',
+        'left-leg': 'right-leg',
+        'right-leg': 'left-leg',
+        'left-foot': 'right-foot',
+        'right-foot': 'left-foot',
+      };
+      lookupName = swapMap[partName] || partName;
+    }
+
     // Map click target name to the body part to shake
     var partMap = {
       'head': activeBodyParts.head,
@@ -961,7 +989,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
       'left-foot': activeBodyParts['left-foot'],
       'right-foot': activeBodyParts['right-foot'],
     };
-    var part = partMap[partName];
+    var part = partMap[lookupName];
     if (!part) return;
 
     // Left-side parts shake one way, right-side the opposite
