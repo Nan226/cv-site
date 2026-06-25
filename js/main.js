@@ -122,8 +122,20 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
     });
   });
 
-  // 暴露计数（供调试）
+  // 暴露计数和重置（供调试 + 开灯后重置）
   window.__tornCount = () => tornCount;
+  window.__resetAllTags = function () {
+    tornCount = 0;
+    tags.forEach(function (tag) {
+      tag.style.display = '';
+      var inner = tag.querySelector('.tag-inner');
+      if (inner) {
+        inner.classList.remove('tearing', 'torn');
+      }
+    });
+    var hint = document.getElementById('easterEggHint');
+    if (hint) hint.classList.remove('all-torn');
+  };
 })();
 
 
@@ -1295,7 +1307,10 @@ function triggerEasterEgg() {
       lidTop.classList.remove('closing');
       lidBottom.classList.remove('closing');
 
-      // 开灯后自动下滑到 About Me
+      // 重置所有标签，回到初始状态，可重新撕碎触发彩蛋
+      if (window.__resetAllTags) window.__resetAllTags();
+
+      // 等 blink 眼睑拉开后，自动下滑到 About Me
       setTimeout(function () {
         var aboutSection = document.getElementById('about');
         if (aboutSection) {
