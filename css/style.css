@@ -323,9 +323,7 @@ body{
   width:.68rem;height:.68rem;
 }
 
-/* 移动到 About Me 时隐藏 HOME 左右提示 */
-.scroll-container:has(#about) .interact-hint,
-body:has(#about:target) .interact-hint,
+/* 移动到 About Me 时隐藏 HOME 左右提示 (由 JS IntersectionObserver 控制) */
 .interact-hint.is-hidden-by-about,
 .easter-egg-hint.is-hidden-by-about{
   opacity:0;pointer-events:none;
