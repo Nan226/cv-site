@@ -1333,20 +1333,14 @@ function triggerEasterEgg() {
 
 
 // ============================================================
-//  About Me — 数据 + 静态渲染
+//  About Me — 数据 + 3D 环绕轮播
 // ============================================================
 
 var ABOUT_CARDS = [
   {
-    id: 'base-info',
-    period: 'FEB 2003',
-    location: 'Quanzhou, Fujian',
-    category: 'Base Info',
-    icon: 'id-card',
-    title: 'Base Information',
-    subtitle: '',
-    image: 'images/About me/照片1.JPEG',
-    logo: null,
+    id: 'base-info', period: 'FEB 2003', location: 'Quanzhou, Fujian',
+    category: 'Base Info', icon: 'id-card', title: 'Base Information', subtitle: '',
+    image: 'images/About me/照片1.JPEG', logo: null,
     items: [
       { icon: 'cake-slice', label: 'Date of Birth', value: 'February 26, 2003' },
       { icon: 'phone', label: 'Phone', value: '183 5056 5182' },
@@ -1357,78 +1351,56 @@ var ABOUT_CARDS = [
     action: { label: 'Download Resume', icon: 'download', disabled: true }
   },
   {
-    id: 'huaqiao',
-    period: 'SEP 2020 - JUN 2024',
-    location: 'Xiamen, Fujian',
-    category: 'Education',
-    icon: 'graduation-cap',
-    title: 'Huaqiao University',
-    subtitle: '',
-    image: 'images/About me/照片2.jpg',
-    logo: 'images/About me/华侨大学校徽.png',
+    id: 'huaqiao', period: 'SEP 2020 - JUN 2024', location: 'Xiamen, Fujian',
+    category: 'Education', icon: 'graduation-cap', title: 'Huaqiao University', subtitle: '',
+    image: 'images/About me/照片2.jpg', logo: 'images/About me/华侨大学校徽.png',
     items: [],
-    tags: ['Top 10% GPA', 'First-Class Scholarship', 'IELTS 6.5', 'CET-6', 'Class Life Committee', 'Sangzi WeAssistant', 'Plant Art Club Lead'],
+    tags: ['Top 10% GPA','First-Class Scholarship','IELTS 6.5','CET-6','Class Life Committee','Sangzi WeAssistant','Plant Art Club Lead'],
     action: null
   },
   {
-    id: 'keendata',
-    period: 'APR 2025 - AUG 2025',
-    location: 'Shenzhen, Guangdong',
-    category: 'Internship',
-    icon: 'briefcase-business',
-    title: 'Keendata',
+    id: 'keendata', period: 'APR 2025 - AUG 2025', location: 'Shenzhen, Guangdong',
+    category: 'Internship', icon: 'briefcase-business', title: 'Keendata',
     subtitle: 'Project Management Intern',
-    image: 'images/About me/照片3.png',
-    logo: 'images/About me/Keendata.png',
+    image: 'images/About me/照片3.png', logo: 'images/About me/Keendata.png',
     items: [],
-    tags: ['Big Data Platform', 'Issue Tracking', 'Requirements Management', 'Custom Delivery'],
+    tags: ['Big Data Platform','Issue Tracking','Requirements Management','Custom Delivery'],
     action: { label: 'View Details', icon: 'arrow-up-right', disabled: true }
   },
   {
-    id: 'polyu',
-    period: 'SEP 2025',
-    location: 'Hung Hom, Hong Kong',
-    category: 'Education',
-    icon: 'graduation-cap',
-    title: 'The Hong Kong Polytechnic University',
-    subtitle: '',
-    image: 'images/About me/照片4.png',
-    logo: 'images/About me/香港理工大学校徽.png',
+    id: 'polyu', period: 'SEP 2025', location: 'Hung Hom, Hong Kong',
+    category: 'Education', icon: 'graduation-cap',
+    title: 'The Hong Kong Polytechnic University', subtitle: '',
+    image: 'images/About me/照片4.png', logo: 'images/About me/香港理工大学校徽.png',
     items: [],
-    tags: ['QS Top 50', 'Metaverse', 'Top 10% GPA'],
+    tags: ['QS Top 50','Metaverse','Top 10% GPA'],
     action: null
   },
   {
-    id: 'xgrids',
-    period: 'JAN 2026 - MAY 2026',
-    location: 'Shenzhen, Guangdong',
-    category: 'Internship',
-    icon: 'scan-line',
-    title: 'XGRIDS',
+    id: 'xgrids', period: 'JAN 2026 - MAY 2026', location: 'Shenzhen, Guangdong',
+    category: 'Internship', icon: 'scan-line', title: 'XGRIDS',
     subtitle: 'Project Management Intern',
-    image: 'images/About me/照片5.png',
-    logo: 'images/About me/XGRIDS.png',
+    image: 'images/About me/照片5.png', logo: 'images/About me/XGRIDS.png',
     items: [],
-    tags: ['Agile Iteration', 'Process SOPs', 'Software Delivery', '3D Reconstruction', 'Spatial Computing'],
+    tags: ['Agile Iteration','Process SOPs','Software Delivery','3D Reconstruction','Spatial Computing'],
     action: { label: 'View Details', icon: 'arrow-up-right', disabled: true }
   },
   {
-    id: 'chery',
-    period: 'JUN 2026 - PRESENT',
-    location: 'Wuhu, Anhui',
-    category: 'Internship',
-    icon: 'car-front',
-    title: 'CHERY',
+    id: 'chery', period: 'JUN 2026 - PRESENT', location: 'Wuhu, Anhui',
+    category: 'Internship', icon: 'car-front', title: 'CHERY',
     subtitle: 'Project Management Intern',
-    image: 'images/About me/照片6.png',
-    logo: 'images/About me/CHERY.png',
+    image: 'images/About me/照片6.png', logo: 'images/About me/CHERY.png',
     items: [],
-    tags: ['Intelligent Driving', 'ADSD', 'Jira Governance', 'Quality Management', 'Robotaxi', 'Cross-functional Communication'],
+    tags: ['Intelligent Driving','ADSD','Jira Governance','Quality Management','Robotaxi','Cross-functional Communication'],
     action: { label: 'View Details', icon: 'arrow-up-right', disabled: true }
   }
 ];
 
-var currentCardIndex = 0;
+var carouselAngle = 0;       // 当前旋转角度 (度)
+var carouselSpeed = 0;       // 瞬时速度
+var carouselTarget = null;   // snap 目标角度
+var carouselAuto = true;     // 是否自动旋转
+var carouselRAF = null;
 
 function initAboutMe() {
   var timelineTrack = document.getElementById('timelineTrack');
@@ -1446,15 +1418,28 @@ function initAboutMe() {
       '<span class="timeline-dot"></span>' +
       '<span class="timeline-period">' + card.period + '</span>' +
       '<span class="timeline-location">' + card.location + '</span>';
-    btn.addEventListener('click', function () { switchToCard(i); });
+    btn.addEventListener('click', function () { snapToCard(i); });
     timelineTrack.appendChild(btn);
   });
 
-  // ---- 渲染卡片 ----
+  // ---- 构建 3D 环绕 wrapper ----
+  var wrapper = document.createElement('div');
+  wrapper.className = 'carousel-wrapper';
+  wrapper.id = 'carouselWrapper';
+  cardsContainer.appendChild(wrapper);
+
+  var cardCount = ABOUT_CARDS.length;
+  var angleStep = 360 / cardCount;
+  var radius = 480; // translateZ 距离
+
   ABOUT_CARDS.forEach(function (card, i) {
     var el = document.createElement('div');
-    el.className = 'about-card' + (i === 0 ? ' active' : '');
-    el.setAttribute('aria-label', 'Slide ' + (i + 1) + ' of 6: ' + card.title);
+    el.className = 'about-card';
+    el.setAttribute('aria-label', 'Slide ' + (i + 1) + ' of ' + cardCount + ': ' + card.title);
+
+    // 初始 transform
+    var initAngle = i * angleStep;
+    el.style.transform = 'rotateY(' + initAngle + 'deg) translateZ(' + radius + 'px)';
 
     // Image
     var imgHTML =
@@ -1463,13 +1448,13 @@ function initAboutMe() {
         '<span class="card-category">' + card.category + '</span>' +
       '</div>';
 
-    // Body — build head section
+    // Head: logo or icon
     var headIconHTML = card.logo
       ? '<img src="' + card.logo + '" alt="" class="card-logo">'
       : '<i data-lucide="' + card.icon + '" class="card-head-icon"></i>';
     var subtitleHTML = card.subtitle ? '<p class="card-subtitle">' + card.subtitle + '</p>' : '';
 
-    // Body — items: info list or tags
+    // Items
     var itemsHTML = '';
     if (card.items.length > 0) {
       itemsHTML = '<div class="card-info-list">';
@@ -1490,7 +1475,7 @@ function initAboutMe() {
       itemsHTML += '</div>';
     }
 
-    // Action button
+    // Action
     var actionHTML = '';
     if (card.action) {
       actionHTML =
@@ -1511,51 +1496,199 @@ function initAboutMe() {
         actionHTML +
       '</div>';
 
-    cardsContainer.appendChild(el);
+    wrapper.appendChild(el);
   });
 
-  // ---- 初始化 Lucide 图标 ----
+  // Lucide icons
   if (window.lucide) { lucide.createIcons(); }
 
-  // ---- 卡片点击切换 ----
-  var cards = cardsContainer.querySelectorAll('.about-card');
-  cards.forEach(function (cardEl, i) {
-    cardEl.addEventListener('click', function (e) {
-      // 不拦截按钮点击
-      if (e.target.closest('button')) return;
-      if (i !== currentCardIndex) switchToCard(i);
-    });
-  });
-}
+  // ---- 拖拽交互 ----
+  var dragging = false;
+  var lastX = 0;
+  var dragVelocity = 0;
 
-function switchToCard(index) {
-  if (index === currentCardIndex) return;
-  currentCardIndex = index;
-
-  // 更新卡片
-  var allCards = document.querySelectorAll('#aboutCards .about-card');
-  allCards.forEach(function (el, i) {
-    el.classList.toggle('active', i === index);
+  cardsContainer.addEventListener('mousedown', function (e) {
+    if (e.target.closest('button')) return;
+    dragging = true;
+    carouselAuto = false;
+    carouselTarget = null;
+    lastX = e.clientX;
+    dragVelocity = 0;
+    cardsContainer.classList.add('dragging');
+    e.preventDefault();
   });
 
-  // 更新节点
-  var allNodes = document.querySelectorAll('#timelineTrack .timeline-node');
-  allNodes.forEach(function (el, i) {
-    el.classList.toggle('active', i === index);
-    if (i === index) {
-      el.setAttribute('aria-current', 'step');
+  window.addEventListener('mousemove', function (e) {
+    if (!dragging) return;
+    var delta = e.clientX - lastX;
+    carouselAngle += delta * 0.35;
+    dragVelocity = delta * 0.35;
+    lastX = e.clientX;
+    updateCarousel();
+  });
+
+  window.addEventListener('mouseup', function () {
+    if (!dragging) return;
+    dragging = false;
+    cardsContainer.classList.remove('dragging');
+    // 惯性衰减
+    if (Math.abs(dragVelocity) > 0.5) {
+      carouselSpeed = dragVelocity * 0.3;
+      carouselAuto = true;
     } else {
-      el.removeAttribute('aria-current');
+      carouselAuto = true;
+      carouselSpeed = 0;
     }
   });
 
-  // 滚动当前卡片到可见位置
-  if (allCards[index]) {
-    allCards[index].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  // 滚轮
+  cardsContainer.addEventListener('wheel', function (e) {
+    e.preventDefault();
+    carouselAuto = false;
+    carouselTarget = null;
+    carouselAngle += e.deltaX * 0.3 + e.deltaY * 0.15;
+    carouselSpeed = 0;
+    updateCarousel();
+    // 短暂停后恢复自动
+    clearTimeout(cardsContainer._wheelTimeout);
+    cardsContainer._wheelTimeout = setTimeout(function () { carouselAuto = true; }, 1500);
+  }, { passive: false });
+
+  // 触控
+  var touchStartX = 0;
+  cardsContainer.addEventListener('touchstart', function (e) {
+    if (e.target.closest('button')) return;
+    carouselAuto = false;
+    carouselTarget = null;
+    touchStartX = e.touches[0].clientX;
+    lastX = touchStartX;
+    dragVelocity = 0;
+    cardsContainer.classList.add('dragging');
+  }, { passive: true });
+
+  cardsContainer.addEventListener('touchmove', function (e) {
+    if (!cardsContainer.classList.contains('dragging')) return;
+    var delta = e.touches[0].clientX - lastX;
+    carouselAngle += delta * 0.35;
+    dragVelocity = delta * 0.35;
+    lastX = e.touches[0].clientX;
+    updateCarousel();
+  }, { passive: true });
+
+  cardsContainer.addEventListener('touchend', function () {
+    cardsContainer.classList.remove('dragging');
+    if (Math.abs(dragVelocity) > 0.5) {
+      carouselSpeed = dragVelocity * 0.3;
+      carouselAuto = true;
+    } else {
+      carouselAuto = true;
+      carouselSpeed = 0;
+    }
+  });
+
+  // ---- 自动旋转 loop ----
+  function carouselLoop() {
+    if (carouselTarget !== null) {
+      // snap 动画
+      var diff = carouselTarget - carouselAngle;
+      if (Math.abs(diff) < 0.3) {
+        carouselAngle = carouselTarget;
+        carouselTarget = null;
+        carouselAuto = true;
+        carouselSpeed = 0;
+      } else {
+        carouselAngle += diff * 0.08;
+      }
+    } else if (carouselAuto) {
+      // 慢速自动旋转
+      carouselSpeed += (0.015 - carouselSpeed) * 0.02;
+      carouselAngle += carouselSpeed;
+    }
+
+    // 惯性衰减
+    if (!carouselAuto && carouselTarget === null) {
+      carouselSpeed *= 0.95;
+      carouselAngle += carouselSpeed;
+    }
+
+    updateCarousel();
+    carouselRAF = requestAnimationFrame(carouselLoop);
+  }
+  carouselLoop();
+
+  // ---- IntersectionObserver: 进入 About Me 隐藏 HOME 提示 ----
+  if (window.IntersectionObserver) {
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        var interactHint = document.getElementById('interactHint');
+        var easterEggHint = document.getElementById('easterEggHint');
+        if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+          if (interactHint) interactHint.classList.add('is-hidden-by-about');
+          if (easterEggHint) easterEggHint.classList.add('is-hidden-by-about');
+        } else {
+          if (interactHint) interactHint.classList.remove('is-hidden-by-about');
+          if (easterEggHint) easterEggHint.classList.remove('is-hidden-by-about');
+        }
+      });
+    }, { threshold: [0.5] });
+    observer.observe(document.getElementById('about'));
   }
 }
 
-// 页面加载后初始化
+function updateCarousel() {
+  var wrapper = document.getElementById('carouselWrapper');
+  if (!wrapper) return;
+
+  var cardCount = ABOUT_CARDS.length;
+  var angleStep = 360 / cardCount;
+  var radius = 480;
+
+  // 归一化角度
+  var norm = ((carouselAngle % 360) + 360) % 360;
+
+  // 找到最接近正前方的卡片
+  var frontIndex = Math.round(norm / angleStep) % cardCount;
+  if (frontIndex < 0) frontIndex += cardCount;
+
+  // 更新 wrapper 旋转
+  wrapper.style.transform = 'rotateY(' + (-carouselAngle) + 'deg)';
+
+  // 更新每张卡片的角度感知（用于 front class）
+  var cards = wrapper.querySelectorAll('.about-card');
+  cards.forEach(function (el, i) {
+    // 计算这张卡当前在视线中的偏移角
+    var cardAngle = ((i * angleStep - norm) % 360 + 360) % 360;
+    if (cardAngle > 180) cardAngle -= 360;
+
+    // 是否在前面
+    var isFront = Math.abs(cardAngle) < angleStep / 2 + 1;
+    el.classList.toggle('front', isFront);
+
+    // 透明度：前方最亮，后方渐暗
+    var absAngle = Math.abs(cardAngle);
+    var opacity = absAngle < 90 ? 1 - (absAngle / 90) * 0.55 : 0.45 - ((absAngle - 90) / 90) * 0.25;
+    el.style.opacity = Math.max(0.2, opacity);
+  });
+
+  // 更新时间线高亮
+  var nodes = document.querySelectorAll('#timelineTrack .timeline-node');
+  nodes.forEach(function (node, i) {
+    node.classList.toggle('active', i === frontIndex);
+    if (i === frontIndex) {
+      node.setAttribute('aria-current', 'step');
+    } else {
+      node.removeAttribute('aria-current');
+    }
+  });
+}
+
+function snapToCard(index) {
+  var angleStep = 360 / ABOUT_CARDS.length;
+  carouselTarget = index * angleStep;
+  carouselAuto = false;
+}
+
+// 初始化
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initAboutMe);
 } else {

@@ -153,39 +153,53 @@ body{
 }
 .timeline-node.active .timeline-location{ color:var(--text-mid); }
 
-/* ---- 卡片区 ---- */
+/* ---- 3D 环绕轮播 ---- */
 .about-cards{
   flex:1 1 auto;
   display:flex;align-items:center;justify-content:center;
-  gap:1.8vw;
-  overflow-x:auto;overflow-y:visible;
-  padding:1vh 1vw 2vh;
-  scroll-behavior:smooth;
-  -webkit-overflow-scrolling:touch;
+  perspective:1400px;
+  perspective-origin:50% 45%;
+  overflow:hidden;
+  cursor:grab;
+  -webkit-user-select:none;user-select:none;
 }
-.about-cards::-webkit-scrollbar{ height:3px; }
-.about-cards::-webkit-scrollbar-thumb{ background:rgba(160,140,200,.25);border-radius:3px; }
+.about-cards:active{ cursor:grabbing; }
+.about-cards.dragging{ cursor:grabbing; }
+
+.carousel-wrapper{
+  position:relative;
+  width:100%;height:100%;
+  transform-style:preserve-3d;
+  display:flex;align-items:center;justify-content:center;
+  will-change:transform;
+}
 
 .about-card{
-  flex:0 0 290px;
+  position:absolute;
+  width:290px;
+  max-height:85%;
   border-radius:8px;
-  background:rgba(255,255,255,.88);
+  background:rgba(255,255,255,.92);
   border:1px solid rgba(126,112,180,.1);
-  box-shadow:0 2px 16px rgba(120,100,170,.06);
+  box-shadow:0 3px 20px rgba(120,100,170,.07);
   overflow:hidden;
   display:flex;flex-direction:column;
-  transition:transform .35s ease,box-shadow .35s ease,opacity .35s ease;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+  transition:box-shadow .4s ease;
+  /* transform set via JS inline style */
 }
-.about-card.active{
-  box-shadow:0 4px 24px rgba(130,100,200,.13);
+.about-card.front{
+  box-shadow:0 6px 32px rgba(130,100,200,.14),0 0 0 1px rgba(180,150,220,.06);
 }
 
 /* 卡片图片 */
 .card-image-wrap{
   position:relative;
-  width:100%;height:130px;
+  width:100%;height:155px;
   overflow:hidden;
   background:linear-gradient(135deg,rgba(235,225,255,.4),rgba(250,235,245,.35));
+  flex-shrink:0;
 }
 .card-image-wrap img{
   width:100%;height:100%;
@@ -196,8 +210,8 @@ body{
 .card-image-wrap::after{
   content:'';
   position:absolute;bottom:0;left:0;right:0;
-  height:32px;
-  background:linear-gradient(to bottom,transparent,rgba(255,255,255,.92));
+  height:36px;
+  background:linear-gradient(to bottom,transparent,rgba(255,255,255,.95));
 }
 /* 左上角分类标签 */
 .card-category{
@@ -205,40 +219,41 @@ body{
   top:10px;left:10px;
   z-index:1;
   font-family:var(--font-tag);
-  font-size:.52rem;
+  font-size:.5rem;
   font-weight:600;
   letter-spacing:.06em;
   text-transform:uppercase;
   color:var(--white);
   background:rgba(0,0,0,.42);
   backdrop-filter:blur(6px);
-  padding:.25em .7em;
+  padding:.22em .65em;
   border-radius:999px;
 }
 
 /* 卡片内容区 */
 .card-body{
   flex:1 1 auto;
-  padding:1rem 1.1rem .8rem;
+  padding:.85rem 1rem .7rem;
   display:flex;flex-direction:column;
-  gap:.55rem;
+  gap:.4rem;
+  overflow-y:auto;
 }
 .card-head{
-  display:flex;align-items:center;gap:.45rem;
+  display:flex;align-items:center;gap:.4rem;
 }
 .card-head-icon{
-  width:1.15rem;height:1.15rem;
+  width:1.1rem;height:1.1rem;
   color:var(--purple);
   flex-shrink:0;
 }
 .card-logo{
-  width:auto;height:1.3rem;
-  max-width:3.5rem;
+  width:auto;height:1.2rem;
+  max-width:3.2rem;
   object-fit:contain;
 }
 .card-title{
   font-family:var(--font-heading);
-  font-size:.82rem;
+  font-size:.78rem;
   font-weight:700;
   letter-spacing:.02em;
   color:var(--text-dark);
@@ -246,34 +261,34 @@ body{
 }
 .card-subtitle{
   font-family:var(--font-tag);
-  font-size:.62rem;
+  font-size:.58rem;
   color:var(--text-mid);
 }
 .card-items{
-  display:flex;flex-wrap:wrap;gap:5px;
-  margin-top:.15rem;
+  display:flex;flex-wrap:wrap;gap:4px;
+  margin-top:.1rem;
 }
 .card-tag{
   font-family:var(--font-tag);
-  font-size:.52rem;
+  font-size:.5rem;
   font-weight:500;
   color:var(--purple);
   background:rgba(210,185,250,.18);
-  padding:.18em .6em;
+  padding:.15em .55em;
   border-radius:999px;
   white-space:nowrap;
 }
 .card-info-list{
-  display:flex;flex-direction:column;gap:4px;
-  margin-top:.1rem;
+  display:flex;flex-direction:column;gap:3px;
+  margin-top:.05rem;
 }
 .card-info-item{
-  display:flex;align-items:center;gap:6px;
-  font-size:.58rem;
+  display:flex;align-items:center;gap:5px;
+  font-size:.55rem;
   color:var(--text-mid);
 }
 .card-info-item i{
-  width:.8rem;height:.8rem;
+  width:.72rem;height:.72rem;
   color:var(--purple-light);
   flex-shrink:0;
 }
@@ -281,18 +296,18 @@ body{
 /* 卡片操作按钮 */
 .card-action{
   margin-top:auto;
-  padding-top:.3rem;
+  padding-top:.2rem;
 }
 .card-action-btn{
-  display:inline-flex;align-items:center;gap:.35rem;
+  display:inline-flex;align-items:center;gap:.3rem;
   font-family:var(--font-tag);
-  font-size:.58rem;
+  font-size:.55rem;
   font-weight:550;
   color:var(--purple);
   background:none;
   border:1px solid rgba(160,130,210,.25);
   border-radius:999px;
-  padding:.35em 1em;
+  padding:.3em .85em;
   cursor:pointer;
   transition:background .2s ease,border-color .2s ease;
 }
@@ -305,7 +320,15 @@ body{
   cursor:not-allowed;
 }
 .card-action-btn i{
-  width:.72rem;height:.72rem;
+  width:.68rem;height:.68rem;
+}
+
+/* 移动到 About Me 时隐藏 HOME 左右提示 */
+.scroll-container:has(#about) .interact-hint,
+body:has(#about:target) .interact-hint,
+.interact-hint.is-hidden-by-about,
+.easter-egg-hint.is-hidden-by-about{
+  opacity:0;pointer-events:none;
 }
 a{text-decoration:none;color:inherit}ul{list-style:none}
 
@@ -386,6 +409,7 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   transition:opacity .35s ease;
 }
 .character-fallback-image.is-visible{opacity:1;visibility:visible}
+.interact-hint.is-hidden{opacity:0;visibility:hidden}
 .model-status{
   position:absolute;
   left:50%;
