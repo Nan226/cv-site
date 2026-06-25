@@ -955,9 +955,13 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
     var part = partMap[partName];
     if (!part) return;
 
+    // Left-side parts shake one way, right-side the opposite
+    var direction = partName.indexOf('left') === 0 ? -1 :
+                    partName.indexOf('right') === 0 ? 1 : 0;
+
     var originalRotation = part.rotation.clone();
     var startTime = performance.now();
-    var duration = 500;
+    var duration = 450;
     var frameId = 0;
 
     function restoreShake() {
@@ -971,11 +975,11 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
     function animateShake(now) {
       var elapsed = now - startTime;
       var t = Math.min(elapsed / duration, 1);
-      // Damped oscillation: 5 half-cycles, amplitude decays to zero
-      var shake = Math.sin(t * Math.PI * 5) * (1 - t) * 0.12;
+      // Gentle damped oscillation: 5 half-cycles, amplitude 0.06 rad
+      var shake = Math.sin(t * Math.PI * 5) * (1 - t) * 0.06;
 
       part.rotation.copy(originalRotation);
-      part.rotation.z += shake;
+      part.rotation.z += direction !== 0 ? shake * direction : shake;
 
       if (t < 1) {
         frameId = requestAnimationFrame(animateShake);
@@ -996,33 +1000,32 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
     if (animationMixer) animationMixer.update(clock.getDelta());
 
-    // 角色上半身随鼠标轻微转向
-    const targetRotY = mouseOnCharacter ? mouse.x * 0.32 : 0;
-    const targetRotX = mouseOnCharacter ? -mouse.y * 0.12 : 0;
+    // 身体仅轻微微转（不要整体跟着鼠标跑）
+    const targetRotY = mouseOnCharacter ? mouse.x * 0.12 : 0;
+    const targetRotX = mouseOnCharacter ? -mouse.y * 0.05 : 0;
 
     if (!stopActiveReaction) {
       activeCharacter.rotation.y += (targetRotY - activeCharacter.rotation.y) * 0.06;
       activeCharacter.rotation.x += (targetRotX - activeCharacter.rotation.x) * 0.06;
     }
 
-    // 头部额外跟随，正式骨骼与简模共用
+    // 头部跟随（比身体稍灵敏）
     const activeHead = activeBodyParts.head;
     if (activeHead && !stopActiveReaction) {
       const baseRotation = activeHead.userData.followBaseRotation || new THREE.Euler();
-      const headTargetY = baseRotation.y + (mouseOnCharacter ? mouse.x * 0.16 : 0);
-      const headTargetX = baseRotation.x + (mouseOnCharacter ? -mouse.y * 0.08 : 0);
-      activeHead.rotation.y += (headTargetY - activeHead.rotation.y) * 0.08;
-      activeHead.rotation.x += (headTargetX - activeHead.rotation.x) * 0.08;
+      const headTargetY = baseRotation.y + (mouseOnCharacter ? mouse.x * 0.2 : 0);
+      const headTargetX = baseRotation.x + (mouseOnCharacter ? -mouse.y * 0.12 : 0);
+      activeHead.rotation.y += (headTargetY - activeHead.rotation.y) * 0.1;
+      activeHead.rotation.x += (headTargetX - activeHead.rotation.x) * 0.1;
     }
 
-    // 眼睛瞳孔跟随鼠标
-    const lookX = mouseOnCharacter ? mouse.x * 0.04 : 0;
-    const lookY = mouseOnCharacter ? mouse.y * 0.03 : 0;
+    // 瞳孔跟踪（范围加大，更灵敏）
+    const lookX = mouseOnCharacter ? mouse.x * 0.08 : 0;
+    const lookY = mouseOnCharacter ? mouse.y * 0.06 : 0;
     activeEyePairs.forEach(({ group }) => {
-      // 瞳孔偏移（限制范围）
       group.children.forEach(child => {
         if (child.name && child.name.startsWith('pupil')) {
-          child.position.x = (child.name === 'pupil-left' ? -1 : 1) * 0.0 + lookX;
+          child.position.x = lookX;
           child.position.y = lookY;
         }
       });
