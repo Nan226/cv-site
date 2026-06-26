@@ -48,7 +48,8 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 (function initNavClicks() {
   var sectionMap = {
     'About Me': 'about',
-    // Internship / Projects / Skills / Learning 分区待建，暂不绑定
+    'Internship': 'internship',
+    // Projects / Skills / Learning 分区待建，暂不绑定
   };
 
   document.querySelectorAll('.nav-item').forEach(function (link) {
@@ -1368,6 +1369,250 @@ function triggerEasterEgg() {
 
 
 // ============================================================
+//  Internship — 实习旅程
+// ============================================================
+
+var INTERNSHIP_CARDS = [
+  {
+    id: 'keendata',
+    company: 'Keendata',
+    role: 'Project Management Intern',
+    period: 'APR 2025 - AUG 2025',
+    location: 'Shenzhen, Guangdong',
+    image: 'images/Internship/卡片1.jpg',
+    logo: '',
+    summary: 'Coordinated requirements, issues, and custom delivery workflows for data platform projects.',
+    tags: ['Requirements', 'Issue Tracking', 'Data Platform', 'Delivery'],
+    responsibilities: ['To be completed.'],
+    methods: ['To be completed.'],
+    highlights: ['To be completed.']
+  },
+  {
+    id: 'xgrids',
+    company: 'XGRIDS',
+    role: 'Project Management Intern',
+    period: 'JAN 2026 - MAY 2026',
+    location: 'Shenzhen, Guangdong',
+    image: 'images/Internship/卡片2.jpg',
+    logo: '',
+    summary: 'Supported agile delivery, SOP refinement, and software iteration for spatial computing products.',
+    tags: ['Agile', 'SOP', '3D Reconstruction', 'Spatial Computing'],
+    responsibilities: ['To be completed.'],
+    methods: ['To be completed.'],
+    highlights: ['To be completed.']
+  },
+  {
+    id: 'chery',
+    company: 'CHERY',
+    role: 'Project Management Intern',
+    period: 'JUN 2026 - PRESENT',
+    location: 'Wuhu, Anhui',
+    image: 'images/Internship/卡片3.jpg',
+    logo: '',
+    summary: 'Worked on intelligent driving delivery governance, quality tracking, and cross-functional coordination.',
+    tags: ['Jira', 'Quality', 'Intelligent Driving', 'Robotaxi'],
+    responsibilities: ['To be completed.'],
+    methods: ['To be completed.'],
+    highlights: ['To be completed.']
+  }
+];
+
+var currentInternshipState = 'intro'; // intro | cards | detail
+
+function initInternshipJourney() {
+  var stage = document.getElementById('internshipStage');
+  var cardsContainer = document.getElementById('internshipCards');
+  var detailContainer = document.getElementById('internshipDetail');
+  var introImage = document.getElementById('internshipIntroImage');
+  var scrollHint = document.getElementById('internshipScrollHint');
+  if (!stage || !cardsContainer) return;
+
+  // ---- 预加载图片 ----
+  preloadInternshipImages();
+
+  // ---- 构建卡片 ----
+  buildInternshipCards(cardsContainer);
+
+  // ---- 滚动/点击触发：intro → cards ----
+  var section = document.getElementById('internship');
+  var transitioned = false;
+  var touchStartY = 0;
+
+  function transitionToCards() {
+    if (transitioned) return;
+    transitioned = true;
+    stage.classList.remove('is-intro');
+    stage.classList.add('is-cards');
+    currentInternshipState = 'cards';
+
+    // 翻转动画：逐张翻转
+    var cards = cardsContainer.querySelectorAll('.internship-card');
+    cards.forEach(function (card, i) {
+      setTimeout(function () {
+        card.classList.add('is-flipped');
+      }, 1450 + i * 260);
+    });
+  }
+
+  // 在 internship section 内第一次滚轮触发
+  if (section) {
+    section.addEventListener('wheel', function (e) {
+      if (currentInternshipState !== 'intro') return;
+
+      // 检查是否在 section 可视区域内
+      var rect = section.getBoundingClientRect();
+      if (rect.top <= 0 && rect.bottom >= 0) {
+        e.preventDefault();
+        transitionToCards();
+      }
+    }, { passive: false });
+
+    section.addEventListener('touchstart', function (e) {
+      if (currentInternshipState !== 'intro') return;
+      touchStartY = e.touches && e.touches.length ? e.touches[0].clientY : 0;
+    }, { passive: true });
+
+    section.addEventListener('touchend', function (e) {
+      if (currentInternshipState !== 'intro') return;
+      var touchEndY = e.changedTouches && e.changedTouches.length ? e.changedTouches[0].clientY : touchStartY;
+      if (touchStartY - touchEndY > 24) transitionToCards();
+    }, { passive: true });
+  }
+
+  // 点击 Scroll down 提示
+  if (scrollHint) {
+    scrollHint.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (currentInternshipState === 'intro') {
+        transitionToCards();
+      }
+    });
+  }
+
+  // ---- 卡片点击 → 详情 ----
+  cardsContainer.addEventListener('click', function (e) {
+    var card = e.target.closest('.internship-card');
+    if (!card) return;
+    if (currentInternshipState !== 'cards') return;
+    var cardId = card.getAttribute('data-card-id');
+    if (cardId) openInternshipDetail(cardId, detailContainer, stage);
+  });
+
+  // 键盘支持
+  cardsContainer.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && currentInternshipState === 'cards') {
+      var card = e.target.closest('.internship-card');
+      if (card) {
+        var cardId = card.getAttribute('data-card-id');
+        if (cardId) openInternshipDetail(cardId, detailContainer, stage);
+      }
+    }
+  });
+}
+
+function preloadInternshipImages() {
+  var images = ['images/Internship/主页面.jpg'];
+  INTERNSHIP_CARDS.forEach(function (c) { images.push(c.image); });
+  images.forEach(function (src) {
+    var img = new Image();
+    img.src = src;
+  });
+}
+
+function buildInternshipCards(container) {
+  if (!container) return;
+  var html = '';
+  INTERNSHIP_CARDS.forEach(function (cardData, index) {
+    html += '<div class="internship-card" data-card-id="' + cardData.id + '" tabindex="0" role="button" aria-label="' + cardData.company + ' internship card" style="--card-image:url(' + cardData.image + ')">'
+      + '<div class="internship-card-inner">'
+      + '<div class="internship-card-front">'
+      + '<img src="' + cardData.image + '" alt="' + cardData.company + ' internship card" loading="lazy">'
+      + '<span class="card-front-number">' + String(index + 1).padStart(2, '0') + '</span>'
+      + '</div>'
+      + '<div class="internship-card-back">'
+      + (cardData.logo ? '<img class="card-back-logo" src="' + cardData.logo + '" alt="' + cardData.company + ' logo">' : '')
+      + '<span class="card-back-kicker">Internship ' + String(index + 1).padStart(2, '0') + '</span>'
+      + '<span class="card-back-company">' + cardData.company + '</span>'
+      + '<span class="card-back-role">' + cardData.role + '</span>'
+      + '<span class="card-back-period">' + cardData.period + '</span>'
+      + '<p class="card-back-summary">' + cardData.summary + '</p>'
+      + '<div class="card-back-tags">'
+      + cardData.tags.map(function (t) { return '<span>' + t + '</span>'; }).join('')
+      + '</div>'
+      + '<span class="card-back-action">View Details <i data-lucide="arrow-right" style="width:.65rem;height:.65rem"></i></span>'
+      + '</div>'
+      + '</div>'
+      + '</div>';
+  });
+  container.innerHTML = html;
+  // 重新初始化 Lucide 图标
+  if (window.lucide) lucide.createIcons();
+}
+
+function openInternshipDetail(cardId, detailContainer, stage) {
+  if (!detailContainer || !stage) return;
+  var cardData = INTERNSHIP_CARDS.find(function (c) { return c.id === cardId; });
+  if (!cardData) return;
+
+  currentInternshipState = 'detail';
+  stage.classList.remove('is-cards');
+  stage.classList.add('is-opening-detail');
+  stage.classList.add('is-detail');
+
+  var html = '<div class="internship-detail-card">'
+    + '<img src="' + cardData.image + '" alt="' + cardData.company + ' internship card">'
+    + '</div>'
+    + '<div class="internship-detail-panel">'
+    + '<span class="detail-company">' + cardData.company + '</span>'
+    + '<div class="detail-role-period">'
+    + '<span class="detail-role">' + cardData.role + '</span>'
+    + '<span class="detail-period">' + cardData.period + '</span>'
+    + '</div>'
+    + '<span class="detail-location"><i data-lucide="map-pin" style="width:.6rem;height:.6rem"></i> ' + cardData.location + '</span>'
+    + '<p class="detail-summary">' + cardData.summary + '</p>'
+    + '<div class="detail-tags">' + cardData.tags.map(function (t) { return '<span>' + t + '</span>'; }).join('') + '</div>'
+    + '<div class="detail-section"><h4>Responsibilities</h4><ul>'
+    + cardData.responsibilities.map(function (r) { return '<li>' + r + '</li>'; }).join('')
+    + '</ul></div>'
+    + '<div class="detail-section"><h4>Tools & Methods</h4><ul>'
+    + cardData.methods.map(function (m) { return '<li>' + m + '</li>'; }).join('')
+    + '</ul></div>'
+    + '<div class="detail-section"><h4>Highlights</h4><ul>'
+    + cardData.highlights.map(function (h) { return '<li>' + h + '</li>'; }).join('')
+    + '</ul></div>'
+    + '<button class="detail-back-btn" id="internshipBackBtn"><i data-lucide="arrow-left" style="width:.65rem;height:.65rem"></i> Back to Journey</button>'
+    + '</div>';
+
+  detailContainer.innerHTML = html;
+  if (window.lucide) lucide.createIcons();
+
+  // 返回按钮
+  var backBtn = document.getElementById('internshipBackBtn');
+  if (backBtn) {
+    backBtn.addEventListener('click', function () {
+      closeInternshipDetail(detailContainer, stage);
+    });
+  }
+
+  // 焦点移到返回按钮
+  setTimeout(function () {
+    if (backBtn) backBtn.focus();
+  }, 100);
+
+  setTimeout(function () {
+    stage.classList.remove('is-opening-detail');
+  }, 820);
+}
+
+function closeInternshipDetail(detailContainer, stage) {
+  if (!detailContainer || !stage) return;
+  currentInternshipState = 'cards';
+  stage.classList.remove('is-detail');
+  stage.classList.add('is-cards');
+  detailContainer.innerHTML = '';
+}
+
+// ============================================================
 //  About Me — 数据 + 3D 环绕轮播
 // ============================================================
 
@@ -1595,17 +1840,18 @@ function initAboutMe() {
     }
   });
 
-  // 滚轮
+  // 滚轮：横向滚动/触控板手势旋转轮播，纵向滚动留给页面滚动容器
   cardsContainer.addEventListener('wheel', function (e) {
-    e.preventDefault();
-    carouselAuto = false;
-    carouselTarget = null;
-    carouselAngle += e.deltaX * 0.3 + e.deltaY * 0.15;
-    carouselSpeed = 0;
-    updateCarousel();
-    // 短暂停后恢复自动
-    clearTimeout(cardsContainer._wheelTimeout);
-    cardsContainer._wheelTimeout = setTimeout(function () { carouselAuto = true; }, 1500);
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY) * 0.6) {
+      e.preventDefault();
+      carouselAuto = false;
+      carouselTarget = null;
+      carouselAngle += e.deltaX * 0.3 + e.deltaY * 0.08;
+      carouselSpeed = 0;
+      updateCarousel();
+      clearTimeout(cardsContainer._wheelTimeout);
+      cardsContainer._wheelTimeout = setTimeout(function () { carouselAuto = true; }, 1500);
+    }
   }, { passive: false });
 
   // 触控
@@ -1708,7 +1954,7 @@ function updateCarousel() {
   if (frontIndex < 0) frontIndex += cardCount;
 
   // 更新 wrapper 旋转
-  wrapper.style.transform = 'rotateY(' + (-carouselAngle) + 'deg)';
+  wrapper.style.transform = 'rotateY(' + carouselAngle + 'deg)';
 
   // 更新每张卡片的角度感知（用于 front class）
   var cards = wrapper.querySelectorAll('.about-card');
@@ -1754,7 +2000,11 @@ function snapToCard(index) {
 
 // 初始化
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initAboutMe);
+  document.addEventListener('DOMContentLoaded', function () {
+    initAboutMe();
+    initInternshipJourney();
+  });
 } else {
   initAboutMe();
+  initInternshipJourney();
 }

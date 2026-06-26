@@ -73,18 +73,6 @@
         Preparing 3D character...
       </p>
 
-      <!-- 左侧交互提示 -->
-      <div class="interact-hint" id="interactHint">
-        <span>Click the character</span>
-        <span>for reactions ✨</span>
-      </div>
-
-      <!-- 右侧彩蛋提示 -->
-      <div class="easter-egg-hint" id="easterEggHint">
-        <span>Tear all tags</span>
-        <span>for a surprise ✨</span>
-      </div>
-
       <!-- 角色左右标签 -->
       <div class="character-tags tags-left">
         <span class="tag">PMO</span>
@@ -132,6 +120,46 @@
       <!-- JS 动态填充 -->
     </div>
 
+  </section>
+
+  <!-- ========== Internship 页 ========== -->
+  <section id="internship" class="page-section internship-section">
+    <div class="internship-stage is-intro" id="internshipStage">
+
+      <!-- 标题 -->
+      <div class="internship-header">
+        <h2 class="internship-main-title">Internship Journey</h2>
+        <p class="internship-subtitle">Three chapters of practice</p>
+      </div>
+
+      <!-- 内容区 -->
+      <div class="internship-content" id="internshipContent">
+        <button class="internship-scroll-hint" id="internshipScrollHint" type="button">
+          <span>Scroll to reveal internships</span>
+          <small>roll down to split the cards</small>
+        </button>
+
+        <!-- 开场中央主图 -->
+        <div class="internship-intro-image" id="internshipIntroImage">
+          <div class="internship-intro-composite" aria-label="Three internship cards combined">
+            <img src="images/Internship/卡片1.jpg" alt="Keendata internship card">
+            <img src="images/Internship/卡片2.jpg" alt="XGRIDS internship card">
+            <img src="images/Internship/卡片3.jpg" alt="CHERY internship card">
+          </div>
+        </div>
+
+        <!-- 三张卡片 (JS 动态填充) -->
+        <div class="internship-cards" id="internshipCards">
+          <!-- JS 渲染 -->
+        </div>
+
+        <!-- 详情面板 (JS 动态填充) -->
+        <div class="internship-detail" id="internshipDetail">
+          <!-- JS 渲染 -->
+        </div>
+      </div>
+
+    </div>
   </section>
 
   </main><!-- /.scroll-container -->
