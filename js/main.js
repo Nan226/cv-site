@@ -154,7 +154,27 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
   // ---- Scene / Camera / Renderer ----
   const scene = new THREE.Scene();
 
-  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  let renderer = null;
+  try {
+    renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  } catch (error) {
+    const spinner = document.getElementById('loadingSpinner');
+    const modelStatus = document.getElementById('modelStatus');
+    if (spinner) spinner.classList.add('is-hidden');
+    canvas.classList.add('is-hidden');
+    if (fallbackImage) fallbackImage.classList.add('is-visible');
+    if (interactHint) interactHint.classList.add('is-hidden');
+    if (easterEggHint) easterEggHint.classList.add('is-hidden');
+    if (modelStatus) {
+      modelStatus.textContent = 'Static character preview';
+      modelStatus.classList.add('is-hidden');
+    }
+    window.__threeCharacter = {
+      unavailable: true,
+      reason: 'webgl-unavailable',
+    };
+    return;
+  }
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(container.clientWidth, container.clientHeight, false);
   renderer.shadowMap.enabled = true;
@@ -1433,7 +1453,14 @@ function initAboutMe() {
 
   var cardCount = ABOUT_CARDS.length;
   var angleStep = 360 / cardCount;
-  var radius = 360; // translateZ 距离
+  var radius = getCarouselRadius(); // translateZ 距离
+
+  function setCardBaseTransforms() {
+    var currentRadius = getCarouselRadius();
+    wrapper.querySelectorAll('.about-card').forEach(function (cardEl, cardIndex) {
+      cardEl.style.transform = 'rotateY(' + (cardIndex * angleStep) + 'deg) translateZ(' + currentRadius + 'px)';
+    });
+  }
 
   ABOUT_CARDS.forEach(function (card, i) {
     var el = document.createElement('div');
@@ -1441,20 +1468,20 @@ function initAboutMe() {
     el.setAttribute('aria-label', 'Slide ' + (i + 1) + ' of ' + cardCount + ': ' + card.title);
 
     // 初始 transform
-    var initAngle = i * angleStep;
-    el.style.transform = 'rotateY(' + initAngle + 'deg) translateZ(' + radius + 'px)';
+    el.style.transform = 'rotateY(' + (i * angleStep) + 'deg) translateZ(' + radius + 'px)';
 
     // Image
     var imgHTML =
       '<div class="card-image-wrap">' +
         '<img src="' + card.image + '" alt="' + card.title + '" loading="' + (i === 0 ? 'eager' : 'lazy') + '">' +
         '<span class="card-category">' + card.category + '</span>' +
+        '<span class="card-number">' + String(i + 1).padStart(2, '0') + '</span>' +
       '</div>';
 
     // Head: logo or icon
     var headIconHTML = card.logo
-      ? '<img src="' + card.logo + '" alt="" class="card-logo">'
-      : '<i data-lucide="' + card.icon + '" class="card-head-icon"></i>';
+      ? '<span class="card-logo-wrap"><img src="' + card.logo + '" alt="" class="card-logo"></span>'
+      : '<span class="card-icon-wrap"><i data-lucide="' + card.icon + '" class="card-head-icon"></i></span>';
     var subtitleHTML = card.subtitle ? '<p class="card-subtitle">' + card.subtitle + '</p>' : '';
 
     // Items
@@ -1466,7 +1493,7 @@ function initAboutMe() {
           '<div class="card-info-item">' +
             '<i data-lucide="' + item.icon + '"></i>' +
             '<span>' + item.label + '</span>' +
-            '<span style="margin-left:auto;color:var(--text-dark);font-weight:500">' + item.value + '</span>' +
+            '<span class="card-info-value">' + item.value + '</span>' +
           '</div>';
       });
       itemsHTML += '</div>';
@@ -1619,6 +1646,11 @@ function initAboutMe() {
   }
   carouselLoop();
 
+  window.addEventListener('resize', function () {
+    setCardBaseTransforms();
+    updateCarousel();
+  });
+
   // ---- IntersectionObserver: 进入 About Me 隐藏 HOME 提示 ----
   if (window.IntersectionObserver) {
     var observer = new IntersectionObserver(function (entries) {
@@ -1644,8 +1676,6 @@ function updateCarousel() {
 
   var cardCount = ABOUT_CARDS.length;
   var angleStep = 360 / cardCount;
-  var radius = 480;
-
   // 归一化角度
   var norm = ((carouselAngle % 360) + 360) % 360;
 
@@ -1683,6 +1713,13 @@ function updateCarousel() {
       node.removeAttribute('aria-current');
     }
   });
+}
+
+function getCarouselRadius() {
+  var width = window.innerWidth || 1200;
+  if (width < 560) return 170;
+  if (width < 900) return 240;
+  return Math.min(360, Math.max(300, width * 0.24));
 }
 
 function snapToCard(index) {
