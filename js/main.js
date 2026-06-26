@@ -63,6 +63,18 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
       }
     });
   });
+
+  // HOME 图标点击：回到首页
+  var homeBtn = document.getElementById('navHome');
+  if (homeBtn) {
+    homeBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      var home = document.getElementById('home');
+      if (home) {
+        home.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  }
 })();
 
 
@@ -1011,32 +1023,32 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
     requestAnimationFrame(animate);
 
     // 平滑鼠标
-    mouse.lerp(mouseTarget, 0.08);
+    mouse.lerp(mouseTarget, 0.12);
 
     if (animationMixer) animationMixer.update(clock.getDelta());
 
-    // 身体仅轻微微转（不要整体跟着鼠标跑）
-    const targetRotY = mouseOnCharacter ? mouse.x * 0.12 : 0;
-    const targetRotX = mouseOnCharacter ? -mouse.y * 0.05 : 0;
+    // 身体跟随鼠标转动，幅度加大
+    const targetRotY = mouseOnCharacter ? mouse.x * 0.30 : 0;
+    const targetRotX = mouseOnCharacter ? mouse.y * 0.12 : 0;
 
     if (!stopActiveReaction) {
-      activeCharacter.rotation.y += (targetRotY - activeCharacter.rotation.y) * 0.06;
-      activeCharacter.rotation.x += (targetRotX - activeCharacter.rotation.x) * 0.06;
+      activeCharacter.rotation.y += (targetRotY - activeCharacter.rotation.y) * 0.10;
+      activeCharacter.rotation.x += (targetRotX - activeCharacter.rotation.x) * 0.10;
     }
 
-    // 头部跟随（比身体稍灵敏）
+    // 头部跟随（比身体更灵敏）
     const activeHead = activeBodyParts.head;
     if (activeHead && !stopActiveReaction) {
       const baseRotation = activeHead.userData.followBaseRotation || new THREE.Euler();
-      const headTargetY = baseRotation.y + (mouseOnCharacter ? mouse.x * 0.2 : 0);
-      const headTargetX = baseRotation.x + (mouseOnCharacter ? -mouse.y * 0.12 : 0);
-      activeHead.rotation.y += (headTargetY - activeHead.rotation.y) * 0.1;
-      activeHead.rotation.x += (headTargetX - activeHead.rotation.x) * 0.1;
+      const headTargetY = baseRotation.y + (mouseOnCharacter ? mouse.x * 0.45 : 0);
+      const headTargetX = baseRotation.x + (mouseOnCharacter ? mouse.y * 0.28 : 0);
+      activeHead.rotation.y += (headTargetY - activeHead.rotation.y) * 0.12;
+      activeHead.rotation.x += (headTargetX - activeHead.rotation.x) * 0.12;
     }
 
     // 瞳孔跟踪（范围加大，更灵敏）
-    const lookX = mouseOnCharacter ? mouse.x * 0.08 : 0;
-    const lookY = mouseOnCharacter ? mouse.y * 0.06 : 0;
+    const lookX = mouseOnCharacter ? mouse.x * 0.14 : 0;
+    const lookY = mouseOnCharacter ? mouse.y * 0.10 : 0;
     activeEyePairs.forEach(({ group }) => {
       group.children.forEach(child => {
         if (child.name && child.name.startsWith('pupil')) {
@@ -1364,14 +1376,18 @@ var ABOUT_CARDS = [
     id: 'base-info', period: 'FEB 2003', location: 'Quanzhou, Fujian',
     category: 'Base Info', icon: 'id-card', title: 'Base Information', subtitle: '',
     image: 'images/About me/照片1.JPEG', logo: null,
-    items: [
-      { icon: 'cake-slice', label: 'Date of Birth', value: 'February 26, 2003' },
-      { icon: 'phone', label: 'Phone', value: '183 5056 5182' },
-      { icon: 'message-circle', label: 'WeChat', value: 'kunan0226' },
-      { icon: 'mail', label: 'Email', value: 'kunan0226@163.com' }
+    items: [],
+    tags: [
+      'enfp',
+      'soft girl',
+      '00s',
+      'creator',
+      'learner',
+      { label: 'phone', value: '183 5056 5182' },
+      { label: 'wechat', value: 'kunan0226' },
+      { label: 'email', value: 'kunan0226@163.com' }
     ],
-    tags: [],
-    action: { label: 'Download Resume', icon: 'download', disabled: true }
+    action: { label: 'Resume', icon: 'download', disabled: true, disabledLabel: 'Resume' }
   },
   {
     id: 'huaqiao', period: 'SEP 2020 - JUN 2024', location: 'Xiamen, Fujian',
@@ -1405,7 +1421,7 @@ var ABOUT_CARDS = [
     subtitle: 'Project Management Intern',
     image: 'images/About me/照片5.png', logo: 'images/About me/XGRIDS.png',
     items: [],
-    tags: ['Agile Iteration','Process SOPs','Software Delivery','3D Reconstruction','Spatial Computing'],
+    tags: ['Software Delivery','3D Reconstruction','Spatial Computing'],
     action: { label: 'View Details', icon: 'arrow-up-right', disabled: true }
   },
   {
@@ -1414,7 +1430,7 @@ var ABOUT_CARDS = [
     subtitle: 'Project Management Intern',
     image: 'images/About me/照片6.png', logo: 'images/About me/CHERY.png',
     items: [],
-    tags: ['Intelligent Driving','ADSD','Jira Governance','Quality Management','Robotaxi','Cross-functional Communication'],
+    tags: ['Intelligent Driving','ADSD','Jira Governance','Quality Management','Robotaxi'],
     action: { label: 'View Details', icon: 'arrow-up-right', disabled: true }
   }
 ];
@@ -1465,6 +1481,7 @@ function initAboutMe() {
   ABOUT_CARDS.forEach(function (card, i) {
     var el = document.createElement('div');
     el.className = 'about-card';
+    el.dataset.cardId = card.id;
     el.setAttribute('aria-label', 'Slide ' + (i + 1) + ' of ' + cardCount + ': ' + card.title);
 
     // 初始 transform
@@ -1500,7 +1517,14 @@ function initAboutMe() {
     } else if (card.tags.length > 0) {
       itemsHTML = '<div class="card-items">';
       card.tags.forEach(function (tag) {
-        itemsHTML += '<span class="card-tag">' + tag + '</span>';
+        if (typeof tag === 'string') {
+          itemsHTML += '<span class="card-tag">' + tag + '</span>';
+        } else {
+          itemsHTML +=
+            '<span class="card-tag card-tag-private" tabindex="0" data-private-value="' + tag.value + '">' +
+              tag.label +
+            '</span>';
+        }
       });
       itemsHTML += '</div>';
     }
@@ -1512,7 +1536,7 @@ function initAboutMe() {
         '<div class="card-action">' +
           '<button class="card-action-btn"' + (card.action.disabled ? ' disabled title="Coming Soon"' : '') + '>' +
             '<i data-lucide="' + card.action.icon + '"></i>' +
-            '<span>' + (card.action.disabled ? 'Coming Soon' : card.action.label) + '</span>' +
+            '<span>' + (card.action.disabled ? (card.action.disabledLabel || 'Coming Soon') : card.action.label) + '</span>' +
           '</button>' +
         '</div>';
     }
