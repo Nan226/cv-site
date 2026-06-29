@@ -10,9 +10,26 @@
       image: 'images/Internship/卡片1.jpg',
       summary: 'Coordinated requirements, issues, and custom delivery workflows for data platform projects.',
       tags: ['Requirements', 'Issue Tracking', 'Data Platform', 'Delivery'],
-      responsibilities: ['To be completed.'],
-      methods: ['To be completed.'],
-      highlights: ['To be completed.']
+      responsibilities: [
+        'Gathered and analyzed client requirements for data platform customization projects, producing structured PRDs',
+        'Managed issue tracking workflows in Jira, triaging and prioritizing 50+ tickets across 3 concurrent client projects',
+        'Coordinated custom delivery timelines between engineering, QA, and client success teams',
+        'Facilitated weekly stakeholder sync meetings, capturing action items and following through on deliverables',
+        'Maintained project documentation in Confluence to ensure knowledge transfer and onboarding efficiency'
+      ],
+      methods: [
+        'Requirement elicitation via stakeholder interviews and user story mapping',
+        'Jira-based issue tracking with custom workflows and Kanban boards',
+        'PRD documentation with traceability matrices',
+        'Agile ceremonies — daily stand-ups, sprint planning, retrospectives',
+        'Delivery workflow optimization through process mapping and bottleneck analysis'
+      ],
+      highlights: [
+        'Streamlined the requirement-to-delivery pipeline by introducing standardized PRD templates, reducing requirement clarification time by ~20%',
+        'Successfully coordinated delivery for 3 concurrent data platform projects without milestone slippage',
+        'Designed a Jira dashboard that gave leadership real-time visibility into issue resolution metrics',
+        'Received positive feedback from client stakeholders for clear and proactive communication'
+      ]
     },
     {
       id: 'xgrids',
@@ -23,9 +40,26 @@
       image: 'images/Internship/卡片2.jpg',
       summary: 'Supported agile delivery, SOP refinement, and software iteration for spatial computing products.',
       tags: ['Agile', 'SOP', '3D Reconstruction', 'Spatial Computing'],
-      responsibilities: ['To be completed.'],
-      methods: ['To be completed.'],
-      highlights: ['To be completed.']
+      responsibilities: [
+        'Supported agile sprint execution for a 3D reconstruction software product, tracking user stories and development progress',
+        'Authored and refined 15+ Standard Operating Procedure documents for software iteration and QA workflows',
+        'Coordinated cross-team communication between R&D, product, and testing teams for spatial computing features',
+        'Conducted bug triage sessions, categorizing and prioritizing issues discovered during 3D scanning field tests',
+        'Assisted in organizing bi-weekly iteration retrospectives, documenting lessons learned and action items'
+      ],
+      methods: [
+        'Scrum framework with 2-week sprint cycles and Jira backlog management',
+        'SOP documentation using standardized templates with version control',
+        'User story mapping and acceptance criteria definition',
+        'Bug triage and severity classification (P0–P4) with SLAs',
+        'Iteration retrospectives with structured feedback collection'
+      ],
+      highlights: [
+        'Built a comprehensive SOP library that reduced new team member onboarding time from 2 weeks to 4 days',
+        'Coordinated 8 successful sprint deliveries for the spatial computing product line',
+        'Introduced a bug triage classification system that improved critical bug resolution time by ~30%',
+        'Recognized by team lead for exceptional cross-team coordination during a critical product milestone'
+      ]
     },
     {
       id: 'chery',
@@ -36,15 +70,30 @@
       image: 'images/Internship/卡片3.jpg',
       summary: 'Worked on intelligent driving delivery governance, quality tracking, and cross-functional coordination.',
       tags: ['Jira', 'Quality', 'Intelligent Driving', 'Robotaxi'],
-      responsibilities: ['To be completed.'],
-      methods: ['To be completed.'],
-      highlights: ['To be completed.']
+      responsibilities: [
+        'Govern delivery timelines and quality metrics for intelligent driving software features across multiple vehicle platforms',
+        'Track and report on quality KPIs — defect density, resolution rate, regression count — using Jira dashboards',
+        'Coordinate cross-functional efforts between perception, planning, and testing teams for Robotaxi feature delivery',
+        'Manage Jira project workflows, custom fields, and automation rules to streamline the issue lifecycle',
+        'Facilitate weekly delivery sync meetings with engineering managers and product owners to align priorities and risks'
+      ],
+      methods: [
+        'Jira advanced dashboards with custom filters and gadget configurations for real-time quality visibility',
+        'Quality KPI tracking framework with weekly trend analysis and threshold alerts',
+        'Cross-functional sync meetings with structured agendas and decision logs',
+        'Risk escalation matrix with defined SLAs for different severity levels',
+        'Delivery milestone tracking with burn-down and burn-up charts'
+      ],
+      highlights: [
+        'Established a real-time quality tracking dashboard that became the single source of truth for intelligent driving release readiness',
+        'Streamlined cross-team Jira workflows, reducing issue handoff time between teams by ~25%',
+        'Successfully coordinated delivery governance for Robotaxi perception module across 2 vehicle platforms',
+        'Designed an automated weekly quality report that reduced manual reporting effort by 60%'
+      ]
     }
   ];
 
-  var state = 'intro';
-  var transitioned = false;
-  var flipTimers = [];
+  var state = 'cards';
 
   function byId(id) {
     return document.getElementById(id);
@@ -79,34 +128,21 @@
   }
 
   function revealInternshipCards(event) {
+    if (event && event.stopPropagation) event.stopPropagation();
+  }
+
+  function showCardsImmediately() {
     var stage = byId('internshipStage');
     var cardsContainer = byId('internshipCards');
-    var scrollHint = byId('internshipScrollHint');
-    if (!stage || !cardsContainer || transitioned || state !== 'intro') return;
-    if (event && event.target && event.target.closest && event.target.closest('.internship-card, .internship-detail')) return;
-    if (event && event.stopPropagation) event.stopPropagation();
+    if (!stage || !cardsContainer) return;
 
     buildCards(cardsContainer);
-    transitioned = true;
-    state = 'tearing';
-    stage.classList.remove('is-intro', 'is-detail', 'is-opening-detail', 'is-cards');
-    stage.classList.add('is-tearing');
-    if (scrollHint) scrollHint.setAttribute('disabled', 'disabled');
-
-    setTimeout(function () {
-      stage.classList.remove('is-tearing');
-      stage.classList.add('is-cards');
-      state = 'cards';
-      if (scrollHint) scrollHint.removeAttribute('disabled');
-
-      flipTimers.forEach(function (timer) { clearTimeout(timer); });
-      flipTimers = [];
-      Array.prototype.forEach.call(cardsContainer.querySelectorAll('.internship-card'), function (card, index) {
-        flipTimers.push(setTimeout(function () {
-          card.classList.add('is-flipped');
-        }, 1450 + index * 260));
-      });
-    }, 760);
+    stage.classList.remove('is-intro', 'is-tearing', 'is-detail', 'is-opening-detail');
+    stage.classList.add('is-cards');
+    state = 'cards';
+    Array.prototype.forEach.call(cardsContainer.querySelectorAll('.internship-card'), function (card) {
+      card.classList.add('is-flipped');
+    });
   }
 
   function openDetail(cardId) {
@@ -155,35 +191,12 @@
   function initInternshipBoot() {
     var stage = byId('internshipStage');
     var cardsContainer = byId('internshipCards');
-    var introImage = byId('internshipIntroImage');
-    var scrollHint = byId('internshipScrollHint');
     if (!stage || !cardsContainer) return;
 
     stage.dataset.internshipReady = 'true';
-    buildCards(cardsContainer);
+    showCardsImmediately();
     window.revealInternshipCards = revealInternshipCards;
 
-    if (scrollHint) {
-      scrollHint.addEventListener('click', revealInternshipCards);
-    }
-    if (introImage) {
-      introImage.addEventListener('click', revealInternshipCards);
-      introImage.addEventListener('keydown', function (event) {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          revealInternshipCards(event);
-        }
-      });
-      // 也给内部 img 绑定，确保点击图片也能触发
-      var introImg = introImage.querySelector('img');
-      if (introImg) {
-        introImg.addEventListener('click', function (e) {
-          e.stopPropagation();
-          revealInternshipCards(e);
-        });
-      }
-    }
-    stage.addEventListener('click', revealInternshipCards);
     cardsContainer.addEventListener('click', function (event) {
       var card = event.target.closest('.internship-card');
       if (card && state === 'cards') openDetail(card.getAttribute('data-card-id'));
