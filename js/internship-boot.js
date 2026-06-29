@@ -174,6 +174,14 @@
           revealInternshipCards(event);
         }
       });
+      // 也给内部 img 绑定，确保点击图片也能触发
+      var introImg = introImage.querySelector('img');
+      if (introImg) {
+        introImg.addEventListener('click', function (e) {
+          e.stopPropagation();
+          revealInternshipCards(e);
+        });
+      }
     }
     stage.addEventListener('click', revealInternshipCards);
     cardsContainer.addEventListener('click', function (event) {
