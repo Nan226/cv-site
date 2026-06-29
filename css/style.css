@@ -1132,6 +1132,46 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   filter:saturate(.9) brightness(1.08);
   pointer-events:none;
 }
+.internship-meteors{
+  position:absolute;
+  inset:0;
+  z-index:2;
+  overflow:hidden;
+  pointer-events:none;
+  opacity:.72;
+}
+.internship-meteor{
+  position:absolute;
+  top:var(--top);
+  left:var(--left);
+  width:clamp(76px,10vw,148px);
+  height:1px;
+  border-radius:999px;
+  background:linear-gradient(90deg,hsla(var(--hue),86%,70%,0) 0%,hsla(var(--hue),86%,72%,.62) 42%,rgba(255,255,255,.92) 100%);
+  filter:drop-shadow(0 0 8px hsla(var(--hue),86%,72%,.34));
+  transform:translate3d(-18vw,-14vh,0) rotate(-28deg);
+  animation:intMeteorFall var(--dur) ease-in-out infinite;
+  animation-delay:var(--delay);
+  will-change:transform,opacity;
+}
+.internship-meteor::after{
+  content:'';
+  position:absolute;
+  right:-2px;
+  top:50%;
+  width:4px;
+  height:4px;
+  border-radius:50%;
+  background:rgba(255,255,255,.95);
+  box-shadow:0 0 12px hsla(var(--hue),86%,72%,.52);
+  transform:translateY(-50%);
+}
+@keyframes intMeteorFall{
+  0%{opacity:0;transform:translate3d(-18vw,-14vh,0) rotate(-28deg)}
+  10%{opacity:.82}
+  34%{opacity:.46}
+  58%,100%{opacity:0;transform:translate3d(34vw,42vh,0) rotate(-28deg)}
+}
 
 /* ---- 标题 ---- */
 .internship-header{
@@ -1178,6 +1218,7 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   box-shadow:0 20px 80px rgba(120,154,217,.13),0 8px 30px rgba(231,151,196,.12);
   transition:opacity 1.15s ease,transform 1.15s ease,filter 1.15s ease;
   background:rgba(255,255,255,.7);
+  cursor:pointer;
 }
 .internship-intro-image img{
   width:100%;height:100%;
@@ -1252,6 +1293,12 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
 .internship-stage.is-tearing .internship-intro-image img{
   opacity:0;
 }
+.internship-stage.is-tearing .internship-scroll-hint{
+  opacity:0;
+  visibility:hidden;
+  animation:none;
+  pointer-events:none;
+}
 .internship-stage.is-tearing .internship-intro-image::before,
 .internship-stage.is-tearing .internship-intro-image::after{
   opacity:1;
@@ -1280,10 +1327,11 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
 
 /* ---- 状态：cards ---- */
 .internship-stage.is-cards .internship-intro-image{
-  opacity:0;
-  transform:translate(-50%,-50%) scale(.55);
-  filter:blur(8px);
+  opacity:.13;
+  transform:translate(-50%,-50%) scale(.72);
+  filter:blur(.4px) saturate(.92) brightness(1.08);
   pointer-events:none;
+  box-shadow:none;
 }
 .internship-stage.is-cards .internship-scroll-hint{
   opacity:0;
@@ -1292,9 +1340,9 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   pointer-events:none;
 }
 .internship-stage.is-detail .internship-intro-image{
-  opacity:.22;
-  transform:translate(-50%,-50%) scale(1.12);
-  filter:blur(1px) saturate(.92) brightness(1.08);
+  opacity:.15;
+  transform:translate(-50%,-50%) scale(.76);
+  filter:blur(.6px) saturate(.92) brightness(1.08);
   pointer-events:none;
   box-shadow:none;
 }
@@ -1306,21 +1354,6 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
 }
 .internship-stage.is-detail::before{
   opacity:.14;
-}
-.internship-stage.is-merging .internship-intro-image{
-  opacity:1;
-  transform:translate(-50%,-50%) scale(.88);
-  filter:blur(0);
-  pointer-events:none;
-}
-.internship-stage.is-merging .internship-intro-image img{
-  opacity:1;
-}
-.internship-stage.is-merging .internship-scroll-hint{
-  opacity:0;
-  visibility:hidden;
-  animation:none;
-  pointer-events:none;
 }
 
 /* 卡片容器 */
@@ -1377,9 +1410,6 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
 .internship-stage.is-cards .internship-card{
   animation:intCardSplit 1.35s cubic-bezier(.2,.88,.24,1) both;
 }
-.internship-stage.is-merging .internship-card{
-  animation:intCardMerge .86s cubic-bezier(.28,.02,.24,1) both;
-}
 .internship-stage.is-cards .internship-card:nth-child(1){animation-delay:.06s}
 .internship-stage.is-cards .internship-card:nth-child(2){animation-delay:.16s}
 .internship-stage.is-cards .internship-card:nth-child(3){animation-delay:.26s}
@@ -1388,11 +1418,6 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   18%{opacity:1}
   62%{opacity:1;transform:translateX(0) translateY(-.4vh) scale(1.035) rotate(var(--card-tilt));filter:blur(0) saturate(1.04)}
   100%{opacity:1;transform:translateX(0) translateY(0) scale(1) rotate(var(--card-tilt));filter:blur(0) saturate(1)}
-}
-@keyframes intCardMerge{
-  0%{opacity:1;transform:translateX(0) translateY(0) scale(1) rotate(var(--card-tilt));filter:blur(0) saturate(1)}
-  62%{opacity:.78;transform:translateX(var(--split-from-x)) translateY(.8vh) scaleX(var(--split-from-scale-x)) scaleY(var(--split-from-scale-y)) rotate(0deg);filter:blur(2px) saturate(.9)}
-  100%{opacity:0;transform:translateX(var(--split-from-x)) translateY(1vh) scaleX(var(--split-from-scale-x)) scaleY(var(--split-from-scale-y)) rotate(0deg);filter:blur(7px) saturate(.82)}
 }
 .internship-card:hover{
   transform:translateY(-10px) rotate(var(--card-tilt));
@@ -1744,6 +1769,7 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   .internship-card{transition:none}
   .internship-detail-panel{animation:none}
   .internship-scroll-hint{animation:none}
+  .internship-meteor{animation:none;opacity:.18}
 }
 
 /* ---- 移动端 ---- */
@@ -1775,6 +1801,9 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
     max-width:100%;
     max-height:55vh;
     padding:1rem;
+  }
+  .internship-meteor:nth-child(n+4){
+    display:none;
   }
 }
 

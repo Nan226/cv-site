@@ -125,6 +125,13 @@
   <!-- ========== Internship 页 ========== -->
   <section id="internship" class="page-section internship-section">
     <div class="internship-stage is-intro" id="internshipStage">
+      <div class="internship-meteors" aria-hidden="true">
+        <span class="internship-meteor" style="--top:8%;--left:6%;--delay:.2s;--dur:7.8s;--hue:203"></span>
+        <span class="internship-meteor" style="--top:18%;--left:72%;--delay:1.7s;--dur:8.8s;--hue:329"></span>
+        <span class="internship-meteor" style="--top:38%;--left:12%;--delay:3.4s;--dur:9.4s;--hue:214"></span>
+        <span class="internship-meteor" style="--top:58%;--left:66%;--delay:4.9s;--dur:8.2s;--hue:318"></span>
+        <span class="internship-meteor" style="--top:72%;--left:28%;--delay:6.1s;--dur:10.2s;--hue:197"></span>
+      </div>
 
       <!-- 标题 -->
       <div class="internship-header">
@@ -135,12 +142,12 @@
       <!-- 内容区 -->
       <div class="internship-content" id="internshipContent">
         <button class="internship-scroll-hint" id="internshipScrollHint" type="button">
-          <span>Scroll to reveal internships</span>
-          <small>roll down to split the cards</small>
+          <span>Click to reveal internships</span>
+          <small>tap the watercolor to open</small>
         </button>
 
         <!-- 开场中央主图 -->
-        <div class="internship-intro-image" id="internshipIntroImage">
+        <div class="internship-intro-image" id="internshipIntroImage" role="button" tabindex="0" aria-label="Click to reveal internship cards">
           <img src="images/Internship/主页面.jpg" alt="Internship journey watercolor">
         </div>
 

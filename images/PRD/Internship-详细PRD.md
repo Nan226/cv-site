@@ -76,8 +76,9 @@ Internship 页面用于承接 About Me 中的三段实习卡片，展示 Ye Nan 
 |---|---|---|
 | Section | `.internship-section` | 100vh 页面容器，承接导航跳转 |
 | Stage | `.internship-stage` | 动画舞台，负责 intro/cards/detail 状态切换 |
-| Header | `.internship-header` | 英文标题和向下滚动提示 |
+| Header | `.internship-header` | 英文标题和点击展开提示 |
 | Content | `.internship-content` | 开场图、卡片组、详情面板 |
+| Atmosphere | `.internship-meteors` | 粉蓝轻量流星层，增强背景但不遮挡卡片 |
 
 ## 6. 文案规范
 
@@ -87,7 +88,7 @@ Internship 页面用于承接 About Me 中的三段实习卡片，展示 Ye Nan 
 |---|---|
 | 主标题 | `Internship Journey` |
 | 英文辅助小字 | `Three chapters of practice` |
-| 开场提示 | `Scroll to reveal internships` / `roll down to split the cards` |
+| 开场提示 | `Click to reveal internships` / `tap the watercolor to open` |
 | 卡片提示 | `Choose a card` |
 | 详情返回按钮 | `Back to Journey` |
 
@@ -127,20 +128,24 @@ Internship 页面用于承接 About Me 中的三段实习卡片，展示 Ye Nan 
   - 进入：`opacity: 1`，`scale: 1`，清晰。
   - 回落：`scale: .86 - .9`，保留主图的完整感，并为后续横向分裂留空间。
 - 标题 `Internship Journey` 在图片稳定后出现。
-- 标题下方显示动态提示 `Scroll to reveal internships` / `roll down to split the cards`，可以带轻微上下浮动，并明确提示用户继续向下滑动。
+- 标题下方显示动态提示 `Click to reveal internships` / `tap the watercolor to open`，可以带轻微上下浮动，并明确提示用户点击展开。
 
 ### 7.2 状态二：图片分裂成三张卡片
 
 触发方式：
 
-- 用户在 Internship section 中第一次向下滚动。
-- 或点击/触摸 `Scroll to reveal internships` 提示。
-- 如果用户通过导航直接跳转，也可以在开场动画结束后自动进入卡片状态，但建议保留 800ms - 1200ms 让用户看到开场。
+- 用户点击/触摸 `Click to reveal internships` 提示。
+- 用户点击/触摸中央 `images/Internship/主页面.jpg` 开场图。
+- 用户点击 Internship 开场舞台空白区域，也应触发同一套撕开动画，避免只有点到特定小区域才有效。
+- 滚动只负责正常页面切换，不触发开卡、合卡或状态重置，避免循环卡片问题。
 
 动画：
 
 - 中央主页面图先从画面中线产生类似剪刀剪开/纸张撕裂的效果，左右两半向外分离并淡出。
+- 开始撕开时应立即退出 `.is-intro` 状态，避免开场入场动画压住撕裂动画。
 - 主页面图撕裂后，三张小蝴蝶卡片逐渐出现。
+- 卡片展开后，`主页面.jpg` 不完全消失，而是作为较小、很淡的背景停留在卡片后方，配合粉蓝白背景和飘带，避免卡片状态显得单调。
+- 背景增加少量粉蓝流星滑落：层级在主图/卡片后方，透明度低，移动速度慢，不允许遮挡卡片文字和点击区域。
 - 三张卡片从中心位置横向分裂到左、中、右：
   - 左卡：`translateX(-115%) rotate(-5deg)`
   - 中卡：`translateX(0) rotate(0deg)`
@@ -148,7 +153,7 @@ Internship 页面用于承接 About Me 中的三段实习卡片，展示 Ye Nan 
 - 三张卡片保持 `aspect-ratio: 5 / 7`。
 - 分裂完成后卡片执行一次 180 度翻转，露出公司信息面。
 - 卡片翻转实现必须避免文字镜像：外层只负责移动和倾斜，内层 `.internship-card-inner` 负责 3D 翻转；`Internship 01` 等文字在翻转完成后必须正向显示。
-- 用户从三卡或详情状态继续滑动去其他页面时，三张卡片需要先向中间合拢并淡出，再恢复成 `主页面.jpg` 的完整主图，然后再滚动到相邻页面。
+- 用户从三卡或详情状态继续滑动去其他页面时，页面按正常滚动离开 Internship，不再播放合拢动画。
 
 ### 7.3 状态三：三张卡片待选择
 
@@ -330,7 +335,8 @@ const INTERNSHIP_CARDS = [
   - `.internship-stage.is-intro`
   - `.internship-stage.is-cards`
   - `.internship-stage.is-detail`
-- 监听 section 内第一次 wheel/touch/click，用于从 intro 进入 cards。
+- 监听提示按钮、中央主图和 Internship 开场舞台 click/key/touch，用于从 intro 进入 cards。
+- 不监听 `wheel` 作为 Internship 状态切换触发器，避免滚动时反复展开或合回。
 - 点击卡片后调用 `openInternshipDetail(cardId)`。
 - 返回按钮调用 `closeInternshipDetail()`。
 - 更新导航映射：

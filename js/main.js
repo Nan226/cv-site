@@ -1427,6 +1427,8 @@ function initInternshipJourney() {
   var introImage = document.getElementById('internshipIntroImage');
   var scrollHint = document.getElementById('internshipScrollHint');
   if (!stage || !cardsContainer) return;
+  if (stage.dataset.internshipReady === 'true') return;
+  stage.dataset.internshipReady = 'true';
 
   // ---- 预加载图片 ----
   preloadInternshipImages();
@@ -1434,26 +1436,26 @@ function initInternshipJourney() {
   // ---- 构建卡片 ----
   buildInternshipCards(cardsContainer);
 
-  // ---- 滚动/点击触发：intro → cards ----
-  var section = document.getElementById('internship');
+  // ---- 点击触发：intro → cards ----
   var transitioned = false;
-  var isMergingAway = false;
-  var touchStartY = 0;
   var cardFlipTimers = [];
-  var cardsReadyAt = 0;
 
   function transitionToCards() {
     if (transitioned) return;
     transitioned = true;
     currentInternshipState = 'tearing';
+    stage.classList.remove('is-intro');
+    stage.classList.remove('is-detail');
+    stage.classList.remove('is-opening-detail');
+    stage.classList.remove('is-cards');
     stage.classList.add('is-tearing');
+    if (scrollHint) scrollHint.setAttribute('disabled', 'disabled');
 
     setTimeout(function () {
-      stage.classList.remove('is-intro');
       stage.classList.remove('is-tearing');
       stage.classList.add('is-cards');
       currentInternshipState = 'cards';
-      cardsReadyAt = Date.now() + 2300;
+      if (scrollHint) scrollHint.removeAttribute('disabled');
 
       // 翻转动画：逐张翻转
       var cards = cardsContainer.querySelectorAll('.internship-card');
@@ -1468,85 +1470,7 @@ function initInternshipJourney() {
     }, 760);
   }
 
-  function getAdjacentInternshipSection(deltaY) {
-    var sections = Array.prototype.slice.call(document.querySelectorAll('.page-section'));
-    var currentIndex = sections.indexOf(section);
-    if (currentIndex === -1) return null;
-    var targetIndex = deltaY > 0 ? currentIndex + 1 : currentIndex - 1;
-    return sections[targetIndex] || null;
-  }
-
-  function mergeBackToIntroThenScroll(deltaY) {
-    if (isMergingAway || currentInternshipState === 'intro' || currentInternshipState === 'tearing') return;
-    if (Date.now() < cardsReadyAt) return;
-    var targetSection = getAdjacentInternshipSection(deltaY);
-    if (!targetSection) return;
-
-    isMergingAway = true;
-    currentInternshipState = 'merging';
-
-    cardFlipTimers.forEach(function (timer) { clearTimeout(timer); });
-    cardFlipTimers = [];
-
-    var cards = cardsContainer.querySelectorAll('.internship-card');
-    cards.forEach(function (card) {
-      card.classList.remove('is-flipped');
-    });
-
-    stage.classList.remove('is-detail');
-    stage.classList.remove('is-opening-detail');
-    stage.classList.add('is-cards');
-    stage.classList.add('is-merging');
-
-    setTimeout(function () {
-      if (detailContainer) detailContainer.innerHTML = '';
-      stage.classList.remove('is-cards');
-      stage.classList.remove('is-merging');
-      stage.classList.add('is-intro');
-      currentInternshipState = 'intro';
-      transitioned = false;
-      isMergingAway = false;
-
-      if (targetSection) {
-        targetSection.scrollIntoView({ behavior: 'smooth' });
-      }
-    }, 940);
-  }
-
-  // 在 internship section 内第一次滚轮触发
-  if (section) {
-    section.addEventListener('wheel', function (e) {
-      // 检查是否在 section 可视区域内
-      var rect = section.getBoundingClientRect();
-      var isVisible = rect.top <= window.innerHeight * 0.35 && rect.bottom >= window.innerHeight * 0.65;
-      if (!isVisible) return;
-
-      if (currentInternshipState === 'intro') {
-        e.preventDefault();
-        transitionToCards();
-      } else if ((currentInternshipState === 'cards' || currentInternshipState === 'detail') && Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-        e.preventDefault();
-        mergeBackToIntroThenScroll(e.deltaY);
-      }
-    }, { passive: false });
-
-    section.addEventListener('touchstart', function (e) {
-      if (currentInternshipState !== 'intro') return;
-      touchStartY = e.touches && e.touches.length ? e.touches[0].clientY : 0;
-    }, { passive: true });
-
-    section.addEventListener('touchend', function (e) {
-      var touchEndY = e.changedTouches && e.changedTouches.length ? e.changedTouches[0].clientY : touchStartY;
-      var deltaY = touchStartY - touchEndY;
-      if (currentInternshipState === 'intro' && deltaY > 24) {
-        transitionToCards();
-      } else if ((currentInternshipState === 'cards' || currentInternshipState === 'detail') && Math.abs(deltaY) > 24) {
-        mergeBackToIntroThenScroll(deltaY);
-      }
-    }, { passive: true });
-  }
-
-  // 点击 Scroll down 提示
+  // 点击提示或主图展开三张卡片；滚动只负责正常页面切换，不再触发状态机。
   if (scrollHint) {
     scrollHint.addEventListener('click', function (e) {
       e.stopPropagation();
@@ -1555,6 +1479,24 @@ function initInternshipJourney() {
       }
     });
   }
+  if (introImage) {
+    introImage.addEventListener('click', function () {
+      if (currentInternshipState === 'intro') {
+        transitionToCards();
+      }
+    });
+    introImage.addEventListener('keydown', function (e) {
+      if ((e.key === 'Enter' || e.key === ' ') && currentInternshipState === 'intro') {
+        e.preventDefault();
+        transitionToCards();
+      }
+    });
+  }
+  stage.addEventListener('click', function (e) {
+    if (currentInternshipState !== 'intro') return;
+    if (e.target.closest('.internship-card') || e.target.closest('.internship-detail')) return;
+    transitionToCards();
+  });
 
   // ---- 卡片点击 → 详情 ----
   cardsContainer.addEventListener('click', function (e) {
@@ -1590,7 +1532,7 @@ function buildInternshipCards(container) {
   if (!container) return;
   var html = '';
   INTERNSHIP_CARDS.forEach(function (cardData, index) {
-    html += '<div class="internship-card" data-card-id="' + cardData.id + '" tabindex="0" role="button" aria-label="' + cardData.company + ' internship card" style="--card-image:url(' + cardData.image + ')">'
+    html += '<div class="internship-card" data-card-id="' + cardData.id + '" tabindex="0" role="button" aria-label="' + cardData.company + ' internship card" style="--card-image:url(../' + cardData.image + ')">'
       + '<div class="internship-card-inner">'
       + '<div class="internship-card-front">'
       + '<img src="' + cardData.image + '" alt="' + cardData.company + ' internship card" loading="lazy">'
@@ -1755,10 +1697,14 @@ function initProjects() {
   var orbsContainer = document.getElementById('projectsOrbs');
   var overlay = document.getElementById('projectsExpandOverlay');
   var canvas = document.getElementById('projectsCaustics');
-  if (!stage || !orbsContainer) return;
+  if (!stage || !orbsContainer) {
+    console.warn('[Projects] stage or orbsContainer missing', { stage: !!stage, orbsContainer: !!orbsContainer });
+    return;
+  }
 
   // ---- 构建光球 ----
   buildProjectOrbs(orbsContainer);
+  console.log('[Projects] Orbs built:', orbsContainer.children.length);
 
   // ---- Canvas 水波效果 ----
   initCaustics(canvas, stage);
