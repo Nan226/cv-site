@@ -1777,3 +1777,454 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
     padding:1rem;
   }
 }
+
+/* ===== Projects 页 — Liquid Light Orbs ===== */
+.projects-section{
+  padding-top:6.5vh;
+  position:relative;
+  overflow:hidden;
+}
+.projects-caustics{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  opacity:.82;
+}
+.projects-stage{
+  position:relative;
+  z-index:2;
+  height:calc(100vh - 6.5vh);
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+
+/* ---- 标题 ---- */
+.projects-header{
+  position:absolute;
+  top:clamp(.8rem, 2.5vh, 1.8rem);
+  left:0;right:0;
+  text-align:center;
+  z-index:10;
+  pointer-events:none;
+  transition:opacity .45s ease,transform .45s ease;
+}
+.projects-main-title{
+  font-family:var(--font-heading);
+  font-size:clamp(1.8rem, 4vw, 2.6rem);
+  font-weight:900;
+  letter-spacing:.04em;
+  background:linear-gradient(135deg, #8f7df4 0%, #9fc9ff 35%, #e99ad6 70%, #ffc1df 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+  margin:0 0 .1rem;
+}
+.projects-subtitle{
+  font-family:var(--font-body);
+  font-size:clamp(.6rem, .95vw, .72rem);
+  color:var(--text-light);
+  letter-spacing:.06em;
+  margin:0;
+}
+
+/* ---- 光球容器 ---- */
+.projects-orbs{
+  position:relative;
+  width:min(86vw, 820px);
+  height:min(60vh, 520px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:clamp(18px, 4vw, 56px);
+}
+
+/* ---- 单颗光球 ---- */
+.project-orb{
+  width:clamp(160px, 18vw, 210px);
+  height:clamp(160px, 18vw, 210px);
+  border-radius:50%;
+  position:relative;
+  cursor:pointer;
+  background:rgba(255,255,255,.55);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border:1px solid rgba(180,160,210,.28);
+  box-shadow:
+    0 4px 32px rgba(135,56,224,.08),
+    0 1px 8px rgba(180,120,200,.05),
+    inset 0 0 60px rgba(255,255,255,.18);
+  transition:
+    transform .55s cubic-bezier(.22,.61,.36,1),
+    box-shadow .55s cubic-bezier(.22,.61,.36,1),
+    border-radius .55s cubic-bezier(.22,.61,.36,1),
+    width .55s cubic-bezier(.22,.61,.36,1),
+    height .55s cubic-bezier(.22,.61,.36,1),
+    opacity .4s ease;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  animation:orbFloat 12s ease-in-out infinite;
+  animation-delay:var(--float-delay, 0s);
+}
+.project-orb::before{
+  content:'';
+  position:absolute;
+  inset:14%;
+  border-radius:50%;
+  background:radial-gradient(circle at var(--glow-x, 45%) var(--glow-y, 40%),
+    var(--orb-tint, rgba(135,56,224,.28)) 0%,
+    rgba(255,255,255,.08) 55%,
+    transparent 100%
+  );
+  animation:orbInnerGlow 7s ease-in-out infinite;
+  animation-delay:var(--glow-delay, 0s);
+  transition:opacity .35s ease;
+}
+.project-orb::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:50%;
+  background:radial-gradient(circle at 30% 28%, rgba(255,255,255,.32) 0%, transparent 50%);
+  pointer-events:none;
+}
+
+@keyframes orbFloat{
+  0%,100%{transform:translateY(0) translateX(0)}
+  25%{transform:translateY(-10px) translateX(6px)}
+  50%{transform:translateY(-4px) translateX(-4px)}
+  75%{transform:translateY(-14px) translateX(-8px)}
+}
+@keyframes orbInnerGlow{
+  0%,100%{opacity:.65;transform:scale(1)}
+  33%{opacity:.9;transform:scale(1.12)}
+  66%{opacity:.55;transform:scale(.92)}
+}
+
+/* 光球 hover */
+.project-orb:hover{
+  transform:translateY(-16px) scale(1.06) !important;
+  box-shadow:
+    0 12px 48px rgba(135,56,224,.14),
+    0 3px 16px rgba(200,140,220,.1),
+    inset 0 0 80px rgba(255,255,255,.22);
+  z-index:5;
+}
+.project-orb:hover::before{
+  opacity:1;
+}
+
+/* 光球内标题 */
+.project-orb .orb-title{
+  font-family:var(--font-heading);
+  font-size:clamp(.65rem, .9vw, .78rem);
+  font-weight:800;
+  text-align:center;
+  background:linear-gradient(135deg, var(--purple) 0%, var(--pink-deep) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+  position:relative;
+  z-index:2;
+  padding:0 .6rem;
+  transition:opacity .35s ease;
+  line-height:1.25;
+}
+.project-orb .orb-category{
+  position:absolute;
+  bottom:clamp(.7rem, 1.8vh, 1rem);
+  left:50%;
+  transform:translateX(-50%);
+  font-family:var(--font-tag);
+  font-size:.5rem;
+  color:var(--text-light);
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  z-index:2;
+  opacity:.7;
+  transition:opacity .3s ease;
+}
+.project-orb:hover .orb-category{
+  opacity:1;
+}
+
+/* ---- 光球粒子 ---- */
+.orb-particles{
+  position:absolute;
+  inset:-30px;
+  pointer-events:none;
+  z-index:1;
+}
+.orb-particle{
+  position:absolute;
+  width:4px;height:4px;
+  border-radius:50%;
+  background:var(--particle-color, rgba(180,140,220,.7));
+  box-shadow:0 0 6px var(--particle-color, rgba(180,140,220,.5));
+  animation:particleOrbit var(--orbit-duration, 5s) linear infinite;
+  animation-delay:var(--orbit-delay, 0s);
+}
+@keyframes particleOrbit{
+  0%{
+    transform:translate(0,0) scale(1);
+  }
+  12.5%{
+    transform:translate(var(--ox1, 30px), var(--oy1, -40px)) scale(.8);
+  }
+  25%{
+    transform:translate(var(--ox2, 60px), var(--oy2, -20px)) scale(1.1);
+  }
+  37.5%{
+    transform:translate(var(--ox3, 50px), var(--oy3, 30px)) scale(.7);
+  }
+  50%{
+    transform:translate(var(--ox4, 10px), var(--oy4, 50px)) scale(1);
+  }
+  62.5%{
+    transform:translate(var(--ox5, -35px), var(--oy5, 30px)) scale(.9);
+  }
+  75%{
+    transform:translate(var(--ox6, -55px), var(--oy6, -10px)) scale(1.15);
+  }
+  87.5%{
+    transform:translate(var(--ox7, -40px), var(--oy7, -35px)) scale(.75);
+  }
+  100%{
+    transform:translate(0,0) scale(1);
+  }
+}
+
+/* ---- 展开遮罩 ---- */
+.projects-expand-overlay{
+  position:fixed;
+  inset:0;
+  z-index:50;
+  pointer-events:none;
+  opacity:0;
+  background:rgba(255,255,255,.55);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  transition:opacity .4s ease;
+}
+.projects-stage.is-expanded .projects-expand-overlay{
+  pointer-events:auto;
+  opacity:1;
+}
+.projects-stage.is-expanded .projects-header{
+  opacity:0;
+  pointer-events:none;
+  transform:translateY(-10px);
+}
+
+/* ---- 展开面板 ---- */
+.project-detail-panel{
+  position:fixed;
+  z-index:60;
+  background:rgba(255,255,255,.88);
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+  border-radius:24px;
+  border:1px solid rgba(255,255,255,.6);
+  box-shadow:
+    0 16px 64px rgba(135,56,224,.1),
+    0 4px 20px rgba(180,120,200,.08);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  opacity:0;
+  pointer-events:none;
+  transition:
+    opacity .45s ease .15s,
+    transform .55s cubic-bezier(.22,.61,.36,1);
+  max-height:82vh;
+}
+.project-detail-panel.is-open{
+  opacity:1;
+  pointer-events:auto;
+}
+.project-detail-panel .detail-top-image{
+  width:100%;
+  height:clamp(140px, 18vh, 200px);
+  object-fit:cover;
+  flex-shrink:0;
+  display:block;
+}
+.project-detail-panel .detail-body{
+  padding:clamp(1rem, 2vh, 1.6rem) clamp(1.2rem, 2.5vw, 2rem);
+  display:flex;
+  flex-direction:column;
+  gap:clamp(.4rem, .8vh, .65rem);
+  overflow-y:auto;
+  flex:1;
+}
+.project-detail-panel .detail-title{
+  font-family:var(--font-heading);
+  font-size:clamp(1rem, 1.4vw, 1.3rem);
+  font-weight:900;
+  background:linear-gradient(135deg, var(--purple) 0%, var(--pink-soft) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.project-detail-panel .detail-meta{
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+  flex-wrap:wrap;
+}
+.project-detail-panel .detail-category{
+  font-family:var(--font-tag);
+  font-size:.55rem;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  color:var(--purple);
+  background:rgba(135,56,224,.06);
+  padding:.2em .7em;
+  border-radius:999px;
+}
+.project-detail-panel .detail-period{
+  font-family:var(--font-tag);
+  font-size:.55rem;
+  color:var(--text-light);
+}
+.project-detail-panel .detail-desc{
+  font-family:var(--font-body);
+  font-size:clamp(.55rem, .75vw, .64rem);
+  color:var(--text-mid);
+  line-height:1.6;
+}
+.project-detail-panel .detail-tags{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.3rem;
+}
+.project-detail-panel .detail-tags span{
+  font-family:var(--font-tag);
+  font-size:.48rem;
+  padding:.16em .6em;
+  border-radius:12px;
+  background:rgba(135,56,224,.06);
+  color:var(--purple);
+  border:1px solid rgba(135,56,224,.08);
+}
+.project-detail-panel .detail-links{
+  display:flex;
+  gap:.5rem;
+  flex-wrap:wrap;
+}
+.project-detail-panel .detail-link-btn{
+  display:flex;
+  align-items:center;
+  gap:.35rem;
+  font-family:var(--font-body);
+  font-size:.56rem;
+  font-weight:600;
+  color:var(--purple-deep);
+  background:rgba(135,56,224,.04);
+  border:1px solid rgba(135,56,224,.12);
+  border-radius:10px;
+  padding:.4em .9em;
+  cursor:pointer;
+  text-decoration:none;
+  transition:all .25s ease;
+}
+.project-detail-panel .detail-link-btn:hover{
+  background:rgba(135,56,224,.1);
+  border-color:var(--purple);
+}
+.project-detail-panel .detail-highlights{
+  list-style:none;
+  padding:0;
+  margin:0;
+  display:flex;
+  flex-direction:column;
+  gap:.2rem;
+}
+.project-detail-panel .detail-highlights li{
+  font-family:var(--font-body);
+  font-size:.52rem;
+  color:var(--text-mid);
+  padding-left:1em;
+  position:relative;
+}
+.project-detail-panel .detail-highlights li::before{
+  content:'✦';
+  position:absolute;
+  left:0;
+  color:var(--pink-soft);
+  font-size:.5rem;
+}
+.project-detail-panel .detail-close-btn{
+  position:absolute;
+  top:clamp(.6rem, 1.5vh, 1rem);
+  right:clamp(.6rem, 1.5vh, 1rem);
+  width:clamp(28px, 3.2vw, 36px);
+  height:clamp(28px, 3.2vw, 36px);
+  border-radius:50%;
+  border:1px solid rgba(135,56,224,.15);
+  background:rgba(255,255,255,.75);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:5;
+  transition:all .25s ease;
+  color:var(--purple);
+  font-size:1rem;
+  line-height:1;
+}
+.project-detail-panel .detail-close-btn:hover{
+  background:rgba(255,255,255,.95);
+  border-color:var(--purple);
+  box-shadow:0 4px 16px rgba(135,56,224,.12);
+}
+
+/* ---- 光球在展开状态下的行为 ---- */
+.projects-stage.is-expanded .project-orb{
+  pointer-events:none;
+}
+.projects-stage.is-expanded .project-orb.is-selected{
+  /* 被选中的光球由 JS 控制 fixed 定位，CSS 不做额外处理 */
+}
+.projects-stage.is-expanded .project-orb:not(.is-selected){
+  opacity:.15;
+  transform:scale(.45) !important;
+}
+
+/* ---- prefers-reduced-motion ---- */
+@media(prefers-reduced-motion:reduce){
+  .project-orb{animation:none}
+  .project-orb::before{animation:none}
+  .orb-particle{animation:none}
+  .project-detail-panel{transition:none}
+}
+
+/* ---- 移动端 ---- */
+@media(max-width:768px){
+  .projects-orbs{
+    flex-direction:column;
+    gap:clamp(16px, 2.5vh, 28px);
+    width:90vw;
+    height:auto;
+  }
+  .project-orb{
+    width:clamp(130px, 34vw, 170px);
+    height:clamp(130px, 34vw, 170px);
+  }
+  .project-detail-panel{
+    width:92vw !important;
+    max-height:78vh;
+    left:4vw !important;
+    top:50% !important;
+    transform:translateY(-50%) !important;
+  }
+  .projects-stage.is-expanded .project-orb:not(.is-selected){
+    opacity:.1;
+    transform:scale(.35) !important;
+  }
+}
