@@ -1485,6 +1485,17 @@ function initInternshipJourney() {
         transitionToCards();
       }
     });
+    // 也监听图片本身（某些浏览器伪元素可能拦截事件）
+    var introImg = introImage.querySelector('img');
+    if (introImg) {
+      introImg.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (currentInternshipState === 'intro') {
+          transitionToCards();
+        }
+      });
+    }
+  }
     introImage.addEventListener('keydown', function (e) {
       if ((e.key === 'Enter' || e.key === ' ') && currentInternshipState === 'intro') {
         e.preventDefault();
@@ -1633,6 +1644,7 @@ var PROJECTS = [
     period: '2025',
     orbTint: 'rgba(135,56,224,.28)',
     particleColor: 'rgba(160,120,220,.7)',
+    accent: '#8f7df4',
     thumbnail: '',
     summary: 'Built an LLM-powered research tool for automated literature review and paper summarization.',
     description: 'Developed a Streamlit web application using LangChain and OpenAI API to ingest academic papers, extract key findings, and generate structured literature reviews. The tool supports PDF upload, semantic search across paper collections, and auto-generation of citation networks. Designed for researchers who need to quickly survey large volumes of academic literature.',
@@ -1653,6 +1665,7 @@ var PROJECTS = [
     period: '2026',
     orbTint: 'rgba(200,140,210,.28)',
     particleColor: 'rgba(210,150,200,.7)',
+    accent: '#e99ad6',
     thumbnail: '',
     summary: 'Designed and developed this interactive 3D portfolio website from scratch.',
     description: 'A fully custom portfolio website featuring a Three.js 3D interactive character, CSS 3D carousel for the About Me timeline, watercolor-inspired Internship section with flip cards, and a liquid light orbs Projects showcase. Every interaction and animation is hand-crafted without frameworks, focusing on creating a memorable personal brand experience.',
@@ -1674,6 +1687,7 @@ var PROJECTS = [
     period: '2025',
     orbTint: 'rgba(100,160,220,.28)',
     particleColor: 'rgba(140,170,230,.7)',
+    accent: '#7aa7e9',
     thumbnail: '',
     summary: 'Automated Jira-to-Notion sync, sprint reporting, and stakeholder update workflows.',
     description: 'Built a Python automation suite that connects Jira and Notion APIs to streamline project management workflows. The system automatically syncs issue tracking data to Notion databases, generates weekly sprint reports with burndown charts, and sends formatted stakeholder updates via email. Reduced manual PM overhead by approximately 40%.',
@@ -1697,19 +1711,20 @@ function initProjects() {
   var orbsContainer = document.getElementById('projectsOrbs');
   var overlay = document.getElementById('projectsExpandOverlay');
   var canvas = document.getElementById('projectsCaustics');
+  var filters = document.getElementById('projectsFilters');
   if (!stage || !orbsContainer) {
     console.warn('[Projects] stage or orbsContainer missing', { stage: !!stage, orbsContainer: !!orbsContainer });
     return;
   }
 
-  // ---- 构建光球 ----
+  // ---- 构建项目卡片 ----
   buildProjectOrbs(orbsContainer);
-  console.log('[Projects] Orbs built:', orbsContainer.children.length);
 
-  // ---- Canvas 水波效果 ----
+  // ---- Canvas 轻量背景效果 ----
   initCaustics(canvas, stage);
+  initProjectFilters(filters, orbsContainer);
 
-  // ---- 光球点击 → 展开 ----
+  // ---- 卡片点击 → 展开 ----
   orbsContainer.addEventListener('click', function (e) {
     var orb = e.target.closest('.project-orb');
     if (!orb) return;
@@ -1748,45 +1763,50 @@ function buildProjectOrbs(container) {
   if (!container) return;
   var html = '';
   PROJECTS.forEach(function (proj, i) {
-    var particles = '';
-    for (var p = 0; p < 16; p++) {
-      var angle = (p / 16) * Math.PI * 2;
-      var rx = 35 + Math.random() * 50;
-      var ry = 35 + Math.random() * 50;
-      particles += '<span class="orb-particle" style="'
-        + '--ox1:' + (Math.cos(angle) * rx).toFixed(0) + 'px;'
-        + '--oy1:' + (Math.sin(angle) * ry).toFixed(0) + 'px;'
-        + '--ox2:' + (Math.cos(angle + .8) * rx * 1.2).toFixed(0) + 'px;'
-        + '--oy2:' + (Math.sin(angle + .8) * ry * .7).toFixed(0) + 'px;'
-        + '--ox3:' + (Math.cos(angle + 1.6) * rx * .8).toFixed(0) + 'px;'
-        + '--oy3:' + (Math.sin(angle + 1.6) * ry * 1.3).toFixed(0) + 'px;'
-        + '--ox4:' + (Math.cos(angle + 2.4) * rx * .5).toFixed(0) + 'px;'
-        + '--oy4:' + (Math.sin(angle + 2.4) * ry * 1.1).toFixed(0) + 'px;'
-        + '--ox5:' + (Math.cos(angle + 3.2) * rx * 1.1).toFixed(0) + 'px;'
-        + '--oy5:' + (Math.sin(angle + 3.2) * ry * .6).toFixed(0) + 'px;'
-        + '--ox6:' + (Math.cos(angle + 4.0) * rx * .7).toFixed(0) + 'px;'
-        + '--oy6:' + (Math.sin(angle + 4.0) * ry * .9).toFixed(0) + 'px;'
-        + '--ox7:' + (Math.cos(angle + 4.8) * rx * .9).toFixed(0) + 'px;'
-        + '--oy7:' + (Math.sin(angle + 4.8) * ry * .8).toFixed(0) + 'px;'
-        + '--orbit-duration:' + (4 + Math.random() * 5).toFixed(1) + 's;'
-        + '--orbit-delay:' + (Math.random() * 4).toFixed(1) + 's;'
-        + '--particle-color:' + proj.particleColor + ';'
-        + '"></span>';
-    }
-    html += '<div class="project-orb" data-project-id="' + proj.id + '" tabindex="0" role="button"'
+    html += '<div class="project-orb" data-project-id="' + proj.id + '" data-category="' + proj.category + '" tabindex="0" role="button"'
       + ' aria-label="' + proj.title + ' — ' + proj.category + '"'
-      + ' style="--float-delay:' + (i * -3.5) + 's;'
-      + '--glow-delay:' + (i * -1.8) + 's;'
+      + ' style="--project-accent:' + (proj.accent || '#8f7df4') + ';'
       + '--orb-tint:' + proj.orbTint + ';'
-      + '--glow-x:' + (40 + i * 10) + '%;'
-      + '--glow-y:' + (35 + i * 8) + '%;'
       + '">'
-      + '<div class="orb-particles" aria-hidden="true">' + particles + '</div>'
-      + '<span class="orb-title">' + proj.title + '</span>'
+      + '<div class="project-card-visual" aria-hidden="true">'
+      + '<span class="project-card-index">' + String(i + 1).padStart(2, '0') + '</span>'
+      + '<i data-lucide="' + getProjectIcon(proj.category) + '"></i>'
+      + '</div>'
+      + '<div class="project-card-body">'
       + '<span class="orb-category">' + proj.category + '</span>'
+      + '<span class="orb-title">' + proj.title + '</span>'
+      + '<p class="project-card-summary">' + proj.summary + '</p>'
+      + '<div class="project-card-tags">' + proj.tags.slice(0, 3).map(function (tag) { return '<span>' + tag + '</span>'; }).join('') + '</div>'
+      + '<span class="project-card-action">View Project <i data-lucide="arrow-up-right" style="width:.68rem;height:.68rem"></i></span>'
+      + '</div>'
       + '</div>';
   });
   container.innerHTML = html;
+  if (window.lucide) lucide.createIcons();
+}
+
+function getProjectIcon(category) {
+  if (category === 'Creative') return 'sparkles';
+  if (category === 'Professional') return 'workflow';
+  if (category === 'Academic') return 'book-open';
+  return 'code-2';
+}
+
+function initProjectFilters(filters, container) {
+  if (!filters || !container) return;
+  filters.addEventListener('click', function (e) {
+    var button = e.target.closest('.project-filter');
+    if (!button) return;
+    var filter = button.getAttribute('data-filter');
+    filters.querySelectorAll('.project-filter').forEach(function (btn) {
+      btn.classList.toggle('is-active', btn === button);
+    });
+    container.querySelectorAll('.project-orb').forEach(function (card) {
+      var match = filter === 'all' || card.getAttribute('data-category') === filter;
+      card.classList.toggle('is-filtered-out', !match);
+      card.setAttribute('aria-hidden', match ? 'false' : 'true');
+    });
+  });
 }
 
 // ---- Canvas 水波涟漪 ----
@@ -1890,7 +1910,7 @@ function expandProject(projectId, stage, overlay) {
   activeProjectId = projectId;
   stage.classList.add('is-expanded');
 
-  // 找到被点击的光球的位置
+  // 找到被点击的项目卡片位置
   var orb = document.querySelector('.project-orb[data-project-id="' + projectId + '"]');
   var orbRect = orb ? orb.getBoundingClientRect() : null;
 
@@ -1906,7 +1926,7 @@ function expandProject(projectId, stage, overlay) {
   if (projectData.thumbnail) {
     html += '<img class="detail-top-image" src="' + projectData.thumbnail + '" alt="' + projectData.title + '">';
   } else {
-    html += '<div class="detail-top-image" style="background:linear-gradient(135deg,' + projectData.orbTint.replace('0.28', '0.5') + ',' + projectData.particleColor.replace('0.7', '0.5') + ');display:flex;align-items:center;justify-content:center;"><span style="font-family:var(--font-heading);font-size:1.6rem;color:rgba(255,255,255,.45);">' + projectData.title.charAt(0) + '</span></div>';
+    html += '<div class="detail-top-image" style="background:linear-gradient(135deg,' + projectData.orbTint.replace('0.28', '0.5') + ',' + projectData.particleColor.replace('0.7', '0.5') + ');display:flex;align-items:center;justify-content:center;"><span style="font-family:var(--font-heading);font-size:1.6rem;color:rgba(255,255,255,.55);">' + projectData.title.charAt(0) + '</span></div>';
   }
   html += '<div class="detail-body">'
     + '<span class="detail-title">' + projectData.title + '</span>'
@@ -1956,7 +1976,7 @@ function expandProject(projectId, stage, overlay) {
   panel.style.height = startH + 'px';
   panel.style.left = (startX - startW / 2) + 'px';
   panel.style.top = (startY - startH / 2) + 'px';
-  panel.style.borderRadius = '50%';
+  panel.style.borderRadius = '18px';
   panel.style.transform = 'scale(1)';
 
   // 先添加到 DOM，opacity 0
@@ -1969,7 +1989,7 @@ function expandProject(projectId, stage, overlay) {
       panel.style.height = targetH + 'px';
       panel.style.left = ((window.innerWidth - targetW) / 2) + 'px';
       panel.style.top = ((window.innerHeight - targetH) / 2) + 'px';
-      panel.style.borderRadius = '24px';
+      panel.style.borderRadius = '18px';
       panel.classList.add('is-open');
     });
   });
@@ -2006,12 +2026,12 @@ function collapseProject(stage, overlay) {
   var orbRect = orb ? orb.getBoundingClientRect() : null;
 
   if (orbRect && panel) {
-    // Morph 回光球
+    // Morph 回项目卡片
     panel.style.width = orbRect.width + 'px';
     panel.style.height = orbRect.height + 'px';
     panel.style.left = (orbRect.left + orbRect.width / 2 - orbRect.width / 2) + 'px';
     panel.style.top = (orbRect.top + orbRect.height / 2 - orbRect.height / 2) + 'px';
-    panel.style.borderRadius = '50%';
+    panel.style.borderRadius = '18px';
     panel.classList.remove('is-open');
   }
 
@@ -2070,7 +2090,7 @@ var ABOUT_CARDS = [
     image: 'images/About me/照片3.png', logo: 'images/About me/Keendata.png',
     items: [],
     tags: ['Big Data Platform','Issue Tracking','Requirements Management','Custom Delivery'],
-    action: { label: 'View Details', icon: 'arrow-up-right', disabled: true }
+    action: { label: 'View Details', icon: 'arrow-up-right', disabled: false }
   },
   {
     id: 'polyu', period: 'SEP 2025', location: 'Hung Hom, Hong Kong',
@@ -2088,7 +2108,7 @@ var ABOUT_CARDS = [
     image: 'images/About me/照片5.png', logo: 'images/About me/XGRIDS.png',
     items: [],
     tags: ['Software Delivery','3D Reconstruction','Spatial Computing'],
-    action: { label: 'View Details', icon: 'arrow-up-right', disabled: true }
+    action: { label: 'View Details', icon: 'arrow-up-right', disabled: false }
   },
   {
     id: 'chery', period: 'JUN 2026 - PRESENT', location: 'Wuhu, Anhui',
@@ -2097,7 +2117,7 @@ var ABOUT_CARDS = [
     image: 'images/About me/照片6.png', logo: 'images/About me/CHERY.png',
     items: [],
     tags: ['Intelligent Driving','ADSD','Jira Governance','Quality Management','Robotaxi'],
-    action: { label: 'View Details', icon: 'arrow-up-right', disabled: true }
+    action: { label: 'View Details', icon: 'arrow-up-right', disabled: false }
   }
 ];
 
@@ -2221,6 +2241,46 @@ function initAboutMe() {
 
   // Lucide icons
   if (window.lucide) { lucide.createIcons(); }
+
+  // ---- 卡片按钮：View Details → 跳转到 Internship 详情 ----
+  cardsContainer.addEventListener('click', function (e) {
+    var btn = e.target.closest('.card-action-btn');
+    if (!btn || btn.disabled) return;
+    var cardEl = e.target.closest('.about-card');
+    if (!cardEl) return;
+    var cardId = cardEl.dataset.cardId;
+    var internshipIds = ['keendata', 'xgrids', 'chery'];
+    if (internshipIds.indexOf(cardId) === -1) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    // 滚动到 Internship section
+    var internshipSection = document.getElementById('internship');
+    if (internshipSection) {
+      internshipSection.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // 展开对应实习详情
+    var internshipStage = document.getElementById('internshipStage');
+    var internshipDetail = document.getElementById('internshipDetail');
+    if (internshipStage && internshipDetail) {
+      // 确保处于 cards 状态
+      if (currentInternshipState === 'intro') {
+        // 先触发切换到 cards 状态
+        var stage = document.getElementById('internshipStage');
+        if (stage) {
+          stage.classList.remove('is-intro');
+          stage.classList.add('is-cards');
+          currentInternshipState = 'cards';
+        }
+      }
+      // 延迟打开详情，等滚动到位
+      setTimeout(function () {
+        openInternshipDetail(cardId, internshipDetail, internshipStage);
+      }, 800);
+    }
+  });
 
   // ---- 拖拽交互 ----
   var dragging = false;

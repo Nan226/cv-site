@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>YE NAN — Portfolio</title>
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=20260629-2">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script type="importmap">
     {
@@ -124,7 +124,7 @@
 
   <!-- ========== Internship 页 ========== -->
   <section id="internship" class="page-section internship-section">
-    <div class="internship-stage is-intro" id="internshipStage">
+    <div class="internship-stage is-intro" id="internshipStage" onclick="window.revealInternshipCards && window.revealInternshipCards(event)">
       <div class="internship-meteors" aria-hidden="true">
         <span class="internship-meteor" style="--top:8%;--left:6%;--delay:.2s;--dur:7.8s;--hue:203"></span>
         <span class="internship-meteor" style="--top:18%;--left:72%;--delay:1.7s;--dur:8.8s;--hue:329"></span>
@@ -141,13 +141,13 @@
 
       <!-- 内容区 -->
       <div class="internship-content" id="internshipContent">
-        <button class="internship-scroll-hint" id="internshipScrollHint" type="button">
+        <button class="internship-scroll-hint" id="internshipScrollHint" type="button" onclick="window.revealInternshipCards && window.revealInternshipCards(event)">
           <span>Click to reveal internships</span>
           <small>tap the watercolor to open</small>
         </button>
 
         <!-- 开场中央主图 -->
-        <div class="internship-intro-image" id="internshipIntroImage" role="button" tabindex="0" aria-label="Click to reveal internship cards">
+        <div class="internship-intro-image" id="internshipIntroImage" role="button" tabindex="0" aria-label="Click to reveal internship cards" onclick="window.revealInternshipCards && window.revealInternshipCards(event)">
           <img src="images/Internship/主页面.jpg" alt="Internship journey watercolor">
         </div>
 
@@ -171,7 +171,13 @@
     <div class="projects-stage" id="projectsStage">
       <div class="projects-header">
         <h2 class="projects-main-title">Project Showcase</h2>
-        <p class="projects-subtitle">Three creations, one journey</p>
+        <p class="projects-subtitle">Selected experiments, systems, and creative builds</p>
+        <div class="projects-filters" id="projectsFilters" aria-label="Project filters">
+          <button type="button" class="project-filter is-active" data-filter="all">All</button>
+          <button type="button" class="project-filter" data-filter="Technical">Technical</button>
+          <button type="button" class="project-filter" data-filter="Creative">Creative</button>
+          <button type="button" class="project-filter" data-filter="Professional">Professional</button>
+        </div>
       </div>
       <div class="projects-orbs" id="projectsOrbs" aria-roledescription="carousel">
         <!-- JS 动态渲染 -->
@@ -207,6 +213,7 @@
     <p class="pull-chain-hint">Pull the chain to bring back the light</p>
   </div>
 
-  <script type="module" src="js/main.js"></script>
+  <script src="js/internship-boot.js?v=20260629-3"></script>
+  <script type="module" src="js/main.js?v=20260629-3"></script>
 </body>
 </html>
