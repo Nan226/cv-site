@@ -1495,7 +1495,6 @@ function initInternshipJourney() {
         }
       });
     }
-  }
     introImage.addEventListener('keydown', function (e) {
       if ((e.key === 'Enter' || e.key === ' ') && currentInternshipState === 'intro') {
         e.preventDefault();
@@ -1640,7 +1639,7 @@ var PROJECTS = [
   {
     id: 'ai-research',
     title: 'AI Research Assistant',
-    category: 'Technical',
+    category: 'Professional',
     period: '2025',
     orbTint: 'rgba(135,56,224,.28)',
     particleColor: 'rgba(160,120,220,.7)',
@@ -1765,7 +1764,7 @@ function buildProjectOrbs(container) {
   PROJECTS.forEach(function (proj, i) {
     html += '<div class="project-orb" data-project-id="' + proj.id + '" data-category="' + proj.category + '" tabindex="0" role="button"'
       + ' aria-label="' + proj.title + ' — ' + proj.category + '"'
-      + ' style="--project-accent:' + (proj.accent || '#8f7df4') + ';'
+      + ' style="--card-order:' + i + ';--project-accent:' + (proj.accent || '#8f7df4') + ';'
       + '--orb-tint:' + proj.orbTint + ';'
       + '">'
       + '<div class="project-card-visual" aria-hidden="true">'
@@ -1913,6 +1912,7 @@ function expandProject(projectId, stage, overlay) {
   // 找到被点击的项目卡片位置
   var orb = document.querySelector('.project-orb[data-project-id="' + projectId + '"]');
   var orbRect = orb ? orb.getBoundingClientRect() : null;
+  if (orb) orb.classList.add('is-selected');
 
   // 构建详情面板
   var panel = document.createElement('div');
@@ -2046,6 +2046,9 @@ function collapseProject(stage, overlay) {
   currentProjectState = 'orbs';
   activeProjectId = null;
   stage.classList.remove('is-expanded');
+  document.querySelectorAll('.project-orb.is-selected').forEach(function (selected) {
+    selected.classList.remove('is-selected');
+  });
 
   // 焦点返回光球
   if (orb) {
