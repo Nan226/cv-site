@@ -1170,30 +1170,36 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   top:52%;left:50%;
   transform:translate(-50%,-50%) scale(1);
   z-index:5;
-  width:clamp(520px, 62vw, 880px);
-  max-width:92vw;
-  aspect-ratio:15/7;
+  width:clamp(360px, 45vw, 680px);
+  max-width:88vw;
+  aspect-ratio:1595 / 1206;
   border-radius:24px;
   overflow:hidden;
   box-shadow:0 20px 80px rgba(120,154,217,.13),0 8px 30px rgba(231,151,196,.12);
   transition:opacity 1.15s ease,transform 1.15s ease,filter 1.15s ease;
   background:rgba(255,255,255,.7);
 }
-.internship-intro-composite{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  width:100%;
-  height:100%;
-  overflow:hidden;
-}
-.internship-intro-composite img{
+.internship-intro-image img{
   width:100%;height:100%;
   display:block;
   object-fit:cover;
-  min-width:0;
+  transition:opacity .42s ease;
 }
-.internship-intro-composite img + img{
-  border-left:1px solid rgba(255,255,255,.46);
+.internship-intro-image::before,
+.internship-intro-image::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:url('../images/Internship/主页面.jpg') center/cover no-repeat;
+  opacity:0;
+  pointer-events:none;
+  z-index:1;
+}
+.internship-intro-image::before{
+  clip-path:polygon(0 0,51% 0,48% 12%,52% 22%,47% 35%,51% 48%,46% 61%,50% 75%,47% 88%,51% 100%,0 100%);
+}
+.internship-intro-image::after{
+  clip-path:polygon(49% 0,100% 0,100% 100%,49% 100%,53% 88%,50% 75%,54% 61%,49% 48%,53% 35%,48% 22%,52% 12%);
 }
 .internship-scroll-hint{
   position:absolute;
@@ -1243,10 +1249,33 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
 .internship-stage.is-intro .internship-intro-image{
   animation:introAppear 1.45s cubic-bezier(.24,1,.28,1) forwards;
 }
+.internship-stage.is-tearing .internship-intro-image img{
+  opacity:0;
+}
+.internship-stage.is-tearing .internship-intro-image::before,
+.internship-stage.is-tearing .internship-intro-image::after{
+  opacity:1;
+}
+.internship-stage.is-tearing .internship-intro-image::before{
+  animation:introTearLeft .82s cubic-bezier(.2,.86,.24,1) forwards;
+}
+.internship-stage.is-tearing .internship-intro-image::after{
+  animation:introTearRight .82s cubic-bezier(.2,.86,.24,1) forwards;
+}
 @keyframes introAppear{
   0%{opacity:0;transform:translate(-50%,-50%) scale(1.18);filter:blur(8px)}
   58%{opacity:1;transform:translate(-50%,-50%) scale(1);filter:blur(0)}
   100%{opacity:1;transform:translate(-50%,-50%) scale(.88);filter:blur(0)}
+}
+@keyframes introTearLeft{
+  0%{transform:translateX(0) rotate(0deg);filter:blur(0)}
+  42%{transform:translateX(-1.8vw) rotate(-1.6deg);filter:blur(.4px)}
+  100%{transform:translateX(-12vw) rotate(-7deg);filter:blur(4px);opacity:0}
+}
+@keyframes introTearRight{
+  0%{transform:translateX(0) rotate(0deg);filter:blur(0)}
+  42%{transform:translateX(1.8vw) rotate(1.6deg);filter:blur(.4px)}
+  100%{transform:translateX(12vw) rotate(7deg);filter:blur(4px);opacity:0}
 }
 
 /* ---- 状态：cards ---- */
@@ -1258,6 +1287,39 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
 }
 .internship-stage.is-cards .internship-scroll-hint{
   opacity:0;
+  visibility:hidden;
+  animation:none;
+  pointer-events:none;
+}
+.internship-stage.is-detail .internship-intro-image{
+  opacity:.22;
+  transform:translate(-50%,-50%) scale(1.12);
+  filter:blur(1px) saturate(.92) brightness(1.08);
+  pointer-events:none;
+  box-shadow:none;
+}
+.internship-stage.is-detail .internship-scroll-hint{
+  opacity:0;
+  visibility:hidden;
+  animation:none;
+  pointer-events:none;
+}
+.internship-stage.is-detail::before{
+  opacity:.14;
+}
+.internship-stage.is-merging .internship-intro-image{
+  opacity:1;
+  transform:translate(-50%,-50%) scale(.88);
+  filter:blur(0);
+  pointer-events:none;
+}
+.internship-stage.is-merging .internship-intro-image img{
+  opacity:1;
+}
+.internship-stage.is-merging .internship-scroll-hint{
+  opacity:0;
+  visibility:hidden;
+  animation:none;
   pointer-events:none;
 }
 
@@ -1315,6 +1377,9 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
 .internship-stage.is-cards .internship-card{
   animation:intCardSplit 1.35s cubic-bezier(.2,.88,.24,1) both;
 }
+.internship-stage.is-merging .internship-card{
+  animation:intCardMerge .86s cubic-bezier(.28,.02,.24,1) both;
+}
 .internship-stage.is-cards .internship-card:nth-child(1){animation-delay:.06s}
 .internship-stage.is-cards .internship-card:nth-child(2){animation-delay:.16s}
 .internship-stage.is-cards .internship-card:nth-child(3){animation-delay:.26s}
@@ -1323,6 +1388,11 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   18%{opacity:1}
   62%{opacity:1;transform:translateX(0) translateY(-.4vh) scale(1.035) rotate(var(--card-tilt));filter:blur(0) saturate(1.04)}
   100%{opacity:1;transform:translateX(0) translateY(0) scale(1) rotate(var(--card-tilt));filter:blur(0) saturate(1)}
+}
+@keyframes intCardMerge{
+  0%{opacity:1;transform:translateX(0) translateY(0) scale(1) rotate(var(--card-tilt));filter:blur(0) saturate(1)}
+  62%{opacity:.78;transform:translateX(var(--split-from-x)) translateY(.8vh) scaleX(var(--split-from-scale-x)) scaleY(var(--split-from-scale-y)) rotate(0deg);filter:blur(2px) saturate(.9)}
+  100%{opacity:0;transform:translateX(var(--split-from-x)) translateY(1vh) scaleX(var(--split-from-scale-x)) scaleY(var(--split-from-scale-y)) rotate(0deg);filter:blur(7px) saturate(.82)}
 }
 .internship-card:hover{
   transform:translateY(-10px) rotate(var(--card-tilt));

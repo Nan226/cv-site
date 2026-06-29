@@ -1436,34 +1436,96 @@ function initInternshipJourney() {
   // ---- 滚动/点击触发：intro → cards ----
   var section = document.getElementById('internship');
   var transitioned = false;
+  var isMergingAway = false;
   var touchStartY = 0;
+  var cardFlipTimers = [];
+  var cardsReadyAt = 0;
 
   function transitionToCards() {
     if (transitioned) return;
     transitioned = true;
-    stage.classList.remove('is-intro');
-    stage.classList.add('is-cards');
-    currentInternshipState = 'cards';
+    currentInternshipState = 'tearing';
+    stage.classList.add('is-tearing');
 
-    // 翻转动画：逐张翻转
+    setTimeout(function () {
+      stage.classList.remove('is-intro');
+      stage.classList.remove('is-tearing');
+      stage.classList.add('is-cards');
+      currentInternshipState = 'cards';
+      cardsReadyAt = Date.now() + 2300;
+
+      // 翻转动画：逐张翻转
+      var cards = cardsContainer.querySelectorAll('.internship-card');
+      cardFlipTimers.forEach(function (timer) { clearTimeout(timer); });
+      cardFlipTimers = [];
+      cards.forEach(function (card, i) {
+        var timer = setTimeout(function () {
+          card.classList.add('is-flipped');
+        }, 1450 + i * 260);
+        cardFlipTimers.push(timer);
+      });
+    }, 760);
+  }
+
+  function getAdjacentInternshipSection(deltaY) {
+    var sections = Array.prototype.slice.call(document.querySelectorAll('.page-section'));
+    var currentIndex = sections.indexOf(section);
+    if (currentIndex === -1) return null;
+    var targetIndex = deltaY > 0 ? currentIndex + 1 : currentIndex - 1;
+    return sections[targetIndex] || null;
+  }
+
+  function mergeBackToIntroThenScroll(deltaY) {
+    if (isMergingAway || currentInternshipState === 'intro' || currentInternshipState === 'tearing') return;
+    if (Date.now() < cardsReadyAt) return;
+    var targetSection = getAdjacentInternshipSection(deltaY);
+    if (!targetSection) return;
+
+    isMergingAway = true;
+    currentInternshipState = 'merging';
+
+    cardFlipTimers.forEach(function (timer) { clearTimeout(timer); });
+    cardFlipTimers = [];
+
     var cards = cardsContainer.querySelectorAll('.internship-card');
-    cards.forEach(function (card, i) {
-      setTimeout(function () {
-        card.classList.add('is-flipped');
-      }, 1450 + i * 260);
+    cards.forEach(function (card) {
+      card.classList.remove('is-flipped');
     });
+
+    stage.classList.remove('is-detail');
+    stage.classList.remove('is-opening-detail');
+    stage.classList.add('is-cards');
+    stage.classList.add('is-merging');
+
+    setTimeout(function () {
+      if (detailContainer) detailContainer.innerHTML = '';
+      stage.classList.remove('is-cards');
+      stage.classList.remove('is-merging');
+      stage.classList.add('is-intro');
+      currentInternshipState = 'intro';
+      transitioned = false;
+      isMergingAway = false;
+
+      if (targetSection) {
+        targetSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 940);
   }
 
   // 在 internship section 内第一次滚轮触发
   if (section) {
     section.addEventListener('wheel', function (e) {
-      if (currentInternshipState !== 'intro') return;
-
       // 检查是否在 section 可视区域内
       var rect = section.getBoundingClientRect();
-      if (rect.top <= 0 && rect.bottom >= 0) {
+      var isVisible = rect.top <= window.innerHeight * 0.35 && rect.bottom >= window.innerHeight * 0.65;
+      if (!isVisible) return;
+
+      if (currentInternshipState === 'intro') {
         e.preventDefault();
         transitionToCards();
+      } else if ((currentInternshipState === 'cards' || currentInternshipState === 'detail') && Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+        e.preventDefault();
+        mergeBackToIntroThenScroll(e.deltaY);
       }
     }, { passive: false });
 
@@ -1473,9 +1535,13 @@ function initInternshipJourney() {
     }, { passive: true });
 
     section.addEventListener('touchend', function (e) {
-      if (currentInternshipState !== 'intro') return;
       var touchEndY = e.changedTouches && e.changedTouches.length ? e.changedTouches[0].clientY : touchStartY;
-      if (touchStartY - touchEndY > 24) transitionToCards();
+      var deltaY = touchStartY - touchEndY;
+      if (currentInternshipState === 'intro' && deltaY > 24) {
+        transitionToCards();
+      } else if ((currentInternshipState === 'cards' || currentInternshipState === 'detail') && Math.abs(deltaY) > 24) {
+        mergeBackToIntroThenScroll(deltaY);
+      }
     }, { passive: true });
   }
 
@@ -1930,6 +1996,7 @@ function initAboutMe() {
         if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
           if (interactHint) interactHint.classList.add('is-hidden-by-about');
           if (easterEggHint) easterEggHint.classList.add('is-hidden-by-about');
+          stabilizeAboutCarousel();
         } else {
           if (interactHint) interactHint.classList.remove('is-hidden-by-about');
           if (easterEggHint) easterEggHint.classList.remove('is-hidden-by-about');
@@ -1938,6 +2005,20 @@ function initAboutMe() {
     }, { threshold: [0.5] });
     observer.observe(document.getElementById('about'));
   }
+}
+
+function getCurrentAboutFrontIndex() {
+  var cardCount = ABOUT_CARDS.length;
+  var angleStep = 360 / cardCount;
+  var norm = ((carouselAngle % 360) + 360) % 360;
+  var index = Math.round((360 - norm) / angleStep) % cardCount;
+  return index < 0 ? index + cardCount : index;
+}
+
+function stabilizeAboutCarousel() {
+  if (window.innerWidth < 769) return;
+  var index = getCurrentAboutFrontIndex();
+  snapToCard(index);
 }
 
 function updateCarousel() {
@@ -1950,7 +2031,7 @@ function updateCarousel() {
   var norm = ((carouselAngle % 360) + 360) % 360;
 
   // 找到最接近正前方的卡片
-  var frontIndex = Math.round(norm / angleStep) % cardCount;
+  var frontIndex = Math.round((360 - norm) / angleStep) % cardCount;
   if (frontIndex < 0) frontIndex += cardCount;
 
   // 更新 wrapper 旋转
@@ -1960,7 +2041,7 @@ function updateCarousel() {
   var cards = wrapper.querySelectorAll('.about-card');
   cards.forEach(function (el, i) {
     // 计算这张卡当前在视线中的偏移角
-    var cardAngle = ((i * angleStep - norm) % 360 + 360) % 360;
+    var cardAngle = ((i * angleStep + norm) % 360 + 360) % 360;
     if (cardAngle > 180) cardAngle -= 360;
 
     // 是否在前面
@@ -1994,7 +2075,8 @@ function getCarouselRadius() {
 
 function snapToCard(index) {
   var angleStep = 360 / ABOUT_CARDS.length;
-  carouselTarget = index * angleStep;
+  var baseTarget = -index * angleStep;
+  carouselTarget = baseTarget + Math.round((carouselAngle - baseTarget) / 360) * 360;
   carouselAuto = false;
 }
 
