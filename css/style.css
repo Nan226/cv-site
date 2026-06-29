@@ -1518,6 +1518,12 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   align-self:flex-start;
   margin-bottom:.15rem;
 }
+.internship-card-back .card-back-icon{
+  color:rgba(255,255,255,.72);
+  align-self:flex-start;
+  margin-bottom:.15rem;
+  stroke-width:1.8;
+}
 .internship-card-back .card-back-kicker{
   align-self:flex-start;
   font-family:var(--font-tag);
@@ -1665,6 +1671,8 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   font-weight:800;
   color:var(--text-dark);
   letter-spacing:.03em;
+  display:flex;
+  align-items:center;
 }
 .internship-detail-panel .detail-role-period{
   display:flex;
@@ -1717,6 +1725,8 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   color:var(--text-dark);
   margin:0 0 .25rem;
   letter-spacing:.03em;
+  display:flex;
+  align-items:center;
 }
 .internship-detail-panel .detail-section ul{
   list-style:none;

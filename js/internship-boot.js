@@ -8,6 +8,7 @@
       period: 'APR 2025 - AUG 2025',
       location: 'Hangzhou, Zhejiang',
       image: 'images/Internship/卡片1.jpg',
+      logo: '',
       summary: 'Coordinated requirements, issues, and custom delivery workflows for data platform projects.',
       tags: ['Requirements', 'Issue Tracking', 'Data Platform', 'Delivery'],
       responsibilities: [
@@ -38,6 +39,7 @@
       period: 'JAN 2026 - MAY 2026',
       location: 'Shenzhen, Guangdong',
       image: 'images/Internship/卡片2.jpg',
+      logo: '',
       summary: 'Supported agile delivery, SOP refinement, and software iteration for spatial computing products.',
       tags: ['Agile', 'SOP', '3D Reconstruction', 'Spatial Computing'],
       responsibilities: [
@@ -68,6 +70,7 @@
       period: 'JUN 2026 - PRESENT',
       location: 'Wuhu, Anhui',
       image: 'images/Internship/卡片3.jpg',
+      logo: '',
       summary: 'Worked on intelligent driving delivery governance, quality tracking, and cross-functional coordination.',
       tags: ['Jira', 'Quality', 'Intelligent Driving', 'Robotaxi'],
       responsibilities: [
@@ -113,8 +116,9 @@
         + '<span class="card-front-number">' + String(index + 1).padStart(2, '0') + '</span>'
         + '</div>'
         + '<div class="internship-card-back">'
+        + (card.logo ? '<img class="card-back-logo" src="' + card.logo + '" alt="' + card.company + ' logo">' : '<i data-lucide="building-2" class="card-back-icon" style="width:1.2rem;height:1.2rem"></i>')
         + '<span class="card-back-kicker">Internship ' + String(index + 1).padStart(2, '0') + '</span>'
-        + '<span class="card-back-company">' + card.company + '</span>'
+        + '<span class="card-back-company"><i data-lucide="building-2" style="width:.9rem;height:.9rem;margin-right:.25rem;opacity:.78"></i>' + card.company + '</span>'
         + '<span class="card-back-role">' + card.role + '</span>'
         + '<span class="card-back-period">' + card.period + '</span>'
         + '<p class="card-back-summary">' + card.summary + '</p>'
@@ -158,14 +162,14 @@
       + '<img src="' + card.image + '" alt="' + card.company + ' internship card">'
       + '</div>'
       + '<div class="internship-detail-panel">'
-      + '<span class="detail-company">' + card.company + '</span>'
+      + '<span class="detail-company"><i data-lucide="building-2" style="width:1.1rem;height:1.1rem;margin-right:.35rem;color:var(--purple)"></i>' + card.company + '</span>'
       + '<div class="detail-role-period"><span class="detail-role">' + card.role + '</span><span class="detail-period">' + card.period + '</span></div>'
       + '<span class="detail-location">' + card.location + '</span>'
       + '<p class="detail-summary">' + card.summary + '</p>'
       + '<div class="detail-tags">' + card.tags.map(function (tag) { return '<span>' + tag + '</span>'; }).join('') + '</div>'
-      + '<div class="detail-section"><h4>Responsibilities</h4><ul>' + card.responsibilities.map(function (item) { return '<li>' + item + '</li>'; }).join('') + '</ul></div>'
-      + '<div class="detail-section"><h4>Methods</h4><ul>' + card.methods.map(function (item) { return '<li>' + item + '</li>'; }).join('') + '</ul></div>'
-      + '<div class="detail-section"><h4>Highlights</h4><ul>' + card.highlights.map(function (item) { return '<li>' + item + '</li>'; }).join('') + '</ul></div>'
+      + '<div class="detail-section"><h4><i data-lucide="clipboard-list" style="width:.75rem;height:.75rem;margin-right:.3rem;color:var(--purple)"></i>Responsibilities</h4><ul>' + card.responsibilities.map(function (item) { return '<li>' + item + '</li>'; }).join('') + '</ul></div>'
+      + '<div class="detail-section"><h4><i data-lucide="wrench" style="width:.75rem;height:.75rem;margin-right:.3rem;color:var(--purple)"></i>Tools & Methods</h4><ul>' + card.methods.map(function (item) { return '<li>' + item + '</li>'; }).join('') + '</ul></div>'
+      + '<div class="detail-section"><h4><i data-lucide="sparkles" style="width:.75rem;height:.75rem;margin-right:.3rem;color:var(--purple)"></i>Highlights</h4><ul>' + card.highlights.map(function (item) { return '<li>' + item + '</li>'; }).join('') + '</ul></div>'
       + '<button class="detail-back-btn" id="internshipBackBtn"><i data-lucide="arrow-left" style="width:.65rem;height:.65rem"></i> Back to Journey</button>'
       + '</div>';
     createIcons();

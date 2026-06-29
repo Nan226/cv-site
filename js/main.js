@@ -1534,9 +1534,9 @@ function buildInternshipCards(container) {
       + '<span class="card-front-number">' + String(index + 1).padStart(2, '0') + '</span>'
       + '</div>'
       + '<div class="internship-card-back">'
-      + (cardData.logo ? '<img class="card-back-logo" src="' + cardData.logo + '" alt="' + cardData.company + ' logo">' : '')
+      + (cardData.logo ? '<img class="card-back-logo" src="' + cardData.logo + '" alt="' + cardData.company + ' logo">' : '<i data-lucide="building-2" class="card-back-icon" style="width:1.2rem;height:1.2rem"></i>')
       + '<span class="card-back-kicker">Internship ' + String(index + 1).padStart(2, '0') + '</span>'
-      + '<span class="card-back-company">' + cardData.company + '</span>'
+      + '<span class="card-back-company"><i data-lucide="building-2" style="width:.9rem;height:.9rem;margin-right:.25rem;opacity:.78"></i>' + cardData.company + '</span>'
       + '<span class="card-back-role">' + cardData.role + '</span>'
       + '<span class="card-back-period">' + cardData.period + '</span>'
       + '<p class="card-back-summary">' + cardData.summary + '</p>'
@@ -1567,7 +1567,7 @@ function openInternshipDetail(cardId, detailContainer, stage) {
     + '<img src="' + cardData.image + '" alt="' + cardData.company + ' internship card">'
     + '</div>'
     + '<div class="internship-detail-panel">'
-    + '<span class="detail-company">' + cardData.company + '</span>'
+    + '<span class="detail-company"><i data-lucide="building-2" style="width:1.1rem;height:1.1rem;margin-right:.35rem;color:var(--purple)"></i>' + cardData.company + '</span>'
     + '<div class="detail-role-period">'
     + '<span class="detail-role">' + cardData.role + '</span>'
     + '<span class="detail-period">' + cardData.period + '</span>'
@@ -1575,13 +1575,13 @@ function openInternshipDetail(cardId, detailContainer, stage) {
     + '<span class="detail-location"><i data-lucide="map-pin" style="width:.6rem;height:.6rem"></i> ' + cardData.location + '</span>'
     + '<p class="detail-summary">' + cardData.summary + '</p>'
     + '<div class="detail-tags">' + cardData.tags.map(function (t) { return '<span>' + t + '</span>'; }).join('') + '</div>'
-    + '<div class="detail-section"><h4>Responsibilities</h4><ul>'
+    + '<div class="detail-section"><h4><i data-lucide="clipboard-list" style="width:.75rem;height:.75rem;margin-right:.3rem;color:var(--purple)"></i>Responsibilities</h4><ul>'
     + cardData.responsibilities.map(function (r) { return '<li>' + r + '</li>'; }).join('')
     + '</ul></div>'
-    + '<div class="detail-section"><h4>Tools & Methods</h4><ul>'
+    + '<div class="detail-section"><h4><i data-lucide="wrench" style="width:.75rem;height:.75rem;margin-right:.3rem;color:var(--purple)"></i>Tools & Methods</h4><ul>'
     + cardData.methods.map(function (m) { return '<li>' + m + '</li>'; }).join('')
     + '</ul></div>'
-    + '<div class="detail-section"><h4>Highlights</h4><ul>'
+    + '<div class="detail-section"><h4><i data-lucide="sparkles" style="width:.75rem;height:.75rem;margin-right:.3rem;color:var(--purple)"></i>Highlights</h4><ul>'
     + cardData.highlights.map(function (h) { return '<li>' + h + '</li>'; }).join('')
     + '</ul></div>'
     + '<button class="detail-back-btn" id="internshipBackBtn"><i data-lucide="arrow-left" style="width:.65rem;height:.65rem"></i> Back to Journey</button>'
