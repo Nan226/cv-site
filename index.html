@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>YE NAN — Portfolio</title>
-  <link rel="stylesheet" href="css/style.css?v=20260629-5">
+  <link rel="stylesheet" href="css/style.css?v=20260629-7">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script type="importmap">
     {
@@ -162,7 +162,6 @@
 
   <!-- ========== Projects 页 ========== -->
   <section id="projects" class="page-section projects-section">
-    <canvas class="projects-caustics" id="projectsCaustics" aria-hidden="true"></canvas>
     <div class="projects-stage" id="projectsStage">
       <div class="projects-header">
         <h2 class="projects-main-title">Project Showcase</h2>
@@ -174,12 +173,11 @@
           <button type="button" class="project-filter" data-filter="Professional">Professional</button>
         </div>
       </div>
-      <div class="projects-orbs" id="projectsOrbs" aria-roledescription="carousel">
-        <!-- JS 动态渲染 -->
-      </div>
-      <div class="projects-expand-overlay" id="projectsExpandOverlay">
-        <!-- JS 动态渲染展开面板 -->
-      </div>
+      <!-- 3D ocean canvas injected by JS -->
+      <div id="bottleMorphOrigin" class="bottle-morph-origin" aria-hidden="true"></div>
+    </div>
+    <div class="projects-expand-overlay" id="projectsExpandOverlay">
+      <!-- JS 动态渲染展开面板 -->
     </div>
   </section>
 
@@ -231,7 +229,7 @@
     </div>
   </div>
 
-  <script src="js/internship-boot.js?v=20260629-6"></script>
-  <script type="module" src="js/main.js?v=20260629-6"></script>
+  <script src="js/internship-boot.js?v=20260629-7"></script>
+  <script type="module" src="js/main.js?v=20260629-7"></script>
 </body>
 </html>

@@ -3,6 +3,7 @@
    导航撕碎效果 + Three.js 3D人物
    ======================================== */
 import * as THREE from 'three';
+import { initProjectsOcean } from './projects-ocean.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
@@ -1725,41 +1726,21 @@ var activeProjectId = null;
 
 function initProjects() {
   var stage = document.getElementById('projectsStage');
-  var orbsContainer = document.getElementById('projectsOrbs');
   var overlay = document.getElementById('projectsExpandOverlay');
-  var canvas = document.getElementById('projectsCaustics');
   var filters = document.getElementById('projectsFilters');
-  if (!stage || !orbsContainer) {
-    console.warn('[Projects] stage or orbsContainer missing', { stage: !!stage, orbsContainer: !!orbsContainer });
-    return;
-  }
+  var section = document.getElementById('projects');
+  if (!stage || !section) return;
 
-  // ---- 构建项目卡片 ----
-  buildProjectOrbs(orbsContainer);
-
-  // ---- Canvas 轻量背景效果 ----
-  initCaustics(canvas, stage);
-  initProjectFilters(filters, orbsContainer);
-
-  // ---- 卡片点击 → 展开 ----
-  orbsContainer.addEventListener('click', function (e) {
-    var orb = e.target.closest('.project-orb');
-    if (!orb) return;
+  // ---- 初始化 3D 海洋场景 ----
+  var oceanAPI = initProjectsOcean(section, PROJECTS, function (projectId) {
     if (currentProjectState === 'expanded') return;
-    var projectId = orb.getAttribute('data-project-id');
-    if (projectId) expandProject(projectId, stage, overlay);
+    expandProject(projectId, stage, overlay);
   });
 
-  // 键盘
-  orbsContainer.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter' && currentProjectState === 'orbs') {
-      var orb = e.target.closest('.project-orb');
-      if (orb) {
-        var projectId = orb.getAttribute('data-project-id');
-        if (projectId) expandProject(projectId, stage, overlay);
-      }
-    }
-  });
+  if (!oceanAPI) return;
+
+  // ---- Filter → bottle visibility ----
+  initProjectFilters(filters, oceanAPI);
 
   // ---- 遮罩点击关闭 ----
   if (overlay) {
@@ -1774,43 +1755,13 @@ function initProjects() {
       collapseProject(stage, overlay);
     }
   });
+
+  // Store for cleanup
+  stage._oceanAPI = oceanAPI;
 }
 
-function buildProjectOrbs(container) {
-  if (!container) return;
-  var html = '';
-  PROJECTS.forEach(function (proj, i) {
-    html += '<div class="project-orb" data-project-id="' + proj.id + '" data-category="' + proj.category + '" tabindex="0" role="button"'
-      + ' aria-label="' + proj.title + ' — ' + proj.category + '"'
-      + ' style="--card-order:' + i + ';--project-accent:' + (proj.accent || '#8f7df4') + ';'
-      + '--orb-tint:' + proj.orbTint + ';'
-      + '">'
-      + '<div class="project-card-visual" aria-hidden="true">'
-      + '<span class="project-card-index">' + String(i + 1).padStart(2, '0') + '</span>'
-      + '<i data-lucide="' + getProjectIcon(proj.category) + '"></i>'
-      + '</div>'
-      + '<div class="project-card-body">'
-      + '<span class="orb-category">' + proj.category + '</span>'
-      + '<span class="orb-title">' + proj.title + '</span>'
-      + '<p class="project-card-summary">' + proj.summary + '</p>'
-      + '<div class="project-card-tags">' + proj.tags.slice(0, 3).map(function (tag) { return '<span>' + tag + '</span>'; }).join('') + '</div>'
-      + '<span class="project-card-action">View Project <i data-lucide="arrow-up-right" style="width:.68rem;height:.68rem"></i></span>'
-      + '</div>'
-      + '</div>';
-  });
-  container.innerHTML = html;
-  if (window.lucide) lucide.createIcons();
-}
-
-function getProjectIcon(category) {
-  if (category === 'Creative') return 'sparkles';
-  if (category === 'Professional') return 'workflow';
-  if (category === 'Academic') return 'book-open';
-  return 'code-2';
-}
-
-function initProjectFilters(filters, container) {
-  if (!filters || !container) return;
+function initProjectFilters(filters, oceanAPI) {
+  if (!filters || !oceanAPI) return;
   filters.addEventListener('click', function (e) {
     var button = e.target.closest('.project-filter');
     if (!button) return;
@@ -1818,105 +1769,12 @@ function initProjectFilters(filters, container) {
     filters.querySelectorAll('.project-filter').forEach(function (btn) {
       btn.classList.toggle('is-active', btn === button);
     });
-    container.querySelectorAll('.project-orb').forEach(function (card) {
-      var match = filter === 'all' || card.getAttribute('data-category') === filter;
-      card.classList.toggle('is-filtered-out', !match);
-      card.setAttribute('aria-hidden', match ? 'false' : 'true');
-    });
-  });
-}
-
-// ---- Canvas 水波涟漪 ----
-function initCaustics(canvas, stage) {
-  if (!canvas) return;
-  var ctx = canvas.getContext('2d');
-  var ripples = [];
-  var maxRipples = 20;
-  var section = document.getElementById('projects');
-
-  function resize() {
-    if (!section) return;
-    var rect = section.getBoundingClientRect();
-    var dpr = window.devicePixelRatio || 1;
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
-    canvas.style.width = rect.width + 'px';
-    canvas.style.height = rect.height + 'px';
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  }
-  resize();
-  window.addEventListener('resize', resize);
-
-  var mouseX = -100, mouseY = -100;
-  var lastMouseX = -100, lastMouseY = -100;
-  var mouseInSection = false;
-
-  if (section) {
-    section.addEventListener('mousemove', function (e) {
-      var rect = section.getBoundingClientRect();
-      mouseX = e.clientX - rect.left;
-      mouseY = e.clientY - rect.top;
-      mouseInSection = true;
-
-      // 鼠标移动够远时生成涟漪
-      var dx = mouseX - lastMouseX;
-      var dy = mouseY - lastMouseY;
-      var dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist > 35) {
-        lastMouseX = mouseX;
-        lastMouseY = mouseY;
-        ripples.push({
-          x: mouseX,
-          y: mouseY,
-          radius: 0,
-          maxRadius: 80 + Math.random() * 100,
-          opacity: .25 + Math.random() * .15,
-          speed: 1.2 + Math.random() * 1.8
-        });
-        if (ripples.length > maxRipples) ripples.shift();
-      }
-    });
-    section.addEventListener('mouseleave', function () {
-      mouseInSection = false;
-    });
-  }
-
-  var raf;
-  function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // 更新并绘制涟漪
-    for (var i = ripples.length - 1; i >= 0; i--) {
-      var r = ripples[i];
-      r.radius += r.speed;
-      var progress = r.radius / r.maxRadius;
-      var alpha = r.opacity * (1 - progress);
-
-      if (alpha <= 0.005) {
-        ripples.splice(i, 1);
-        continue;
-      }
-
-      // 焦散光圈：多层同心环
-      var gradient = ctx.createRadialGradient(r.x, r.y, r.radius * .7, r.x, r.y, r.radius);
-      gradient.addColorStop(0, 'rgba(180,160,220,0)');
-      gradient.addColorStop(.55, 'rgba(180,160,220,' + (alpha * .35).toFixed(3) + ')');
-      gradient.addColorStop(.72, 'rgba(160,140,210,' + (alpha * .6).toFixed(3) + ')');
-      gradient.addColorStop(.88, 'rgba(140,120,200,' + (alpha * .25).toFixed(3) + ')');
-      gradient.addColorStop(1, 'rgba(200,180,230,0)');
-
-      ctx.fillStyle = gradient;
-      ctx.fillRect(r.x - r.radius, r.y - r.radius, r.radius * 2, r.radius * 2);
+    var data = oceanAPI.bottleDataMap;
+    for (var i = 0; i < data.length; i++) {
+      var match = filter === 'all' || data[i].category === filter;
+      oceanAPI.setBottleVisible(i, match);
     }
-
-    raf = requestAnimationFrame(animate);
-  }
-  animate();
-
-  // 返回清理函数备用
-  return function () {
-    if (raf) cancelAnimationFrame(raf);
-  };
+  });
 }
 
 function expandProject(projectId, stage, overlay) {
@@ -1930,6 +1788,11 @@ function expandProject(projectId, stage, overlay) {
   // 找到被点击的项目卡片位置
   var orb = document.querySelector('.project-orb[data-project-id="' + projectId + '"]');
   var orbRect = orb ? orb.getBoundingClientRect() : null;
+  // Fallback to bottle morph origin (3D ocean scene)
+  if (!orbRect) {
+    var morphOrigin = document.getElementById('bottleMorphOrigin');
+    if (morphOrigin) orbRect = morphOrigin.getBoundingClientRect();
+  }
   if (orb) orb.classList.add('is-selected');
 
   // 构建详情面板
