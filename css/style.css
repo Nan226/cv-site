@@ -1436,6 +1436,27 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   transform:rotateY(180deg);
 }
 
+/* ---- 翻转卡片 → detail 过渡动画 ---- */
+.internship-card.is-flipping .internship-card-inner{
+  animation:cardFlipOut .55s cubic-bezier(.22,.61,.36,1) forwards;
+  pointer-events:none;
+}
+@keyframes cardFlipOut{
+  0%  { transform:rotateY(180deg) scale(1); opacity:1; }
+  30% { transform:rotateY(270deg) scale(1.08); opacity:.65; }
+  100%{ transform:rotateY(360deg) scale(1.15); opacity:0; }
+}
+
+/* detail 面板翻转进场（针对整体容器） */
+.internship-stage.is-opening-detail .internship-detail{
+  animation:detailFlipIn .62s cubic-bezier(.18,.86,.24,1) both;
+}
+@keyframes detailFlipIn{
+  0%  { transform:perspective(1000px) rotateY(-180deg) scale(.82); opacity:0; }
+  50% { transform:perspective(1000px) rotateY(-90deg) scale(.9); opacity:.4; }
+  100%{ transform:perspective(1000px) rotateY(0deg) scale(1); opacity:1; }
+}
+
 /* 卡片正面（图片面） */
 .internship-card-front,
 .internship-card-back{
@@ -1625,20 +1646,46 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   opacity:1;
 }
 
-/* 详情左侧主卡 */
+/* 详情左侧主卡 — About Me 风格 */
 .internship-detail-card{
   flex-shrink:0;
   width:clamp(200px,24vw,300px);
   aspect-ratio:5/7;
-  border-radius:22px;
+  border-radius:18px;
   overflow:hidden;
-  box-shadow:0 10px 44px rgba(135,56,224,.1),0 3px 14px rgba(180,120,200,.07);
+  background:rgba(255,255,255,.9);
+  border:1px solid rgba(207,190,246,.34);
+  box-shadow:0 12px 38px rgba(111,96,158,.1),0 10px 44px rgba(135,56,224,.1);
+  display:flex;
+  flex-direction:column;
   animation:detailCardFloatIn .78s cubic-bezier(.18,.86,.24,1) both;
 }
-.internship-detail-card img{
+.internship-detail-card .card-image-wrap{
+  position:relative;
+  width:100%;
+  height:60%;
+  overflow:hidden;
+  background:linear-gradient(135deg,rgba(229,241,255,.7),rgba(255,235,247,.62));
+  flex-shrink:0;
+}
+.internship-detail-card .card-image-wrap img{
   width:100%;height:100%;
   object-fit:cover;
   display:block;
+}
+.internship-detail-card .card-body{
+  flex:1 1 auto;
+  margin-top:-1.2rem;
+  padding:.5rem .9rem .7rem;
+  display:flex;flex-direction:column;
+  gap:.22rem;
+  position:relative;
+  z-index:2;
+}
+.internship-detail-card .card-body .card-head-icon{
+  width:1.2rem;height:1.2rem;
+  color:var(--purple);
+  margin-bottom:.1rem;
 }
 
 /* 详情右侧面板 */
@@ -1777,9 +1824,97 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   .internship-stage.is-intro .internship-intro-image{animation:none}
   .internship-intro-image{transition:none}
   .internship-card{transition:none}
+  .internship-card.is-flipping .internship-card-inner{animation:none;opacity:0}
   .internship-detail-panel{animation:none}
+  .internship-detail-card{animation:none}
+  .internship-stage.is-opening-detail .internship-detail{animation:none}
   .internship-scroll-hint{animation:none}
   .internship-meteor{animation:none;opacity:.18}
+}
+
+/* ---- 简历下载弹框 ---- */
+.resume-dialog-overlay{
+  position:fixed;inset:0;z-index:9999;
+  background:rgba(20,14,38,.62);
+  backdrop-filter:blur(6px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity .32s ease;
+}
+.resume-dialog-overlay.is-open{
+  opacity:1;pointer-events:auto;
+}
+.resume-dialog{
+  background:rgba(255,255,255,.94);
+  backdrop-filter:blur(18px);
+  border-radius:20px;
+  border:1px solid rgba(207,190,246,.34);
+  box-shadow:0 24px 64px rgba(80,56,140,.18);
+  padding:2rem 2rem 1.6rem;
+  width:min(380px,88vw);
+  text-align:center;
+  position:relative;
+  animation:dialogPopIn .38s cubic-bezier(.18,.86,.24,1) both;
+}
+@keyframes dialogPopIn{
+  from{transform:scale(.88) translateY(18px);opacity:0}
+  to{transform:scale(1) translateY(0);opacity:1}
+}
+.resume-dialog-close{
+  position:absolute;top:.65rem;right:.65rem;
+  width:2rem;height:2rem;
+  border-radius:50%;border:none;
+  background:rgba(135,56,224,.06);
+  color:var(--text-light);
+  cursor:pointer;
+  display:grid;place-items:center;
+  transition:background .2s ease,color .2s ease;
+}
+.resume-dialog-close:hover{background:rgba(135,56,224,.14);color:var(--purple)}
+.resume-dialog-title{
+  font-family:var(--font-heading);
+  font-size:1.15rem;font-weight:800;
+  color:var(--text-dark);
+  margin-bottom:.25rem;
+}
+.resume-dialog-sub{
+  font-family:var(--font-body);
+  font-size:.62rem;
+  color:var(--text-light);
+  margin-bottom:1.2rem;
+}
+.resume-dialog-options{
+  display:flex;flex-direction:column;
+  gap:.6rem;
+}
+.resume-dialog-option{
+  display:flex;align-items:center;gap:.7rem;
+  padding:.85rem 1rem;
+  border-radius:14px;
+  border:1px solid rgba(207,190,246,.4);
+  background:rgba(248,245,255,.55);
+  text-decoration:none;color:inherit;
+  cursor:pointer;
+  transition:background .22s ease,border-color .22s ease,box-shadow .22s ease;
+}
+.resume-dialog-option:not(.is-disabled):hover{
+  background:rgba(232,220,255,.5);
+  border-color:rgba(175,148,240,.6);
+  box-shadow:0 6px 18px rgba(135,56,224,.08);
+}
+.resume-dialog-option.is-disabled{
+  opacity:.48;cursor:not-allowed;
+}
+.resume-dialog-option i{color:var(--purple);flex-shrink:0}
+.resume-dialog-option.is-disabled i{color:var(--text-light)}
+.resume-opt-lang{
+  font-family:var(--font-heading);
+  font-size:.85rem;font-weight:700;
+  flex:1;text-align:left;
+}
+.resume-opt-hint{
+  font-family:var(--font-tag);
+  font-size:.52rem;color:var(--text-light);
 }
 
 /* ---- 移动端 ---- */

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>YE NAN — Portfolio</title>
-  <link rel="stylesheet" href="css/style.css?v=20260629-4">
+  <link rel="stylesheet" href="css/style.css?v=20260629-5">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script type="importmap">
     {
@@ -208,7 +208,30 @@
     <p class="pull-chain-hint">Pull the chain to bring back the light</p>
   </div>
 
-  <script src="js/internship-boot.js?v=20260629-5"></script>
-  <script type="module" src="js/main.js?v=20260629-5"></script>
+  <!-- ========== 简历下载弹框 ========== -->
+  <div class="resume-dialog-overlay" id="resumeDialogOverlay">
+    <div class="resume-dialog">
+      <button class="resume-dialog-close" id="resumeDialogClose" aria-label="Close">
+        <i data-lucide="x" style="width:1.1rem;height:1.1rem"></i>
+      </button>
+      <h3 class="resume-dialog-title">Download Resume</h3>
+      <p class="resume-dialog-sub">Choose your preferred language</p>
+      <div class="resume-dialog-options">
+        <button class="resume-dialog-option is-disabled" disabled>
+          <i data-lucide="file-text" style="width:1.4rem;height:1.4rem"></i>
+          <span class="resume-opt-lang">中文</span>
+          <span class="resume-opt-hint">Coming Soon</span>
+        </button>
+        <a class="resume-dialog-option" href="images/About me/Nan YE.pdf" download="Nan_YE_Resume.pdf">
+          <i data-lucide="file-text" style="width:1.4rem;height:1.4rem"></i>
+          <span class="resume-opt-lang">English</span>
+          <span class="resume-opt-hint">PDF · Download</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/internship-boot.js?v=20260629-6"></script>
+  <script type="module" src="js/main.js?v=20260629-6"></script>
 </body>
 </html>
