@@ -117,7 +117,7 @@
         + '<span class="card-front-number">' + String(index + 1).padStart(2, '0') + '</span>'
         + '</div>'
         + '<div class="internship-card-back">'
-        + (card.logo ? '<img class="card-back-logo" src="' + card.logo + '" alt="' + card.company + ' logo">' : '<i data-lucide="building-2" class="card-back-icon" style="width:1.2rem;height:1.2rem"></i>')
+        + '<span class="card-back-kicker">Internship ' + String(index + 1).padStart(2, '0') + '</span>'
         + '<span class="card-back-company"><i data-lucide="building-2" style="width:.9rem;height:.9rem;margin-right:.25rem;opacity:.78"></i>' + card.company + '</span>'
         + '<span class="card-back-role">' + card.role + '</span>'
         + '<span class="card-back-period">' + card.period + '</span>'

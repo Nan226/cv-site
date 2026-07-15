@@ -1541,7 +1541,7 @@ function buildInternshipCards(container) {
       + '<span class="card-front-number">' + String(index + 1).padStart(2, '0') + '</span>'
       + '</div>'
       + '<div class="internship-card-back">'
-      + (cardData.logo ? '<img class="card-back-logo" src="' + cardData.logo + '" alt="' + cardData.company + ' logo">' : '<i data-lucide="building-2" class="card-back-icon" style="width:1.2rem;height:1.2rem"></i>')
+      + '<span class="card-back-kicker">Internship ' + String(index + 1).padStart(2, '0') + '</span>'
       + '<span class="card-back-company"><i data-lucide="building-2" style="width:.9rem;height:.9rem;margin-right:.25rem;opacity:.78"></i>' + cardData.company + '</span>'
       + '<span class="card-back-role">' + cardData.role + '</span>'
       + '<span class="card-back-period">' + cardData.period + '</span>'
@@ -2082,7 +2082,7 @@ var ABOUT_CARDS = [
   {
     id: 'base-info', period: 'FEB 2003', location: 'Quanzhou, Fujian',
     category: 'Base Info', icon: 'id-card', title: 'Base Information', subtitle: '',
-    image: 'images/About me/照片1.JPEG', logo: 'images/About me/照片1.JPEG',
+    image: 'images/About me/照片1.JPEG', logo: 'images/照片.JPG',
     items: [],
     tags: [
       'enfp',
