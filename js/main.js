@@ -3,9 +3,9 @@
    导航撕碎效果 + Three.js 3D人物
    ======================================== */
 import * as THREE from 'three';
-import { initProjectsOcean } from './projects-ocean.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+import { initProjectsOrbs } from './projects-orbs.js?v=20260717-8';
 
 // ============================================================
 //  导航栏「撕碎」效果
@@ -51,7 +51,8 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
     'About Me': 'about',
     'Internship': 'internship',
     'Projects': 'projects',
-    // Skills / Learning 分区待建，暂不绑定
+    'Skills & Learning': 'skills-learning',
+    'Me & My Friends': 'travel-memory'
   };
 
   document.querySelectorAll('.nav-item').forEach(function (link) {
@@ -226,6 +227,15 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
   const rimLight = new THREE.DirectionalLight('#f0d8e0', 0.9);
   rimLight.position.set(0, -1, 2);
   scene.add(rimLight);
+
+  function setEasterLighting(isActive) {
+    ambient.intensity = isActive ? 1.8 : 1.55;
+    fillLight.color.set(isActive ? '#d8c2ff' : '#e8ddf5');
+    fillLight.intensity = isActive ? 1.6 : 1.25;
+    rimLight.color.set(isActive ? '#b98cff' : '#f0d8e0');
+    rimLight.intensity = isActive ? 2.7 : 0.9;
+    renderer.toneMappingExposure = isActive ? 1.02 : 0.86;
+  }
 
   // ---- 材质工厂 ----
   const skinMat = new THREE.MeshStandardMaterial({
@@ -1086,6 +1096,7 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
     scene,
     camera,
     triggerReaction,
+    setEasterLighting,
   };
 })();
 
@@ -1099,27 +1110,25 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
   if (!container) return;
 
   const colors = [
-    '#d2b5f2', '#c9a8f0', '#b890e8',  // 浅紫系
-    '#eca1ca', '#f0b8d4', '#e890b0',  // 柔粉系
-    '#a78bfa', '#b99af5',              // 中紫系
-    '#e1c3e8', '#d4a8dd',              // 淡紫粉
+    '#a9d9ed', '#dff1f7', '#f8d2dc', '#f4b8c7',
+    '#c3db7f', '#e9f1c9', '#fff0ab', '#eadff4',
   ];
 
-  const ribbonCount = 25;
+  const ribbonCount = window.innerWidth < 768 ? 16 : 26;
 
   for (let i = 0; i < ribbonCount; i++) {
     const ribbon = document.createElement('div');
     ribbon.className = 'ribbon';
 
     // 随机尺寸
-    const width = 2 + Math.random() * 5;       // 2-7px 宽
-    const height = 10 + Math.random() * 30;     // 10-40px 长
+    const width = 4 + Math.random() * 7;
+    const height = 18 + Math.random() * 34;
 
     // 随机位置
     const leftPos = Math.random() * 100;        // 0-100%
 
     // 随机动画参数
-    const duration = 12 + Math.random() * 20;   // 12-32s
+    const duration = 11 + Math.random() * 16;
     const delay = Math.random() * duration;      // 错开启动
     const drift = (Math.random() - 0.5) * 120;  // 水平飘移距离（px）
     const spin = (Math.random() - 0.5) * 360;   // 旋转角度
@@ -1130,7 +1139,7 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
       left: ${leftPos}%;
       background: ${colors[Math.floor(Math.random() * colors.length)]};
       animation-duration: ${duration}s;
-      animation-delay: ${delay}s;
+      animation-delay: -${delay}s;
       --drift: ${drift}px;
       --spin: ${spin}deg;
     `;
@@ -1147,6 +1156,26 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
       ribbon.style.setProperty('--spin', (Math.random() - 0.5) * 360 + 'deg');
     });
   }
+
+  const scrollContainer = document.getElementById('scrollContainer');
+  const projectsSection = document.getElementById('projects');
+  let visibilityFrame = 0;
+
+  function syncRibbonVisibility() {
+    visibilityFrame = 0;
+    if (!scrollContainer || !projectsSection) return;
+    const cutoff = projectsSection.offsetTop - window.innerHeight * 0.35;
+    container.classList.toggle('is-hidden', scrollContainer.scrollTop >= cutoff);
+  }
+
+  if (scrollContainer) {
+    scrollContainer.addEventListener('scroll', function () {
+      if (visibilityFrame) return;
+      visibilityFrame = window.requestAnimationFrame(syncRibbonVisibility);
+    }, { passive: true });
+  }
+  window.addEventListener('resize', syncRibbonVisibility);
+  syncRibbonVisibility();
 })();
 
 
@@ -1259,6 +1288,10 @@ function triggerEasterEgg() {
         canvas.style.width = rect.width + 'px';
         canvas.style.height = rect.height + 'px';
         canvas.style.zIndex = '10000';
+        canvas.classList.add('is-easter-lit');
+      }
+      if (window.__threeCharacter && window.__threeCharacter.setEasterLighting) {
+        window.__threeCharacter.setEasterLighting(true);
       }
       if (ribbons) ribbons.style.display = 'none';
 
@@ -1346,6 +1379,10 @@ function triggerEasterEgg() {
         canvas.style.left = canvas._origLeft;
         canvas.style.width = canvas._origWidth;
         canvas.style.height = canvas._origHeight;
+        canvas.classList.remove('is-easter-lit');
+      }
+      if (window.__threeCharacter && window.__threeCharacter.setEasterLighting) {
+        window.__threeCharacter.setEasterLighting(false);
       }
       if (ribbons) ribbons.style.removeProperty('display');
       document.removeEventListener('mousemove', updateSpotlight);
@@ -1535,7 +1572,7 @@ function buildInternshipCards(container) {
   if (!container) return;
   var html = '';
   INTERNSHIP_CARDS.forEach(function (cardData, index) {
-    html += '<div class="internship-card" data-card-id="' + cardData.id + '" tabindex="0" role="button" aria-label="' + cardData.company + ' internship card" style="--card-image:url(../' + cardData.image + ')">'
+    html += '<div class="internship-card" data-card-id="' + cardData.id + '" tabindex="0" role="button" aria-label="' + cardData.company + ' internship card">'
       + '<div class="internship-card-inner">'
       + '<div class="internship-card-front">'
       + '<img src="' + cardData.image + '" alt="' + cardData.company + ' internship card" loading="lazy">'
@@ -1543,14 +1580,14 @@ function buildInternshipCards(container) {
       + '</div>'
       + '<div class="internship-card-back">'
       + '<span class="card-back-kicker">Internship ' + String(index + 1).padStart(2, '0') + '</span>'
-      + '<span class="card-back-company"><i data-lucide="building-2" style="width:.9rem;height:.9rem;margin-right:.25rem;opacity:.78"></i>' + cardData.company + '</span>'
+      + '<span class="card-back-company"><i data-lucide="building-2" class="card-back-company-icon" aria-hidden="true"></i>' + cardData.company + '</span>'
       + '<span class="card-back-role">' + cardData.role + '</span>'
       + '<span class="card-back-period">' + cardData.period + '</span>'
       + '<p class="card-back-summary">' + cardData.summary + '</p>'
       + '<div class="card-back-tags">'
       + cardData.tags.map(function (t) { return '<span>' + t + '</span>'; }).join('')
       + '</div>'
-      + '<span class="card-back-action">View Details <i data-lucide="arrow-right" style="width:.65rem;height:.65rem"></i></span>'
+      + '<span class="card-back-action">View Details <i data-lucide="arrow-right" class="card-back-action-icon" aria-hidden="true"></i></span>'
       + '</div>'
       + '</div>'
       + '</div>';
@@ -1591,9 +1628,10 @@ function openInternshipDetail(cardId, detailContainer, stage, cardEl) {
       + '</div>'
       + '<div class="card-items">' + tagsHTML + '</div>'
       + '</div>'
+      + '<button class="internship-card-back-btn" id="internshipBackBtn"><i data-lucide="arrow-left" class="detail-back-icon" aria-hidden="true"></i> Back to Journey</button>'
       + '</div>'
       + '<div class="internship-detail-panel">'
-      + '<span class="detail-company"><i data-lucide="building-2" style="width:1.1rem;height:1.1rem;margin-right:.35rem;color:var(--purple)"></i>' + cardData.company + '</span>'
+      + '<span class="detail-company"><i data-lucide="building-2" class="detail-company-icon" aria-hidden="true"></i>' + cardData.company + '</span>'
       + '<div class="detail-role-period">'
       + '<span class="detail-role">' + cardData.role + '</span>'
       + '<span class="detail-period">' + cardData.period + '</span>'
@@ -1601,16 +1639,15 @@ function openInternshipDetail(cardId, detailContainer, stage, cardEl) {
       + '<span class="detail-location"><i data-lucide="map-pin" style="width:.6rem;height:.6rem"></i> ' + cardData.location + '</span>'
       + '<p class="detail-summary">' + cardData.summary + '</p>'
       + '<div class="detail-tags">' + cardData.tags.map(function (t) { return '<span>' + t + '</span>'; }).join('') + '</div>'
-      + '<div class="detail-section"><h4><i data-lucide="clipboard-list" style="width:.75rem;height:.75rem;margin-right:.3rem;color:var(--purple)"></i>Responsibilities</h4><ul>'
+      + '<div class="detail-section"><h4><i data-lucide="clipboard-list" class="detail-section-icon" aria-hidden="true"></i>Responsibilities</h4><ul>'
       + cardData.responsibilities.map(function (r) { return '<li>' + r + '</li>'; }).join('')
       + '</ul></div>'
-      + '<div class="detail-section"><h4><i data-lucide="wrench" style="width:.75rem;height:.75rem;margin-right:.3rem;color:var(--purple)"></i>Tools & Methods</h4><ul>'
+      + '<div class="detail-section"><h4><i data-lucide="wrench" class="detail-section-icon" aria-hidden="true"></i>Tools & Methods</h4><ul>'
       + cardData.methods.map(function (m) { return '<li>' + m + '</li>'; }).join('')
       + '</ul></div>'
-      + '<div class="detail-section"><h4><i data-lucide="sparkles" style="width:.75rem;height:.75rem;margin-right:.3rem;color:var(--purple)"></i>Highlights</h4><ul>'
+      + '<div class="detail-section"><h4><i data-lucide="sparkles" class="detail-section-icon" aria-hidden="true"></i>Highlights</h4><ul>'
       + cardData.highlights.map(function (h) { return '<li>' + h + '</li>'; }).join('')
       + '</ul></div>'
-      + '<button class="detail-back-btn" id="internshipBackBtn"><i data-lucide="arrow-left" style="width:.65rem;height:.65rem"></i> Back to Journey</button>'
       + '</div>';
 
     detailContainer.innerHTML = html;
@@ -1651,103 +1688,167 @@ function closeInternshipDetail(detailContainer, stage) {
 }
 
 // ============================================================
-//  Projects — Liquid Light Orbs + 水波鼠标跟随
+//  Projects — Falling physics orbs
 // ============================================================
 
 var PROJECTS = [
   {
-    id: 'ai-research',
-    title: 'AI Research Assistant',
-    category: 'Professional',
-    period: '2025',
-    orbTint: 'rgba(135,56,224,.28)',
-    particleColor: 'rgba(160,120,220,.7)',
+    id: 'robotaxi',
+    title: 'Robotaxi Intelligent Driving',
+    category: 'Technical',
+    period: '2026',
     accent: '#8f7df4',
+    state: 'pending',
     thumbnail: '',
-    summary: 'Built an LLM-powered research tool for automated literature review and paper summarization.',
-    description: 'Developed a Streamlit web application using LangChain and OpenAI API to ingest academic papers, extract key findings, and generate structured literature reviews. The tool supports PDF upload, semantic search across paper collections, and auto-generation of citation networks. Designed for researchers who need to quickly survey large volumes of academic literature.',
-    tags: ['Python', 'LangChain', 'OpenAI API', 'Streamlit', 'PDF Processing'],
-    links: [
-      { label: 'View on GitHub', icon: 'github', url: '#' }
-    ],
+    summary: 'A self-developed L4 Robotaxi intelligent driving system concept (placeholder).',
+    description: 'A future L4 Robotaxi intelligent driving project placeholder, awaiting detailed content.',
+    tags: ['Intelligent Driving', 'Robotaxi', 'VLA Model', 'Jira', 'PMO'],
+    links: [],
+    highlights: []
+  },
+  {
+    id: 'ai-pm',
+    title: 'AI-powered Project Management Platform',
+    sceneTitle: 'AI Project Management',
+    code: 'Project 01',
+    category: 'Product Design',
+    period: '2026',
+    accent: '#e99ad6',
+    state: 'active',
+    thumbnail: '',
+    tagline: 'An intelligent workflow system for improving project visibility and execution efficiency',
+    summary: 'Designed a lightweight AI-powered project management platform to address challenges in project scheduling visibility, workflow complexity, and inefficient collaboration across PM, development, testing, and UI teams.',
+    role: 'Product Manager / AI Solution Designer',
+    description: 'Designed a lightweight AI-powered project management platform to address challenges in project scheduling visibility, workflow complexity, and inefficient collaboration across PM, development, testing, and UI teams.',
+    status: 'MVP development and testing phase',
+    techStack: ['AI Agent', 'Product Design', 'PMO', 'Workflow Automation'],
+    tags: ['AI Agent', 'Product Design', 'PMO', 'Workflow Automation'],
+    links: [],
     highlights: [
-      'Processed 500+ academic papers with 92% extraction accuracy',
-      'Reduced literature review time by 60% in user testing',
-      'Featured in university AI showcase event'
+      'Conducted research with 17 R&D members and translated workflow pain points into product requirements and MVP roadmap',
+      'Designed core data models connecting requirements, tasks, and Bugs, with a three-level permission system',
+      'Proposed intelligent workflow mechanisms: project health indicators, drag-and-drop task boards with blocker alerts, automated escalation reminders for overdue tasks',
+      'Designed AI Agent scenarios for risk prediction and schedule assistance, delay detection and notifications, and automated project reports and retrospectives'
     ]
   },
   {
-    id: 'portfolio-site',
-    title: 'Personal Portfolio Site',
+    id: 'metafit',
+    title: 'MetaFit — AI Fashion Recommendation & Virtual Try-on',
+    sceneTitle: 'MetaFit Virtual Try-on',
+    code: 'Project 02',
+    category: 'Product Design',
+    period: '2026',
+    accent: '#7aa7e9',
+    state: 'active',
+    thumbnail: '',
+    tagline: 'Combining LLM recommendation and AIGC virtual try-on for personalized shopping experiences',
+    summary: 'Developed an end-to-end intelligent fashion system integrating LLM-based recommendation and AIGC virtual try-on to improve online shopping personalization and user experience.',
+    role: 'Project Lead / AI Product Designer',
+    description: 'Developed an end-to-end intelligent fashion system integrating LLM-based recommendation and AIGC virtual try-on to improve online shopping personalization and user experience.',
+    status: 'MVP development and integration testing',
+    techStack: ['LLM', 'RAG', 'AIGC', 'Computer Vision', 'Prompt Engineering'],
+    tags: ['LLM', 'RAG', 'AIGC', 'Computer Vision', 'Prompt Engineering'],
+    links: [],
+    highlights: [
+      'Participated in system architecture design, building a complete workflow: User Intent → RAG Recommendation → AIGC Virtual Try-on',
+      'Defined MVP features and coordinated development progress across frontend and backend modules',
+      'Designed and optimized structured prompts covering product category, material, style, and fit preferences',
+      'Analyzed recommendation deviations and generation failures through Bad Case analysis, improving prompt robustness',
+      'Coordinated integration testing and collected user feedback to guide iterative improvements'
+    ]
+  },
+  {
+    id: 'metaverse-classroom',
+    title: 'Metaverse Classroom (Coming Soon)',
     category: 'Creative',
     period: '2026',
-    orbTint: 'rgba(200,140,210,.28)',
-    particleColor: 'rgba(210,150,200,.7)',
-    accent: '#e99ad6',
+    accent: '#7aa7e9',
+    state: 'pending',
     thumbnail: '',
-    summary: 'Designed and developed this interactive 3D portfolio website from scratch.',
-    description: 'A fully custom portfolio website featuring a Three.js 3D interactive character, CSS 3D carousel for the About Me timeline, watercolor-inspired Internship section with flip cards, and a liquid light orbs Projects showcase. Every interaction and animation is hand-crafted without frameworks, focusing on creating a memorable personal brand experience.',
-    tags: ['HTML/CSS', 'JavaScript', 'Three.js', 'UI/UX', 'Animation'],
-    links: [
-      { label: 'View on GitHub', icon: 'github', url: '#' },
-      { label: 'Live Demo', icon: 'external-link', url: '#' }
-    ],
-    highlights: [
-      'Built entirely with vanilla JS, CSS, and HTML — zero frameworks',
-      'Features procedural 3D character and GLB model rendering',
-      'Responsive design with scroll-snap full-page sections'
-    ]
+    summary: 'A virtual reality classroom experience under design exploration.',
+    description: 'Concept exploration for a Metaverse-enabled classroom product, integrating real-time 3D environments with collaborative learning workflows. The project is in early ideation stage, focusing on user experience design and technical feasibility studies.',
+    tags: ['Metaverse', 'VR', 'EdTech'],
+    links: [],
+    highlights: []
   },
   {
-    id: 'pm-automator',
-    title: 'PM Workflow Automator',
-    category: 'Technical',
-    period: '2025',
-    orbTint: 'rgba(100,160,220,.28)',
-    particleColor: 'rgba(140,170,230,.7)',
-    accent: '#7aa7e9',
+    id: 'ar-showroom',
+    title: 'AR Showroom (Coming Soon)',
+    category: 'Creative',
+    period: '2026',
+    accent: '#a98ac9',
+    state: 'pending',
     thumbnail: '',
-    summary: 'Automated Jira-to-Notion sync, sprint reporting, and stakeholder update workflows.',
-    description: 'Built a Python automation suite that connects Jira and Notion APIs to streamline project management workflows. The system automatically syncs issue tracking data to Notion databases, generates weekly sprint reports with burndown charts, and sends formatted stakeholder updates via email. Reduced manual PM overhead by approximately 40%.',
-    tags: ['Python', 'Jira API', 'Notion API', 'Automation', 'Reporting'],
-    links: [
-      { label: 'View on GitHub', icon: 'github', url: '#' }
-    ],
-    highlights: [
-      'Reduced manual PM reporting time by 40%',
-      'Real-time sync between Jira issues and Notion dashboards',
-      'Auto-generated sprint burndown charts and velocity reports'
-    ]
+    summary: 'Augmented reality product showroom under design exploration.',
+    description: 'A product showroom concept leveraging augmented reality for immersive brand experiences. Researching AR frameworks, mobile compatibility, and 3D asset pipelines.',
+    tags: ['AR', '3D', 'Brand'],
+    links: [],
+    highlights: []
+  },
+  {
+    id: 'ai-research',
+    title: 'AI Research Lab (Coming Soon)',
+    category: 'Technical',
+    period: '2026',
+    accent: '#8f7df4',
+    state: 'pending',
+    thumbnail: '',
+    summary: 'A research initiative exploring AI-driven product innovation.',
+    description: 'Research-focused exploration of AI capabilities in real product scenarios, including LLM integration, prompt engineering, and applied machine learning.',
+    tags: ['AI', 'LLM', 'Research'],
+    links: [],
+    highlights: []
+  },
+  {
+    id: 'iot-garden',
+    title: 'IoT Smart Garden (Coming Soon)',
+    category: 'Technical',
+    period: '2026',
+    accent: '#7aa7e9',
+    state: 'pending',
+    thumbnail: '',
+    summary: 'A smart gardening system with IoT sensors under early design.',
+    description: 'IoT-based smart garden concept integrating soil sensors, automated watering, and a mobile dashboard. Currently in ideation and hardware feasibility stage.',
+    tags: ['IoT', 'Hardware', 'Sensors'],
+    links: [],
+    highlights: []
+  },
+  {
+    id: 'data-viz',
+    title: 'Data Visualization (Coming Soon)',
+    category: 'Creative',
+    period: '2026',
+    accent: '#e99ad6',
+    state: 'pending',
+    thumbnail: '',
+    summary: 'An interactive data visualization tool under design.',
+    description: 'A web-based data visualization platform concept, exploring interactive charts, real-time data streams, and aesthetic-driven storytelling.',
+    tags: ['Data Viz', 'D3', 'Storytelling'],
+    links: [],
+    highlights: []
   }
 ];
 
 var currentProjectState = 'orbs'; // orbs | expanded
 var activeProjectId = null;
+var projectsOrbsAPI = null;
 
 function initProjects() {
   var stage = document.getElementById('projectsStage');
   var overlay = document.getElementById('projectsExpandOverlay');
-  var filters = document.getElementById('projectsFilters');
   var section = document.getElementById('projects');
-  if (!stage || !section) return;
+  if (!stage || !section || !overlay || stage.dataset.projectsInitialized === 'true') return;
+  stage.dataset.projectsInitialized = 'true';
 
-  // ---- 初始化 3D 海洋场景 ----
-  var oceanAPI = initProjectsOcean(section, PROJECTS, function (projectId) {
+  projectsOrbsAPI = initProjectsOrbs(section, stage, PROJECTS, function (projectId) {
     if (currentProjectState === 'expanded') return;
     expandProject(projectId, stage, overlay);
   });
 
-  if (!oceanAPI) return;
-
-  // ---- Filter → bottle visibility ----
-  initProjectFilters(filters, oceanAPI);
-
   // ---- 遮罩点击关闭 ----
-  if (overlay) {
-    overlay.addEventListener('click', function () {
-      if (currentProjectState === 'expanded') collapseProject(stage, overlay);
-    });
-  }
+  overlay.addEventListener('click', function () {
+    if (currentProjectState === 'expanded') collapseProject(stage, overlay);
+  });
 
   // ---- Escape 关闭 ----
   document.addEventListener('keydown', function (e) {
@@ -1756,26 +1857,8 @@ function initProjects() {
     }
   });
 
-  // Store for cleanup
-  stage._oceanAPI = oceanAPI;
 }
 
-function initProjectFilters(filters, oceanAPI) {
-  if (!filters || !oceanAPI) return;
-  filters.addEventListener('click', function (e) {
-    var button = e.target.closest('.project-filter');
-    if (!button) return;
-    var filter = button.getAttribute('data-filter');
-    filters.querySelectorAll('.project-filter').forEach(function (btn) {
-      btn.classList.toggle('is-active', btn === button);
-    });
-    var data = oceanAPI.bottleDataMap;
-    for (var i = 0; i < data.length; i++) {
-      var match = filter === 'all' || data[i].category === filter;
-      oceanAPI.setBottleVisible(i, match);
-    }
-  });
-}
 
 function expandProject(projectId, stage, overlay) {
   var projectData = PROJECTS.find(function (p) { return p.id === projectId; });
@@ -1785,15 +1868,14 @@ function expandProject(projectId, stage, overlay) {
   activeProjectId = projectId;
   stage.classList.add('is-expanded');
 
-  // 找到被点击的项目卡片位置
-  var orb = document.querySelector('.project-orb[data-project-id="' + projectId + '"]');
-  var orbRect = orb ? orb.getBoundingClientRect() : null;
-  // Fallback to bottle morph origin (3D ocean scene)
-  if (!orbRect) {
-    var morphOrigin = document.getElementById('bottleMorphOrigin');
-    if (morphOrigin) orbRect = morphOrigin.getBoundingClientRect();
+  // 找到与发光项目球同步的可访问点击区域
+  var projectOriginEl = document.querySelector('.project-physics-orb.is-active[data-project-id="' + projectId + '"]');
+  var projectOriginRect = projectOriginEl ? projectOriginEl.getBoundingClientRect() : null;
+  // Fallback to morph origin
+  if (!projectOriginRect) {
+    var morphOrigin = document.getElementById('projectMorphOrigin');
+    if (morphOrigin) projectOriginRect = morphOrigin.getBoundingClientRect();
   }
-  if (orb) orb.classList.add('is-selected');
 
   // 构建详情面板
   var panel = document.createElement('div');
@@ -1802,45 +1884,71 @@ function expandProject(projectId, stage, overlay) {
   panel.setAttribute('aria-modal', 'true');
   panel.setAttribute('aria-label', projectData.title + ' details');
 
-  var html = '';
-  // 顶部图（如果有 thumbnail；否则用渐变色条）
+  var accent = projectData.accent || '#8f7df4';
+  panel.style.setProperty('--project-accent', accent);
+
+  var html = '<div class="project-detail-dragbar" data-project-drag-handle>'
+    + '<span class="project-detail-drag-label"><i data-lucide="grip-horizontal" aria-hidden="true"></i><span>PROJECT FILE</span></span>'
+    + '<span class="project-detail-window-code">' + (projectData.code || projectData.period || '') + '</span>'
+    + '<button class="detail-close-btn" id="projectCloseBtn" type="button" title="Close" aria-label="Close project details"><i data-lucide="x" aria-hidden="true"></i></button>'
+    + '</div>';
+  // 顶部图（如果有 thumbnail；否则用渐变色条 + 项目编号）
   if (projectData.thumbnail) {
     html += '<img class="detail-top-image" src="' + projectData.thumbnail + '" alt="' + projectData.title + '">';
   } else {
-    html += '<div class="detail-top-image" style="background:linear-gradient(135deg,' + projectData.orbTint.replace('0.28', '0.5') + ',' + projectData.particleColor.replace('0.7', '0.5') + ');display:flex;align-items:center;justify-content:center;"><span style="font-family:var(--font-heading);font-size:1.6rem;color:rgba(255,255,255,.55);">' + projectData.title.charAt(0) + '</span></div>';
+    var kickerText = projectData.code || '';
+    html += '<div class="detail-top-image detail-illustration" aria-hidden="true">';
+    if (kickerText) {
+      html += '<span class="detail-illustration-code">' + kickerText + '</span>';
+    }
+    html += '<span class="detail-illustration-initial">' + projectData.title.charAt(0) + '</span>'
+      + '<span class="detail-illustration-star detail-illustration-star-one">✦</span>'
+      + '<span class="detail-illustration-star detail-illustration-star-two">✦</span>';
+    html += '</div>';
   }
   html += '<div class="detail-body">'
-    + '<span class="detail-title">' + projectData.title + '</span>'
-    + '<div class="detail-meta">'
+    + '<span class="detail-title">' + projectData.title + '</span>';
+  if (projectData.tagline) {
+    html += '<p class="detail-tagline">' + projectData.tagline + '</p>';
+  }
+  html += '<div class="detail-meta">'
     + '<span class="detail-category">' + projectData.category + '</span>'
     + '<span class="detail-period">' + projectData.period + '</span>'
-    + '</div>'
-    + '<p class="detail-desc">' + projectData.description + '</p>'
+    + '</div>';
+  if (projectData.role) {
+    html += '<div class="detail-role"><i data-lucide="user" style="width:.7rem;height:.7rem;color:var(--purple)"></i> ' + projectData.role + '</div>';
+  }
+  html += '<p class="detail-desc">' + projectData.description + '</p>'
     + '<div class="detail-tags">' + projectData.tags.map(function (t) { return '<span>' + t + '</span>'; }).join('') + '</div>';
   if (projectData.links && projectData.links.length > 0) {
     html += '<div class="detail-links">'
       + projectData.links.map(function (l) { return '<a class="detail-link-btn" href="' + l.url + '" target="_blank" rel="noopener"><i data-lucide="' + l.icon + '" style="width:.7rem;height:.7rem"></i> ' + l.label + '</a>'; }).join('')
       + '</div>';
   }
-  html += '<ul class="detail-highlights">'
-    + projectData.highlights.map(function (h) { return '<li>' + h + '</li>'; }).join('')
-    + '</ul>'
-    + '</div>'
-    + '<button class="detail-close-btn" id="projectCloseBtn" aria-label="Close project details">&times;</button>';
+  if (projectData.highlights && projectData.highlights.length > 0) {
+    html += '<div class="detail-section"><h4><i data-lucide="sparkles" style="width:.75rem;height:.75rem;margin-right:.3rem;color:var(--purple)"></i>Highlights</h4><ul class="detail-highlights">'
+      + projectData.highlights.map(function (h) { return '<li>' + h + '</li>'; }).join('')
+      + '</ul></div>';
+  }
+  if (projectData.techStack && projectData.techStack.length > 0) {
+    html += '<div class="detail-section"><h4><i data-lucide="layers" style="width:.75rem;height:.75rem;margin-right:.3rem;color:var(--purple)"></i>Tech Stack</h4><div class="detail-techstack">'
+      + projectData.techStack.map(function (t) { return '<span>' + t + '</span>'; }).join('')
+      + '</div></div>';
+  }
+  if (projectData.status) {
+    html += '<div class="detail-status"><i data-lucide="activity" style="width:.65rem;height:.65rem;color:var(--purple)"></i> <b>Status:</b> ' + projectData.status + '</div>';
+  }
+  html += '</div>';
 
   panel.innerHTML = html;
 
-  // 获取 orbs 容器位置作为 morph 起始点
-  var orbsContainer = document.getElementById('projectsOrbs');
-  var containerRect = orbsContainer ? orbsContainer.getBoundingClientRect() : null;
-
-  // 设置初始位置（从光球位置出发）
+  // 设置初始位置（从发光项目球位置出发）
   var startX, startY, startW, startH;
-  if (orbRect) {
-    startX = orbRect.left + orbRect.width / 2;
-    startY = orbRect.top + orbRect.height / 2;
-    startW = orbRect.width;
-    startH = orbRect.height;
+  if (projectOriginRect) {
+    startX = projectOriginRect.left + projectOriginRect.width / 2;
+    startY = projectOriginRect.top + projectOriginRect.height / 2;
+    startW = projectOriginRect.width;
+    startH = projectOriginRect.height;
   } else {
     startX = window.innerWidth / 2;
     startY = window.innerHeight / 2;
@@ -1849,19 +1957,21 @@ function expandProject(projectId, stage, overlay) {
   }
 
   // 目标尺寸和位置
-  var targetW = Math.min(window.innerWidth * .68, 760);
-  var targetH = Math.min(window.innerHeight * .78, window.innerHeight - 100);
+  var isNarrowProjectViewport = window.innerWidth < 700;
+  var targetW = Math.min(window.innerWidth * (isNarrowProjectViewport ? .92 : .68), 760);
+  var targetH = Math.min(window.innerHeight * (isNarrowProjectViewport ? .74 : .78), window.innerHeight - (isNarrowProjectViewport ? 24 : 100));
 
   // 设置起始状态
   panel.style.width = startW + 'px';
   panel.style.height = startH + 'px';
   panel.style.left = (startX - startW / 2) + 'px';
   panel.style.top = (startY - startH / 2) + 'px';
-  panel.style.borderRadius = '18px';
+  panel.style.borderRadius = '8px';
   panel.style.transform = 'scale(1)';
 
   // 先添加到 DOM，opacity 0
   document.body.appendChild(panel);
+  panel._dragCleanup = makeProjectPanelDraggable(panel);
 
   // 强制 reflow 后设置目标状态
   requestAnimationFrame(function () {
@@ -1870,7 +1980,7 @@ function expandProject(projectId, stage, overlay) {
       panel.style.height = targetH + 'px';
       panel.style.left = ((window.innerWidth - targetW) / 2) + 'px';
       panel.style.top = ((window.innerHeight - targetH) / 2) + 'px';
-      panel.style.borderRadius = '18px';
+      panel.style.borderRadius = '8px';
       panel.classList.add('is-open');
     });
   });
@@ -1884,7 +1994,7 @@ function expandProject(projectId, stage, overlay) {
 
   // 存储引用
   panel._projectData = projectData;
-  panel._projectOrb = orb;
+  panel._projectOriginEl = projectOriginEl;
   overlay._activePanel = panel;
 
   // 初始化 Lucide 图标
@@ -1897,22 +2007,78 @@ function expandProject(projectId, stage, overlay) {
   }, 600);
 }
 
+function makeProjectPanelDraggable(panel) {
+  var handle = panel.querySelector('[data-project-drag-handle]');
+  if (!handle) return function () {};
+
+  var dragState = null;
+
+  handle.addEventListener('pointerdown', function (event) {
+    if (event.button !== 0 || event.target.closest('button,a')) return;
+    var rect = panel.getBoundingClientRect();
+    dragState = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      left: rect.left,
+      top: rect.top
+    };
+    panel.classList.add('is-dragging');
+    if (handle.setPointerCapture) handle.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  });
+
+  function movePanel(event) {
+    if (!dragState || dragState.pointerId !== event.pointerId) return;
+    var margin = 8;
+    var maxLeft = Math.max(margin, window.innerWidth - panel.offsetWidth - margin);
+    var maxTop = Math.max(margin, window.innerHeight - panel.offsetHeight - margin);
+    var nextLeft = Math.min(maxLeft, Math.max(margin, dragState.left + event.clientX - dragState.startX));
+    var nextTop = Math.min(maxTop, Math.max(margin, dragState.top + event.clientY - dragState.startY));
+    panel.style.left = nextLeft + 'px';
+    panel.style.top = nextTop + 'px';
+  }
+
+  function finishDrag(event) {
+    if (!dragState || dragState.pointerId !== event.pointerId) return;
+    if (handle.hasPointerCapture && handle.hasPointerCapture(event.pointerId)) handle.releasePointerCapture(event.pointerId);
+    dragState = null;
+    panel.classList.remove('is-dragging');
+  }
+
+  window.addEventListener('pointermove', movePanel);
+  window.addEventListener('pointerup', finishDrag);
+  window.addEventListener('pointercancel', finishDrag);
+
+  return function () {
+    window.removeEventListener('pointermove', movePanel);
+    window.removeEventListener('pointerup', finishDrag);
+    window.removeEventListener('pointercancel', finishDrag);
+    dragState = null;
+    panel.classList.remove('is-dragging');
+  };
+}
+
 function collapseProject(stage, overlay) {
   if (currentProjectState !== 'expanded') return;
 
   var panel = overlay._activePanel;
-  var orb = panel ? panel._projectOrb : null;
+  var projectOriginEl = panel ? panel._projectOriginEl : null;
+  if (panel && panel._dragCleanup) {
+    panel._dragCleanup();
+    panel._dragCleanup = null;
+  }
 
-  // 获取光球的原始位置
-  var orbRect = orb ? orb.getBoundingClientRect() : null;
+  // 获取发光项目球的当前位置
+  var projectOriginRect = projectOriginEl ? projectOriginEl.getBoundingClientRect() : null;
 
-  if (orbRect && panel) {
-    // Morph 回项目卡片
-    panel.style.width = orbRect.width + 'px';
-    panel.style.height = orbRect.height + 'px';
-    panel.style.left = (orbRect.left + orbRect.width / 2 - orbRect.width / 2) + 'px';
-    panel.style.top = (orbRect.top + orbRect.height / 2 - orbRect.height / 2) + 'px';
-    panel.style.borderRadius = '18px';
+  if (projectOriginRect && panel) {
+    // Morph 回发光项目球
+    panel.style.width = projectOriginRect.width + 'px';
+    panel.style.height = projectOriginRect.height + 'px';
+    panel.style.left = projectOriginRect.left + 'px';
+    panel.style.top = projectOriginRect.top + 'px';
+    panel.style.borderRadius = '8px';
     panel.classList.remove('is-open');
   }
 
@@ -1927,14 +2093,7 @@ function collapseProject(stage, overlay) {
   currentProjectState = 'orbs';
   activeProjectId = null;
   stage.classList.remove('is-expanded');
-  document.querySelectorAll('.project-orb.is-selected').forEach(function (selected) {
-    selected.classList.remove('is-selected');
-  });
-
-  // 焦点返回光球
-  if (orb) {
-    setTimeout(function () { orb.focus(); }, 600);
-  }
+  if (projectsOrbsAPI) projectsOrbsAPI.resetFocus();
 }
 
 // ============================================================
@@ -2015,6 +2174,9 @@ function initAboutMe() {
   var timelineTrack = document.getElementById('timelineTrack');
   var cardsContainer = document.getElementById('aboutCards');
   if (!timelineTrack || !cardsContainer) return;
+
+  // 移动端判断：< 768px 关闭 3D 轮播，使用纯横滑（CSS 已用 !important 覆盖 transform）
+  var isMobile = window.innerWidth < 768;
 
   // ---- 渲染时间线 ----
   ABOUT_CARDS.forEach(function (card, i) {
@@ -2180,143 +2342,229 @@ function initAboutMe() {
     }
   });
 
-  // ---- 拖拽交互 ----
+  // ---- 拖拽交互（仅桌面端启用；移动端用浏览器原生横滑） ----
   var dragging = false;
   var lastX = 0;
   var dragVelocity = 0;
 
-  cardsContainer.addEventListener('mousedown', function (e) {
-    if (e.target.closest('button')) return;
-    dragging = true;
-    carouselAuto = false;
-    carouselTarget = null;
-    lastX = e.clientX;
-    dragVelocity = 0;
-    cardsContainer.classList.add('dragging');
-    e.preventDefault();
-  });
-
-  window.addEventListener('mousemove', function (e) {
-    if (!dragging) return;
-    var delta = e.clientX - lastX;
-    carouselAngle += delta * 0.35;
-    dragVelocity = delta * 0.35;
-    lastX = e.clientX;
-    updateCarousel();
-  });
-
-  window.addEventListener('mouseup', function () {
-    if (!dragging) return;
-    dragging = false;
-    cardsContainer.classList.remove('dragging');
-    // 惯性衰减
-    if (Math.abs(dragVelocity) > 0.5) {
-      carouselSpeed = dragVelocity * 0.3;
-      carouselAuto = true;
-    } else {
-      carouselAuto = true;
-      carouselSpeed = 0;
-    }
-  });
-
-  // 滚轮：横向滚动/触控板手势旋转轮播，纵向滚动留给页面滚动容器
-  cardsContainer.addEventListener('wheel', function (e) {
-    if (Math.abs(e.deltaX) > Math.abs(e.deltaY) * 0.6) {
-      e.preventDefault();
+  if (!isMobile) {
+    cardsContainer.addEventListener('mousedown', function (e) {
+      if (e.target.closest('button')) return;
+      dragging = true;
       carouselAuto = false;
       carouselTarget = null;
-      carouselAngle += e.deltaX * 0.3 + e.deltaY * 0.08;
-      carouselSpeed = 0;
+      lastX = e.clientX;
+      dragVelocity = 0;
+      cardsContainer.classList.add('dragging');
+      e.preventDefault();
+    });
+
+    window.addEventListener('mousemove', function (e) {
+      if (!dragging) return;
+      var delta = e.clientX - lastX;
+      carouselAngle += delta * 0.35;
+      dragVelocity = delta * 0.35;
+      lastX = e.clientX;
       updateCarousel();
-      clearTimeout(cardsContainer._wheelTimeout);
-      cardsContainer._wheelTimeout = setTimeout(function () { carouselAuto = true; }, 1500);
-    }
-  }, { passive: false });
+    });
 
-  // 触控
-  var touchStartX = 0;
-  cardsContainer.addEventListener('touchstart', function (e) {
-    if (e.target.closest('button')) return;
-    carouselAuto = false;
-    carouselTarget = null;
-    touchStartX = e.touches[0].clientX;
-    lastX = touchStartX;
-    dragVelocity = 0;
-    cardsContainer.classList.add('dragging');
-  }, { passive: true });
-
-  cardsContainer.addEventListener('touchmove', function (e) {
-    if (!cardsContainer.classList.contains('dragging')) return;
-    var delta = e.touches[0].clientX - lastX;
-    carouselAngle += delta * 0.35;
-    dragVelocity = delta * 0.35;
-    lastX = e.touches[0].clientX;
-    updateCarousel();
-  }, { passive: true });
-
-  cardsContainer.addEventListener('touchend', function () {
-    cardsContainer.classList.remove('dragging');
-    if (Math.abs(dragVelocity) > 0.5) {
-      carouselSpeed = dragVelocity * 0.3;
-      carouselAuto = true;
-    } else {
-      carouselAuto = true;
-      carouselSpeed = 0;
-    }
-  });
-
-  // ---- 自动旋转 loop ----
-  function carouselLoop() {
-    if (carouselTarget !== null) {
-      // snap 动画
-      var diff = carouselTarget - carouselAngle;
-      if (Math.abs(diff) < 0.3) {
-        carouselAngle = carouselTarget;
-        carouselTarget = null;
+    window.addEventListener('mouseup', function () {
+      if (!dragging) return;
+      dragging = false;
+      cardsContainer.classList.remove('dragging');
+      // 惯性衰减
+      if (Math.abs(dragVelocity) > 0.5) {
+        carouselSpeed = dragVelocity * 0.3;
+        carouselAuto = true;
+      } else {
         carouselAuto = true;
         carouselSpeed = 0;
-      } else {
-        carouselAngle += diff * 0.08;
       }
-    } else if (carouselAuto) {
-      // 慢速自动旋转
-      carouselSpeed += (0.015 - carouselSpeed) * 0.02;
-      carouselAngle += carouselSpeed;
-    }
+    });
 
-    // 惯性衰减
-    if (!carouselAuto && carouselTarget === null) {
-      carouselSpeed *= 0.95;
-      carouselAngle += carouselSpeed;
-    }
-
-    updateCarousel();
-    carouselRAF = requestAnimationFrame(carouselLoop);
+    // 滚轮：横向滚动/触控板手势旋转轮播，纵向滚动留给页面滚动容器
+    cardsContainer.addEventListener('wheel', function (e) {
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY) * 0.6) {
+        e.preventDefault();
+        carouselAuto = false;
+        carouselTarget = null;
+        carouselAngle += e.deltaX * 0.3 + e.deltaY * 0.08;
+        carouselSpeed = 0;
+        updateCarousel();
+        clearTimeout(cardsContainer._wheelTimeout);
+        cardsContainer._wheelTimeout = setTimeout(function () { carouselAuto = true; }, 1500);
+      }
+    }, { passive: false });
   }
-  carouselLoop();
 
-  window.addEventListener('resize', function () {
-    setCardBaseTransforms();
-    updateCarousel();
-  });
+  // 触控：移动端不拦截（让浏览器原生横滑生效），桌面端保留以兼容触屏笔记本
+  if (!isMobile) {
+    var touchStartX = 0;
+    cardsContainer.addEventListener('touchstart', function (e) {
+      if (e.target.closest('button')) return;
+      carouselAuto = false;
+      carouselTarget = null;
+      touchStartX = e.touches[0].clientX;
+      lastX = touchStartX;
+      dragVelocity = 0;
+      cardsContainer.classList.add('dragging');
+    }, { passive: true });
 
-  // ---- IntersectionObserver: 进入 About Me 隐藏 HOME 提示 ----
-  if (window.IntersectionObserver) {
-    var observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        var interactHint = document.getElementById('interactHint');
-        var easterEggHint = document.getElementById('easterEggHint');
-        if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
-          if (interactHint) interactHint.classList.add('is-hidden-by-about');
-          if (easterEggHint) easterEggHint.classList.add('is-hidden-by-about');
-          stabilizeAboutCarousel();
+    cardsContainer.addEventListener('touchmove', function (e) {
+      if (!cardsContainer.classList.contains('dragging')) return;
+      var delta = e.touches[0].clientX - lastX;
+      carouselAngle += delta * 0.35;
+      dragVelocity = delta * 0.35;
+      lastX = e.touches[0].clientX;
+      updateCarousel();
+    }, { passive: true });
+
+    cardsContainer.addEventListener('touchend', function () {
+      cardsContainer.classList.remove('dragging');
+      if (Math.abs(dragVelocity) > 0.5) {
+        carouselSpeed = dragVelocity * 0.3;
+        carouselAuto = true;
+      } else {
+        carouselAuto = true;
+        carouselSpeed = 0;
+      }
+    });
+  }
+
+  // ---- 自动旋转 loop（仅桌面端运行；移动端用浏览器原生滚动） ----
+  if (!isMobile) {
+    function carouselLoop() {
+      if (carouselTarget !== null) {
+        // snap 动画
+        var diff = carouselTarget - carouselAngle;
+        if (Math.abs(diff) < 0.3) {
+          carouselAngle = carouselTarget;
+          carouselTarget = null;
+          carouselAuto = true;
+          carouselSpeed = 0;
         } else {
-          if (interactHint) interactHint.classList.remove('is-hidden-by-about');
-          if (easterEggHint) easterEggHint.classList.remove('is-hidden-by-about');
+          carouselAngle += diff * 0.08;
+        }
+      } else if (carouselAuto) {
+        // 慢速自动旋转
+        carouselSpeed += (0.015 - carouselSpeed) * 0.02;
+        carouselAngle += carouselSpeed;
+      }
+
+      // 惯性衰减
+      if (!carouselAuto && carouselTarget === null) {
+        carouselSpeed *= 0.95;
+        carouselAngle += carouselSpeed;
+      }
+
+      updateCarousel();
+      carouselRAF = requestAnimationFrame(carouselLoop);
+    }
+    carouselLoop();
+
+    window.addEventListener('resize', function () {
+      setCardBaseTransforms();
+      updateCarousel();
+    });
+  } else {
+    // 移动端：监听 scroll 让时间线 active 跟随当前可见卡片
+    var mobileNodeMap = [];
+    timelineTrack.querySelectorAll('.timeline-node').forEach(function (n, idx) {
+      mobileNodeMap.push({ node: n, index: idx });
+    });
+    function updateMobileActive() {
+      // 取最接近视口中心的卡片作为 active
+      var center = cardsContainer.scrollLeft + cardsContainer.clientWidth / 2;
+      var closestIdx = 0;
+      var closestDist = Infinity;
+      var cards = wrapper.querySelectorAll('.about-card');
+      cards.forEach(function (c, idx) {
+        var r = c.offsetLeft + c.offsetWidth / 2;
+        var d = Math.abs(r - center);
+        if (d < closestDist) { closestDist = d; closestIdx = idx; }
+      });
+      mobileNodeMap.forEach(function (m) {
+        m.node.classList.toggle('active', m.index === closestIdx);
+      });
+    }
+    cardsContainer.addEventListener('scroll', updateMobileActive, { passive: true });
+    updateMobileActive();
+  }
+
+  // ---- IntersectionObserver: 离开 HOME 时隐藏提示 ----
+  if (window.IntersectionObserver) {
+    var aboutSection = document.getElementById('about');
+    var internshipSection = document.getElementById('internship');
+    var projectsSection = document.getElementById('projects');
+    var skillsLearningSection = document.getElementById('skills-learning');
+
+    function hideHomeHints() {
+      var ih = document.getElementById('interactHint');
+      var eh = document.getElementById('easterEggHint');
+      if (ih) ih.classList.add('is-hidden-by-about');
+      if (eh) eh.classList.add('is-hidden-by-about');
+    }
+
+    var aboutObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+          hideHomeHints();
+          stabilizeAboutCarousel();
         }
       });
     }, { threshold: [0.5] });
-    observer.observe(document.getElementById('about'));
+    if (aboutSection) aboutObserver.observe(aboutSection);
+
+    // Also hide hints on Internship section
+    if (internshipSection) {
+      var internObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting && entry.intersectionRatio > 0.3) {
+            hideHomeHints();
+          }
+        });
+      }, { threshold: [0.3] });
+      internObserver.observe(internshipSection);
+    }
+
+    // Also hide hints on Projects section
+    if (projectsSection) {
+      var projObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting && entry.intersectionRatio > 0.3) {
+            hideHomeHints();
+          }
+        });
+      }, { threshold: [0.3] });
+      projObserver.observe(projectsSection);
+    }
+
+    if (skillsLearningSection) {
+      var skillsObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting && entry.intersectionRatio > 0.3) {
+            hideHomeHints();
+          }
+        });
+      }, { threshold: [0.3] });
+      skillsObserver.observe(skillsLearningSection);
+    }
+
+    // Show hints again when back on HOME
+    var homeSection = document.getElementById('home');
+    if (homeSection) {
+      var homeObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+            var ih = document.getElementById('interactHint');
+            var eh = document.getElementById('easterEggHint');
+            if (ih) ih.classList.remove('is-hidden-by-about');
+            if (eh) eh.classList.remove('is-hidden-by-about');
+          }
+        });
+      }, { threshold: [0.5] });
+      homeObserver.observe(homeSection);
+    }
   }
 }
 
@@ -2387,10 +2635,386 @@ function getCarouselRadius() {
 }
 
 function snapToCard(index) {
+  // 移动端：原生滚动到对应卡片
+  if (window.innerWidth < 768) {
+    var cardsContainer = document.getElementById('aboutCards');
+    if (cardsContainer) {
+      var card = cardsContainer.querySelectorAll('.about-card')[index];
+      if (card) {
+        var left = card.offsetLeft - (cardsContainer.clientWidth - card.offsetWidth) / 2;
+        cardsContainer.scrollTo({ left: Math.max(0, left), behavior: 'smooth' });
+      }
+    }
+    return;
+  }
   var angleStep = 360 / ABOUT_CARDS.length;
   var baseTarget = -index * angleStep;
   carouselTarget = baseTarget + Math.round((carouselAngle - baseTarget) / 360) * 360;
   carouselAuto = false;
+}
+
+var SKILLS_LEARNING_CARDS = [
+  {
+    index: '01', kind: 'skill', faceLabel: 'Skill 01', backLabel: 'Skill', accent: '#8f7df4',
+    title: 'Scrum',
+    description: 'Sprint planning, daily syncs, reviews and retrospectives with a delivery-first rhythm.'
+  },
+  {
+    index: '02', kind: 'skill', faceLabel: 'Skill 02', backLabel: 'Showcase Skill', accent: '#e99ad6',
+    title: 'AI Video Production',
+    description: 'Prompt-led storyboards, generated visuals, editing and narrative assembly.',
+    marker: 'VIDEO', showcase: 'ai-video'
+  },
+  {
+    index: 'L1', kind: 'learning', faceLabel: 'Learning 01', backLabel: 'Learning', accent: '#79b7e8',
+    title: 'Product Strategy',
+    description: 'Connecting market signals, user value and business trade-offs.'
+  },
+  {
+    index: '03', kind: 'skill', faceLabel: 'Skill 03', backLabel: 'Skill', accent: '#a579e8',
+    title: 'Project Management',
+    description: 'Turning ambiguous goals into owners, milestones, risks and decisions.'
+  },
+  {
+    index: '04', kind: 'skill', faceLabel: 'Skill 04', backLabel: 'Skill', accent: '#f0a4c9',
+    title: 'Cross-functional Collaboration',
+    description: 'Keeping product, design, engineering and stakeholders aligned.'
+  },
+  {
+    index: 'L2', kind: 'learning', faceLabel: 'Learning 02', backLabel: 'Learning', accent: '#6ebbc6',
+    title: 'Generative AI Workflows',
+    description: 'Testing agents, multimodal tools and repeatable AI-assisted systems.'
+  },
+  {
+    index: '05', kind: 'skill', faceLabel: 'Skill 05', backLabel: 'Skill', accent: '#7aa7e9',
+    title: 'Data Analysis',
+    description: 'Using metrics, issue patterns and delivery signals for clearer decisions.'
+  },
+  {
+    index: '06', kind: 'skill', faceLabel: 'Skill 06', backLabel: 'Skill', accent: '#ba8ed2',
+    title: '3D & Spatial Computing',
+    description: 'Hands-on exposure to reconstruction, SLAM and digital-twin workflows.'
+  },
+  {
+    index: 'GO', kind: 'play', faceLabel: 'Play', backLabel: 'Memory Game', accent: '#e7b34f',
+    title: 'Me & My Friends',
+    description: 'Six pairs of people, places and little adventures.',
+    marker: 'PLAY', target: 'travel-memory'
+  }
+];
+
+function initSkillsLearning() {
+  var grid = document.getElementById('skillsLearningGrid');
+  if (!grid || grid.dataset.initialized === 'true') return;
+  grid.dataset.initialized = 'true';
+  var showcaseAPI = initSkillShowcaseWindow();
+  var confirmAPI = initSkillActionConfirm();
+
+  SKILLS_LEARNING_CARDS.forEach(function (item) {
+    var card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'skill-flip-card' + (item.kind === 'play' ? ' skill-play-card' : '') + (item.showcase ? ' has-showcase' : '');
+    card.dataset.kind = item.kind;
+    if (item.showcase) card.dataset.showcase = item.showcase;
+    card.setAttribute('aria-pressed', 'false');
+    card.setAttribute('aria-label', 'Reveal ' + item.title);
+    card.style.setProperty('--card-accent', item.accent);
+
+    var inner = document.createElement('span');
+    inner.className = 'skill-flip-inner';
+
+    var front = document.createElement('span');
+    front.className = 'skill-flip-face skill-flip-front';
+    var frontType = document.createElement('span');
+    frontType.className = 'skill-card-type';
+    frontType.textContent = item.faceLabel;
+    var question = document.createElement('span');
+    question.className = 'skill-card-question';
+    question.textContent = '?';
+    var index = document.createElement('span');
+    index.className = 'skill-card-index';
+    index.textContent = item.index;
+    front.append(frontType, question, index);
+
+    var back = document.createElement('span');
+    back.className = 'skill-flip-face skill-flip-back';
+    var backType = document.createElement('span');
+    backType.className = 'skill-card-type';
+    backType.textContent = item.backLabel;
+    var title = document.createElement('strong');
+    title.textContent = item.title;
+    var description = document.createElement('span');
+    description.className = 'skill-card-description';
+    description.textContent = item.description;
+    back.append(backType, title, description);
+
+    if (item.marker) {
+      var marker = document.createElement('span');
+      marker.className = 'skill-showcase-mark';
+      marker.textContent = item.marker;
+      back.appendChild(marker);
+    }
+
+    inner.append(front, back);
+    card.appendChild(inner);
+    card.addEventListener('click', function () {
+      var isFlipped = card.classList.toggle('is-flipped');
+      card.setAttribute('aria-pressed', isFlipped ? 'true' : 'false');
+      card.setAttribute('aria-label', (isFlipped ? 'Hide ' : 'Reveal ') + item.title);
+      if (isFlipped && item.showcase && showcaseAPI && confirmAPI) {
+        window.setTimeout(function () {
+          if (!card.classList.contains('is-flipped')) return;
+          confirmAPI.open({
+            action: 'video',
+            kicker: 'VIDEO SHOWCASE',
+            title: 'Open the AI Video showcase?',
+            text: 'This will open a movable video window with sound controls.',
+            confirmLabel: 'Open Video',
+            cancelLabel: 'Not Now',
+            onConfirm: showcaseAPI.open
+          });
+        }, 420);
+      }
+      if (isFlipped && item.target && confirmAPI) {
+        window.setTimeout(function () {
+          if (!card.classList.contains('is-flipped')) return;
+          confirmAPI.open({
+            action: 'play',
+            kicker: 'BEFORE YOU GO',
+            title: 'Start the flip-card game?',
+            text: 'You will move to the next page and begin a six-pair memory round.',
+            confirmLabel: 'Start Game',
+            cancelLabel: 'Stay Here',
+            onConfirm: function () {
+              var target = document.getElementById(item.target);
+              if (window.travelMemoryGame) window.travelMemoryGame.reset();
+              if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          });
+        }, 420);
+      }
+    });
+    grid.appendChild(card);
+  });
+}
+
+function initSkillActionConfirm() {
+  var overlay = document.getElementById('skillActionConfirm');
+  var dialog = overlay && overlay.querySelector('.skill-action-confirm-dialog');
+  var kicker = document.getElementById('skillActionConfirmKicker');
+  var title = document.getElementById('skillActionConfirmTitle');
+  var text = document.getElementById('skillActionConfirmText');
+  var cancelButton = document.getElementById('skillActionConfirmCancel');
+  var submitButton = document.getElementById('skillActionConfirmSubmit');
+  if (!overlay || !dialog || !kicker || !title || !text || !cancelButton || !submitButton) return null;
+  if (overlay._confirmAPI) return overlay._confirmAPI;
+
+  var confirmAction = null;
+  var lastFocused = null;
+
+  function close(confirmed) {
+    if (!overlay.classList.contains('is-open')) return;
+    var action = confirmed ? confirmAction : null;
+    overlay.classList.remove('is-open');
+    overlay.setAttribute('aria-hidden', 'true');
+    confirmAction = null;
+    if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus({ preventScroll: true });
+    lastFocused = null;
+    if (action) window.setTimeout(action, 0);
+  }
+
+  function open(options) {
+    lastFocused = document.activeElement;
+    overlay.dataset.action = options.action || 'default';
+    kicker.textContent = options.kicker || 'BEFORE YOU GO';
+    title.textContent = options.title || 'Continue?';
+    text.textContent = options.text || 'Choose whether to continue.';
+    cancelButton.textContent = options.cancelLabel || 'Not Now';
+    submitButton.textContent = options.confirmLabel || 'Continue';
+    confirmAction = typeof options.onConfirm === 'function' ? options.onConfirm : null;
+    overlay.classList.add('is-open');
+    overlay.setAttribute('aria-hidden', 'false');
+    window.requestAnimationFrame(function () { cancelButton.focus(); });
+  }
+
+  cancelButton.addEventListener('click', function () { close(false); });
+  submitButton.addEventListener('click', function () { close(true); });
+  overlay.addEventListener('click', function (event) {
+    if (event.target === overlay) close(false);
+  });
+  dialog.addEventListener('click', function (event) { event.stopPropagation(); });
+  document.addEventListener('keydown', function (event) {
+    if (!overlay.classList.contains('is-open')) return;
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      close(false);
+      return;
+    }
+    if (event.key !== 'Tab') return;
+    var focusable = [cancelButton, submitButton];
+    var currentIndex = focusable.indexOf(document.activeElement);
+    if (event.shiftKey && currentIndex <= 0) {
+      event.preventDefault();
+      submitButton.focus();
+    } else if (!event.shiftKey && currentIndex === focusable.length - 1) {
+      event.preventDefault();
+      cancelButton.focus();
+    }
+  });
+
+  overlay._confirmAPI = { open: open, close: close };
+  return overlay._confirmAPI;
+}
+
+function initSkillShowcaseWindow() {
+  var panel = document.getElementById('skillShowcaseWindow');
+  var handle = document.getElementById('skillShowcaseDragHandle');
+  var closeButton = document.getElementById('skillShowcaseClose');
+  var video = document.getElementById('skillShowcaseVideo');
+  var playToggle = document.getElementById('skillShowcasePlayToggle');
+  var playGlyph = document.getElementById('skillShowcasePlayGlyph');
+  var empty = document.getElementById('skillShowcaseEmpty');
+  var emptyText = document.getElementById('skillShowcaseEmptyText');
+  var status = document.getElementById('skillShowcaseStatus');
+  if (!panel || !handle || !closeButton || !video || !playToggle || !playGlyph || !empty || !emptyText || !status) return null;
+
+  var dragState = null;
+
+  function clampPosition(left, top) {
+    var panelWidth = panel.offsetWidth;
+    var panelHeight = panel.offsetHeight;
+    var nav = document.getElementById('mainNavbar');
+    var minTop = nav ? nav.getBoundingClientRect().height + 8 : 8;
+    var maxLeft = Math.max(8, window.innerWidth - panelWidth - 8);
+    var maxTop = Math.max(minTop, window.innerHeight - panelHeight - 8);
+    panel.style.left = Math.min(Math.max(8, left), maxLeft) + 'px';
+    panel.style.top = Math.min(Math.max(minTop, top), maxTop) + 'px';
+  }
+
+  function centerPanel() {
+    var panelWidth = panel.offsetWidth;
+    var panelHeight = panel.offsetHeight;
+    clampPosition((window.innerWidth - panelWidth) / 2, (window.innerHeight - panelHeight) / 2);
+  }
+
+  function setEmptyState(message, nextStatus) {
+    panel.classList.remove('has-media');
+    playToggle.classList.remove('is-playing');
+    playGlyph.textContent = '\u25b6';
+    playToggle.setAttribute('aria-label', 'Play video');
+    emptyText.textContent = message;
+    status.textContent = nextStatus;
+  }
+
+  function loadVideo() {
+    var source = (panel.dataset.videoSrc || '').trim();
+    video.pause();
+    video.removeAttribute('src');
+    video.load();
+    if (!source) {
+      setEmptyState('Video source pending', 'READY TO LOAD');
+      return;
+    }
+
+    setEmptyState('Loading video...', 'LOADING');
+    video.src = source;
+    video.load();
+  }
+
+  function open() {
+    panel.classList.add('is-open');
+    panel.setAttribute('aria-hidden', 'false');
+    closeButton.tabIndex = 0;
+    if (!panel.dataset.positioned) {
+      panel.dataset.positioned = 'true';
+      window.requestAnimationFrame(centerPanel);
+    } else {
+      clampPosition(parseFloat(panel.style.left) || 0, parseFloat(panel.style.top) || 0);
+    }
+    loadVideo();
+    if (window.lucide) window.lucide.createIcons();
+  }
+
+  function close() {
+    panel.classList.remove('is-open', 'is-dragging', 'has-media');
+    panel.setAttribute('aria-hidden', 'true');
+    closeButton.tabIndex = -1;
+    video.pause();
+    playToggle.classList.remove('is-playing');
+    playGlyph.textContent = '\u25b6';
+    playToggle.setAttribute('aria-label', 'Play video');
+    dragState = null;
+  }
+
+  function endDrag(event) {
+    if (!dragState || event.pointerId !== dragState.pointerId) return;
+    dragState = null;
+    panel.classList.remove('is-dragging');
+    if (handle.hasPointerCapture && handle.hasPointerCapture(event.pointerId)) {
+      handle.releasePointerCapture(event.pointerId);
+    }
+  }
+
+  function moveDrag(event) {
+    if (!dragState || event.pointerId !== dragState.pointerId) return;
+    clampPosition(event.clientX - dragState.offsetX, event.clientY - dragState.offsetY);
+  }
+
+  handle.addEventListener('pointerdown', function (event) {
+    if (event.target.closest('button')) return;
+    var rect = panel.getBoundingClientRect();
+    dragState = {
+      pointerId: event.pointerId,
+      offsetX: event.clientX - rect.left,
+      offsetY: event.clientY - rect.top
+    };
+    panel.classList.add('is-dragging');
+    if (handle.setPointerCapture) handle.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  });
+  handle.addEventListener('pointermove', moveDrag);
+  handle.addEventListener('pointerup', endDrag);
+  handle.addEventListener('pointercancel', endDrag);
+  window.addEventListener('pointermove', moveDrag);
+  window.addEventListener('pointerup', endDrag);
+  window.addEventListener('pointercancel', endDrag);
+  closeButton.addEventListener('click', close);
+  playToggle.addEventListener('click', function (event) {
+    event.stopPropagation();
+    if (video.paused) {
+      video.play().catch(function () { status.textContent = 'USE VIDEO CONTROLS'; });
+    } else {
+      video.pause();
+    }
+  });
+  video.addEventListener('loadeddata', function () {
+    panel.classList.add('has-media');
+    status.textContent = 'PLAYABLE';
+  });
+  video.addEventListener('play', function () {
+    playToggle.classList.add('is-playing');
+    playGlyph.textContent = '\u23f8';
+    playToggle.setAttribute('aria-label', 'Pause video');
+  });
+  video.addEventListener('pause', function () {
+    playToggle.classList.remove('is-playing');
+    playGlyph.textContent = '\u25b6';
+    playToggle.setAttribute('aria-label', 'Play video');
+  });
+  video.addEventListener('error', function () {
+    setEmptyState('Video could not be loaded', 'CHECK SOURCE');
+  });
+  panel.addEventListener('pointerdown', function () { panel.style.zIndex = '1201'; });
+  window.addEventListener('resize', function () {
+    if (panel.classList.contains('is-open')) {
+      clampPosition(parseFloat(panel.style.left) || 0, parseFloat(panel.style.top) || 0);
+    }
+  });
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape' && panel.classList.contains('is-open')) close();
+  });
+
+  return { open: open, close: close };
 }
 
 // ---- 简历下载弹框 ----
@@ -2422,9 +3046,11 @@ if (document.readyState === 'loading') {
     initAboutMe();
     initInternshipJourney();
     initProjects();
+    initSkillsLearning();
   });
 } else {
   initAboutMe();
   initInternshipJourney();
   initProjects();
+  initSkillsLearning();
 }

@@ -4,8 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>YE NAN — Portfolio</title>
-  <link rel="stylesheet" href="css/style.css?v=20260629-7">
+  <link rel="stylesheet" href="css/style.css?v=20260717-17">
+  <link rel="stylesheet" href="css/play.css?v=20260716-3">
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="js/vendor/matter.min.js?v=0.20.0"></script>
   <script type="importmap">
     {
       "imports": {
@@ -22,15 +24,16 @@
 
   <!-- ========== 顶部导航 (fixed，跨所有页面) ========== -->
   <nav class="navbar" id="mainNavbar">
-    <a href="#" class="nav-home" id="navHome" title="Back to Home">
-      <img src="images/HOME.png" alt="Home">
+    <a href="#" class="nav-home" id="navHome" title="Back to Home" aria-label="Back to Home">
+      <i data-lucide="house" class="nav-home-icon" aria-hidden="true"></i>
+      <span class="nav-home-text">Home</span>
     </a>
     <ul class="nav-list">
       <li><a href="#" class="nav-item" data-text="About Me">About Me</a></li>
       <li><a href="#" class="nav-item" data-text="Internship">Internship</a></li>
       <li><a href="#" class="nav-item" data-text="Projects">Projects</a></li>
-      <li><a href="#" class="nav-item" data-text="Skills">Skills</a></li>
-      <li><a href="#" class="nav-item" data-text="Learning">Learning</a></li>
+      <li><a href="#" class="nav-item" data-text="Skills &amp; Learning">Skills &amp; Learning</a></li>
+      <li><a href="#" class="nav-item" data-text="Me &amp; My Friends">Me &amp; My Friends</a></li>
     </ul>
   </nav>
 
@@ -45,6 +48,10 @@
     <h1 class="hero-name">YE NAN</h1>
     <p class="hero-subtitle">Builder · Dreamer · Braver</p>
   </section>
+
+  <!-- 左右交互提示 -->
+  <div class="interact-hint" id="interactHint">Click the character to interact</div>
+  <div class="easter-egg-hint" id="easterEggHint">Tear all tags to unlock easter egg</div>
 
   <!-- ========== 角色展示区（Three.js 3D人物） ========== -->
   <section class="character-area">
@@ -165,19 +172,111 @@
     <div class="projects-stage" id="projectsStage">
       <div class="projects-header">
         <h2 class="projects-main-title">Project Showcase</h2>
-        <p class="projects-subtitle">Selected experiments, systems, and creative builds</p>
-        <div class="projects-filters" id="projectsFilters" aria-label="Project filters">
-          <button type="button" class="project-filter is-active" data-filter="all">All</button>
-          <button type="button" class="project-filter" data-filter="Technical">Technical</button>
-          <button type="button" class="project-filter" data-filter="Creative">Creative</button>
-          <button type="button" class="project-filter" data-filter="Professional">Professional</button>
-        </div>
+        <p class="projects-tagline">Click the glowing orbs to explore each project.</p>
       </div>
-      <!-- 3D ocean canvas injected by JS -->
-      <div id="bottleMorphOrigin" class="bottle-morph-origin" aria-hidden="true"></div>
+      <div class="projects-scene-shell" id="projectsSceneShell" aria-label="Interactive project sphere field"></div>
+      <div id="projectMorphOrigin" class="project-morph-origin" aria-hidden="true"></div>
     </div>
     <div class="projects-expand-overlay" id="projectsExpandOverlay">
       <!-- JS 动态渲染展开面板 -->
+    </div>
+  </section>
+
+  <!-- ========== Skills & Learning 页 ========== -->
+  <section id="skills-learning" class="page-section skills-learning-section">
+    <div class="skills-learning-sparkles" aria-hidden="true">
+      <span style="--x:7%;--y:17%;--r:-12deg">*</span>
+      <span style="--x:15%;--y:78%;--r:18deg">*</span>
+      <span style="--x:76%;--y:15%;--r:9deg">*</span>
+      <span style="--x:92%;--y:72%;--r:-18deg">*</span>
+      <span style="--x:84%;--y:42%;--r:14deg">*</span>
+    </div>
+
+    <div class="skills-learning-layout">
+      <header class="skills-learning-copy">
+        <p class="skills-learning-kicker">PROFILE DECK 09</p>
+        <h2 class="skills-learning-title">Skills<br><span class="skills-learning-title-second">&amp; Learning</span></h2>
+        <p class="skills-learning-tagline">Built through practice. Expanded through curiosity.</p>
+        <div class="skills-learning-counts" aria-label="Deck contents">
+          <span><b>06</b> Skills</span>
+          <span><b>02</b> Learning</span>
+          <span><b>01</b> Play</span>
+        </div>
+      </header>
+
+      <div class="skills-board-wrap">
+        <div class="skills-board-labels" aria-hidden="true">
+          <span>SKILL</span>
+          <span class="skills-board-label-learning">LEARNING / PLAY</span>
+        </div>
+        <div class="skills-board" id="skillsLearningGrid" aria-label="Skills and learning flip cards"></div>
+      </div>
+
+      <aside class="skills-chiikawa" aria-label="Chiikawa companions">
+        <p class="skills-chiikawa-label">CURIOSITY CREW</p>
+        <div class="skills-chiikawa-crop">
+          <img src="images/Play/chiikawa-side.jpg" alt="Chiikawa friends holding ice cream">
+        </div>
+        <p class="skills-chiikawa-note">Keep learning.<br>Keep playing.</p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ========== Me & My Friends 翻牌游戏页 ========== -->
+  <section id="travel-memory" class="page-section memory-page">
+    <div class="memory-sparkles" aria-hidden="true">
+      <span style="--x:7%;--y:20%;--c:#e59ab9">*</span>
+      <span style="--x:15%;--y:78%;--c:#80bdd7">*</span>
+      <span style="--x:76%;--y:14%;--c:#e7ba54">*</span>
+      <span style="--x:92%;--y:70%;--c:#9a83d9">*</span>
+      <span style="--x:83%;--y:38%;--c:#79b99b">*</span>
+    </div>
+
+    <div class="memory-layout">
+      <section class="memory-stats" aria-labelledby="memoryTitle">
+        <p class="memory-kicker">MEMORY FILE 06</p>
+        <h2 id="memoryTitle" aria-label="Me &amp; My Friends">Me &amp; My<br> Friends</h2>
+        <div class="memory-stat-lines">
+          <p><span>Matches</span><strong id="memoryMatches">00 / 06</strong></p>
+          <p><span>Moves</span><strong id="memoryMoves">00</strong></p>
+        </div>
+        <div class="memory-status-row">
+          <p class="memory-status" id="memoryStatus" aria-live="polite">FIND THE PAIRS</p>
+          <div class="memory-inline-actions">
+            <a class="memory-icon-button" href="#skills-learning" aria-label="Back to Skills and Learning" title="Back to Skills and Learning">
+              <span aria-hidden="true">&uarr;</span>
+            </a>
+            <button class="memory-icon-button" id="memoryReset" type="button" aria-label="Shuffle and restart" title="Shuffle and restart">
+              <span aria-hidden="true">&#8635;</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="memory-board-shell" aria-label="Me and my friends memory card game">
+        <div class="memory-board-header" aria-hidden="true">
+          <span>PAIR THE STAMPS</span>
+          <span>12 CARDS</span>
+        </div>
+        <div class="memory-board" id="memoryBoard"></div>
+      </section>
+
+      <aside class="memory-companion" aria-label="Chiikawa memory crew">
+        <p>MEMORY CREW</p>
+        <div class="memory-companion-crop">
+          <img src="images/Play/chiikawa-side.jpg" alt="Chiikawa friends holding ice cream">
+        </div>
+        <span>Little moments,<br>kept together.</span>
+      </aside>
+    </div>
+
+    <div class="memory-complete" id="memoryComplete" aria-hidden="true">
+      <div class="memory-complete-panel" role="dialog" aria-labelledby="memoryCompleteTitle">
+        <span>06 / 06</span>
+        <h2 id="memoryCompleteTitle">All memories found</h2>
+        <p id="memoryCompleteSummary">Completed in 00 moves.</p>
+        <button id="memoryPlayAgain" type="button">Play Again</button>
+      </div>
     </div>
   </section>
 
@@ -206,6 +305,66 @@
     <p class="pull-chain-hint">Pull the chain to bring back the light</p>
   </div>
 
+  <!-- ========== Skills 媒体展示窗口 ========== -->
+  <div
+    class="skill-showcase-window"
+    id="skillShowcaseWindow"
+    role="dialog"
+    aria-labelledby="skillShowcaseTitle"
+    aria-hidden="true"
+    data-video-src="images/Play/ai-video-production.m4v"
+  >
+    <div class="skill-showcase-titlebar" id="skillShowcaseDragHandle">
+      <div class="skill-showcase-window-dots" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </div>
+      <div class="skill-showcase-window-title">
+        <span>AI VIDEO</span>
+        <strong id="skillShowcaseTitle">SHOWCASE</strong>
+      </div>
+      <button class="skill-showcase-close" id="skillShowcaseClose" type="button" aria-label="Close AI Video Production showcase" tabindex="-1">
+        <i data-lucide="x" style="width:1rem;height:1rem"></i>
+      </button>
+    </div>
+    <div class="skill-showcase-content">
+      <div class="skill-showcase-media">
+        <video
+          class="skill-showcase-video"
+          id="skillShowcaseVideo"
+          controls
+          playsinline
+          preload="metadata"
+          aria-label="AI Video Production video"
+        ></video>
+        <button class="skill-showcase-play-toggle" id="skillShowcasePlayToggle" type="button" aria-label="Play video">
+          <span id="skillShowcasePlayGlyph" aria-hidden="true">&#9654;</span>
+        </button>
+        <div class="skill-showcase-empty" id="skillShowcaseEmpty">
+          <i data-lucide="clapperboard" style="width:1.7rem;height:1.7rem"></i>
+          <strong>AI Video Production</strong>
+          <span id="skillShowcaseEmptyText">Video source pending</span>
+        </div>
+      </div>
+      <div class="skill-showcase-meta">
+        <span>AI-assisted storytelling</span>
+        <span id="skillShowcaseStatus">READY TO LOAD</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== Skills 行为确认框 ========== -->
+  <div class="skill-action-confirm" id="skillActionConfirm" aria-hidden="true">
+    <div class="skill-action-confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="skillActionConfirmTitle" aria-describedby="skillActionConfirmText" tabindex="-1">
+      <p class="skill-action-confirm-kicker" id="skillActionConfirmKicker">BEFORE YOU GO</p>
+      <h3 id="skillActionConfirmTitle">Continue?</h3>
+      <p id="skillActionConfirmText">Choose whether to continue.</p>
+      <div class="skill-action-confirm-actions">
+        <button class="skill-action-confirm-cancel" id="skillActionConfirmCancel" type="button">Not Now</button>
+        <button class="skill-action-confirm-submit" id="skillActionConfirmSubmit" type="button">Continue</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ========== 简历下载弹框 ========== -->
   <div class="resume-dialog-overlay" id="resumeDialogOverlay">
     <div class="resume-dialog">
@@ -220,7 +379,7 @@
           <span class="resume-opt-lang">中文</span>
           <span class="resume-opt-hint">Coming Soon</span>
         </button>
-        <a class="resume-dialog-option" href="images/About me/Nan YE.pdf" download="Nan_YE_Resume.pdf">
+        <a class="resume-dialog-option" href="images/PRD/Nan YE.pdf" download="Nan_YE_Resume.pdf">
           <i data-lucide="file-text" style="width:1.4rem;height:1.4rem"></i>
           <span class="resume-opt-lang">English</span>
           <span class="resume-opt-hint">PDF · Download</span>
@@ -229,7 +388,8 @@
     </div>
   </div>
 
-  <script src="js/internship-boot.js?v=20260629-7"></script>
-  <script type="module" src="js/main.js?v=20260629-7"></script>
+  <script src="js/internship-boot.js?v=20260717-2"></script>
+  <script src="js/play.js?v=20260716-3"></script>
+  <script type="module" src="js/main.js?v=20260717-20"></script>
 </body>
 </html>
