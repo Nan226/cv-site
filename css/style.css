@@ -1143,16 +1143,6 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
 }
 
 .nav-home{display:flex;align-items:center;flex-shrink:0;height:6.5vh;padding:1.05vh 0}
-.nav-home img{
-  height:100%;
-  width:auto;
-  display:block;
-  mix-blend-mode:multiply;
-  filter:saturate(.92) brightness(1.06);
-  transition:opacity .3s ease,filter .3s ease;
-  opacity:.66;
-}
-.nav-home:hover img{opacity:.88;filter:saturate(1) brightness(1.02)}
 
 /* ===== Internship 页 ===== */
 .internship-section{
@@ -1173,7 +1163,9 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   content:'';
   position:absolute;
   inset:-8vh -6vw;
-  background:url('../images/Internship/主页面.jpg') center/cover no-repeat;
+  background:
+    linear-gradient(120deg,rgba(169,217,237,.26),transparent 42%),
+    linear-gradient(300deg,rgba(248,210,220,.3),transparent 48%);
   opacity:.055;
   filter:saturate(.78) brightness(1.12);
   pointer-events:none;
@@ -1250,157 +1242,6 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   margin:0;
 }
 
-/* ---- 开场中央主图 ---- */
-.internship-intro-image{
-  position:absolute;
-  top:52%;left:50%;
-  transform:translate(-50%,-50%) scale(1);
-  z-index:5;
-  width:clamp(360px, 45vw, 680px);
-  max-width:88vw;
-  aspect-ratio:1595 / 1206;
-  border:2px solid var(--illustration-ink);
-  border-radius:8px;
-  overflow:hidden;
-  box-shadow:7px 8px 0 rgba(95,75,80,.14),0 18px 36px rgba(95,75,80,.1);
-  transition:opacity 1.15s ease,transform 1.15s ease,filter 1.15s ease;
-  background:var(--illustration-paper);
-  cursor:pointer;
-}
-.internship-intro-image img{
-  width:100%;height:100%;
-  display:block;
-  object-fit:cover;
-  transition:opacity .42s ease;
-}
-.internship-intro-image::before,
-.internship-intro-image::after{
-  content:'';
-  position:absolute;
-  inset:0;
-  background:url('../images/Internship/主页面.jpg') center/cover no-repeat;
-  opacity:0;
-  pointer-events:none;
-  z-index:1;
-}
-.internship-intro-image::before{
-  clip-path:polygon(0 0,51% 0,48% 12%,52% 22%,47% 35%,51% 48%,46% 61%,50% 75%,47% 88%,51% 100%,0 100%);
-}
-.internship-intro-image::after{
-  clip-path:polygon(49% 0,100% 0,100% 100%,49% 100%,53% 88%,50% 75%,54% 61%,49% 48%,53% 35%,48% 22%,52% 12%);
-}
-.internship-scroll-hint{
-  position:absolute;
-  top:clamp(7.2rem, 17vh, 9.5rem);
-  left:50%;
-  transform:translateX(-50%);
-  font-family:var(--font-tag);
-  font-size:.72rem;
-  color:#8274ad;
-  letter-spacing:.1em;
-  animation:intScrollHint 2.4s ease-in-out infinite;
-  pointer-events:auto;
-  cursor:pointer;
-  text-shadow:0 0 12px rgba(255,255,255,.8);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:.12rem;
-  padding:.45rem .85rem .38rem;
-  border-radius:999px;
-  background:rgba(255,255,255,.48);
-  border:1px solid rgba(255,255,255,.58);
-  backdrop-filter:blur(10px);
-  z-index:11;
-}
-.internship-scroll-hint small{
-  font-size:.48rem;
-  letter-spacing:.16em;
-  text-transform:uppercase;
-  color:#b2a7ca;
-}
-.internship-scroll-hint::after{
-  content:'';
-  width:7px;
-  height:7px;
-  border-right:1.5px solid currentColor;
-  border-bottom:1.5px solid currentColor;
-  transform:rotate(45deg);
-  margin-top:.05rem;
-}
-@keyframes intScrollHint{
-  0%,100%{opacity:.45;transform:translateX(-50%) translateY(0)}
-  50%{opacity:.85;transform:translateX(-50%) translateY(-5px)}
-}
-
-/* ---- 状态：intro 开场动画 ---- */
-.internship-stage.is-intro .internship-intro-image{
-  animation:introAppear 1.45s cubic-bezier(.24,1,.28,1) forwards;
-}
-.internship-stage.is-tearing .internship-intro-image img{
-  opacity:0;
-}
-.internship-stage.is-tearing .internship-scroll-hint{
-  opacity:0;
-  visibility:hidden;
-  animation:none;
-  pointer-events:none;
-}
-.internship-stage.is-tearing .internship-intro-image::before,
-.internship-stage.is-tearing .internship-intro-image::after{
-  opacity:1;
-}
-.internship-stage.is-tearing .internship-intro-image::before{
-  animation:introTearLeft .82s cubic-bezier(.2,.86,.24,1) forwards;
-}
-.internship-stage.is-tearing .internship-intro-image::after{
-  animation:introTearRight .82s cubic-bezier(.2,.86,.24,1) forwards;
-}
-@keyframes introAppear{
-  0%{opacity:0;transform:translate(-50%,-50%) scale(1.18);filter:blur(8px)}
-  58%{opacity:1;transform:translate(-50%,-50%) scale(1);filter:blur(0)}
-  100%{opacity:1;transform:translate(-50%,-50%) scale(.88);filter:blur(0)}
-}
-@keyframes introTearLeft{
-  0%{transform:translateX(0) rotate(0deg);filter:blur(0)}
-  42%{transform:translateX(-1.8vw) rotate(-1.6deg);filter:blur(.4px)}
-  100%{transform:translateX(-12vw) rotate(-7deg);filter:blur(4px);opacity:0}
-}
-@keyframes introTearRight{
-  0%{transform:translateX(0) rotate(0deg);filter:blur(0)}
-  42%{transform:translateX(1.8vw) rotate(1.6deg);filter:blur(.4px)}
-  100%{transform:translateX(12vw) rotate(7deg);filter:blur(4px);opacity:0}
-}
-
-/* ---- 状态：cards ---- */
-.internship-stage.is-cards .internship-intro-image{
-  opacity:.08;
-  transform:translate(-50%,-50%) scale(.72);
-  filter:blur(.4px) saturate(.92) brightness(1.08);
-  pointer-events:none;
-  border-color:transparent;
-  box-shadow:none;
-}
-.internship-stage.is-cards .internship-scroll-hint{
-  opacity:0;
-  visibility:hidden;
-  animation:none;
-  pointer-events:none;
-}
-.internship-stage.is-detail .internship-intro-image{
-  opacity:.07;
-  transform:translate(-50%,-50%) scale(.76);
-  filter:blur(.6px) saturate(.92) brightness(1.08);
-  pointer-events:none;
-  border-color:transparent;
-  box-shadow:none;
-}
-.internship-stage.is-detail .internship-scroll-hint{
-  opacity:0;
-  visibility:hidden;
-  animation:none;
-  pointer-events:none;
-}
 .internship-stage.is-detail::before{
   opacity:.075;
 }
@@ -1995,14 +1836,11 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
 
 /* ---- prefers-reduced-motion ---- */
 @media(prefers-reduced-motion:reduce){
-  .internship-stage.is-intro .internship-intro-image{animation:none}
-  .internship-intro-image{transition:none}
   .internship-card{transition:none}
   .internship-card.is-flipping .internship-card-inner{animation:none;opacity:0}
   .internship-detail-panel{animation:none}
   .internship-detail-card{animation:none}
   .internship-stage.is-opening-detail .internship-detail{animation:none}
-  .internship-scroll-hint{animation:none}
   .internship-meteor{animation:none;opacity:.18}
 }
 
@@ -2136,270 +1974,6 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   }
 }
 
-/* ===== Projects 页 — Minimal Ocean + Message Bottles ===== */
-.projects-section{
-  padding-top:6.5vh;
-  position:relative;
-  overflow:hidden;
-  /* 海面在 60% 位置（瓶子中段）：0-60% 粉紫，60% 切到海蓝 */
-  background:linear-gradient(180deg,
-    #faf7fd 0%,
-    #f5edf9 20%,
-    #eeddf5 40%,
-    #e6d2ea 56%,
-    #c8d8e8 60%,
-    #b8d4ea 75%,
-    #a8c4e0 100%
-  );
-}
-/* ---- 2D 水波纹 Canvas (下半部分) ---- */
-.projects-water-canvas{
-  position:absolute;bottom:0;left:0;width:100%;height:40%;z-index:1;pointer-events:none;
-}
-/* ---- 贝壳 & 海底装饰 ---- */
-.projects-seabed{
-  position:absolute;bottom:0;left:0;width:100%;height:40%;z-index:2;pointer-events:none;
-  overflow:hidden;
-}
-/* 贝壳 (CSS 形状) */
-.shell{
-  position:absolute;
-  width:14px;height:11px;
-  border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;
-  background:linear-gradient(160deg,#fff5ee 0%,#f5d6c4 55%,#e3a98c 100%);
-  box-shadow:inset 0 -1px 2px rgba(180,120,90,.25),0 1px 2px rgba(120,80,60,.18);
-}
-.shell::before,.shell::after{
-  content:"";position:absolute;top:0;bottom:0;width:1px;
-  background:rgba(180,120,90,.32);left:50%;
-}
-.shell::after{left:30%;transform:rotate(8deg);}
-.shell::before{left:70%;transform:rotate(-8deg);}
-/* 贝壳颜色变体 */
-.shell.shell-pink{
-  background:linear-gradient(160deg,#fff0f7 0%,#f7c9dc 55%,#d68aae 100%);
-  box-shadow:inset 0 -1px 2px rgba(180,90,130,.25),0 1px 2px rgba(160,80,120,.18);
-}
-.shell.shell-purple{
-  background:linear-gradient(160deg,#f4ecff 0%,#d8c2ee 55%,#a98ac9 100%);
-  box-shadow:inset 0 -1px 2px rgba(120,80,160,.25),0 1px 2px rgba(100,60,140,.18);
-}
-/* 海底小光点 */
-.seabed-light{
-  position:absolute;
-  width:5px;height:5px;border-radius:50%;
-  background:radial-gradient(circle,#fff7d8 0%,rgba(255,220,140,.6) 45%,transparent 70%);
-  box-shadow:0 0 6px 2px rgba(255,220,140,.35);
-  animation:seabedTwinkle 4s ease-in-out infinite;
-}
-@keyframes seabedTwinkle{
-  0%,100%{opacity:.45;transform:scale(1);}
-  50%{opacity:1;transform:scale(1.4);}
-}
-/* ---- 漂流瓶 (CSS-only) ---- */
-.project-bottle{
-  position:absolute;z-index:5;
-  cursor:pointer;
-  display:flex;flex-direction:column;align-items:center;gap:10px;
-  transition:filter .35s ease;
-}
-.project-bottle:hover{filter:brightness(1.08);}
-.project-bottle .bottle-inner{
-  display:flex;flex-direction:column;align-items:center;gap:10px;
-  animation:bottleBob var(--bob-dur,3.5s) ease-in-out var(--bob-delay,0s) infinite;
-}
-.bottle-glass{
-  width:62px;height:104px;
-  position:relative;
-  background:rgba(255,255,255,.32);
-  backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);
-  border:2px solid rgba(255,255,255,.5);
-  border-radius:31px 31px 16px 16px;
-  box-shadow:
-    0 8px 32px rgba(100,140,190,.15),
-    inset 0 0 24px rgba(255,255,255,.18);
-  transition:transform .35s ease,box-shadow .35s ease,border-color .35s ease;
-}
-.project-bottle:hover .bottle-glass{
-  box-shadow:
-    0 12px 40px rgba(100,140,190,.25),
-    inset 0 0 32px rgba(255,255,255,.3);
-  border-color:rgba(255,255,255,.7);
-}
-.bottle-glow{
-  position:absolute;bottom:22%;left:50%;
-  transform:translateX(-50%);
-  width:26px;height:26px;
-  border-radius:50%;
-  opacity:.65;
-  filter:blur(6px);
-  transition:opacity .35s ease,filter .35s ease;
-}
-.project-bottle:hover .bottle-glow{opacity:.9;filter:blur(4px);}
-.bottle-cork{
-  position:absolute;top:-10px;left:50%;
-  transform:translateX(-50%);
-  width:16px;height:14px;
-  background:linear-gradient(180deg,#d4a574,#b8804a);
-  border-radius:3px 3px 6px 6px;
-  box-shadow:0 2px 4px rgba(0,0,0,.1);
-}
-/* ---- 星光粒子（active 瓶子内部） ---- */
-.bottle-stars{
-  position:absolute;inset:0;
-  pointer-events:none;
-  overflow:hidden;
-  border-radius:inherit;
-}
-.bottle-star{
-  position:absolute;
-  left:var(--star-x,50%);top:var(--star-y,50%);
-  width:3px;height:3px;
-  border-radius:50%;
-  background:#fffbe8;
-  box-shadow:0 0 4px 1px rgba(255,250,200,.85);
-  opacity:0;
-  animation:bottleStarTwinkle var(--star-dur,2.6s) ease-in-out var(--star-d,0s) infinite;
-}
-@keyframes bottleStarTwinkle{
-  0%,100%{opacity:0;transform:scale(.6);}
-  50%{opacity:1;transform:scale(1.3);}
-}
-/* ---- Active vs Pending 瓶子状态 ---- */
-.project-bottle.is-pending .bottle-glass{
-  background:rgba(180,190,200,.18);
-  border-color:rgba(180,190,200,.28);
-  box-shadow:
-    0 6px 22px rgba(80,100,120,.08),
-    inset 0 0 18px rgba(180,190,200,.1);
-}
-.project-bottle.is-pending .bottle-glow{
-  opacity:.2;
-  background:rgba(140,150,160,.6) !important;
-  filter:blur(8px);
-}
-.project-bottle.is-pending .bottle-cork{
-  background:linear-gradient(180deg,#a89888,#8a7868);
-  opacity:.6;
-}
-.project-bottle.is-pending .bottle-label-text{
-  color:#8a96a8;
-  opacity:.7;
-}
-.project-bottle.is-pending{cursor:not-allowed;}
-/* hover 时灰色瓶子轻微提亮（暗示"可交互但未激活"） */
-.project-bottle.is-pending:hover .bottle-glass{
-  background:rgba(200,210,220,.28);
-  border-color:rgba(180,190,200,.5);
-  box-shadow:
-    0 8px 28px rgba(80,100,120,.15),
-    inset 0 0 22px rgba(200,210,220,.18);
-}
-.project-bottle.is-pending:hover .bottle-glow{
-  opacity:.35;
-  filter:blur(7px);
-}
-.project-bottle.is-pending:hover .bottle-label-text{
-  color:#5a6678;
-  opacity:.95;
-}
-/* ---- Tooltip: Awaiting Energy ---- */
-.bottle-tooltip{
-  position:absolute;
-  bottom:calc(100% + 14px);left:50%;
-  transform:translateX(-50%) translateY(4px);
-  background:rgba(40,52,68,.92);
-  color:#e8eef5;
-  font-family:var(--font-tag);
-  font-size:.62rem;
-  letter-spacing:.06em;
-  padding:.4em .85em;
-  border-radius:999px;
-  white-space:nowrap;
-  opacity:0;
-  pointer-events:none;
-  transition:opacity .25s ease, transform .25s ease;
-  box-shadow:0 4px 16px rgba(20,30,50,.25);
-  z-index:20;
-}
-.bottle-tooltip::after{
-  content:"";
-  position:absolute;
-  top:100%;left:50%;
-  transform:translateX(-50%);
-  border:5px solid transparent;
-  border-top-color:rgba(40,52,68,.92);
-}
-.project-bottle.is-pending:hover .bottle-tooltip{
-  opacity:1;
-  transform:translateX(-50%) translateY(0);
-}
-/* 点击灰色瓶子时的轻微晃动反馈 */
-@keyframes bottleShake{
-  0%,100%{transform:translateX(0);}
-  20%{transform:translateX(-3px) rotate(-1deg);}
-  40%{transform:translateX(3px) rotate(1deg);}
-  60%{transform:translateX(-2px) rotate(-.5deg);}
-  80%{transform:translateX(2px) rotate(.5deg);}
-}
-.bottle-label-text{
-  font-family:var(--font-tag);
-  font-size:clamp(.5rem,.65vw,.58rem);
-  color:#5a7a9a;
-  text-align:center;
-  max-width:90px;
-  line-height:1.35;
-  letter-spacing:.03em;
-  transition:color .3s ease;
-}
-.project-bottle:hover .bottle-label-text{color:#3a5a7a;}
-/* Bottle animations */
-@keyframes bottleBob{
-  0%,100%{transform:translateY(0);}
-  50%{transform:translateY(-14px);}
-}
-@keyframes bottleFloat{
-  0%,100%{transform:translateX(0);}
-  25%{transform:translateX(10px);}
-  75%{transform:translateX(-8px);}
-}
-/* Legacy morph origin (expand animation fallback) */
-.bottle-morph-origin,
-.project-morph-origin{
-  position:absolute;width:60px;height:120px;
-  pointer-events:none;z-index:5;opacity:0;
-}
-/* ---- 标题 (匹配 Home 页 hero 风格) ---- */
-.projects-header{
-  position:absolute;
-  top:clamp(2.5rem, 10vh, 5rem);
-  left:0;right:0;
-  text-align:center;
-  z-index:10;
-  pointer-events:none;
-  transition:opacity .45s ease,transform .45s ease;
-}
-.projects-main-title{
-  font-family:var(--font-heading);
-  font-size:clamp(2.8rem, 5.8vw, 5rem);
-  font-weight:900;
-  letter-spacing:.07em;
-  line-height:.95;
-  background:linear-gradient(102deg,#6533dd 0%,#7557ed 27%,#9637e1 49%,#bd2fd3 73%,#dd2fb6 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  background-clip:text;
-  color:#8738e0;
-  margin:0 0 .5rem;
-}
-.projects-tagline{
-  font-family:var(--font-tag);
-  font-size:clamp(.78rem,1.15vw,1rem);
-  color:#a292c9;
-  font-weight:500;
-  letter-spacing:.035em;
-  margin:0;
-}
-
 /* ---- Projects falling physics orbs ---- */
 .projects-section{
   padding:0;
@@ -2436,7 +2010,7 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   z-index:1;
   inset:0;
   pointer-events:none;
-  background:url('../images/Projects/chiikawa-spring.jpg') center center / cover no-repeat;
+  background:url('../assets/projects/chiikawa-spring.jpg') center center / cover no-repeat;
   opacity:.62;
   filter:saturate(.94) brightness(1.02);
 }
@@ -2614,6 +2188,7 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   50%{filter:brightness(1.1);}
 }
 .projects-header{
+  position:absolute;
   top:24%;
   left:50%;
   right:auto;
@@ -2621,6 +2196,8 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   text-align:center;
   transform:translate(-50%,-50%);
   z-index:6;
+  pointer-events:none;
+  transition:opacity .45s ease,transform .45s ease;
 }
 .projects-header::before{
   content:'PROJECT ARCHIVE  /  02 LIVE';
@@ -2635,6 +2212,8 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   letter-spacing:.18em;
 }
 .projects-main-title{
+  font-family:var(--font-heading);
+  font-weight:900;
   max-width:none;
   margin:0 0 .52rem;
   font-size:clamp(2rem,3vw,3.2rem);
@@ -2648,10 +2227,21 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   filter:drop-shadow(0 2px 0 rgba(255,255,255,.82));
 }
 .projects-tagline{
+  font-family:var(--font-tag);
   color:#7685a9;
   font-size:clamp(.72rem,1vw,.9rem);
+  font-weight:500;
   letter-spacing:.06em;
   text-transform:none;
+  margin:0;
+}
+.project-morph-origin{
+  position:absolute;
+  width:60px;
+  height:120px;
+  pointer-events:none;
+  z-index:5;
+  opacity:0;
 }
 .projects-stage.is-expanded .projects-physics-layer{
   filter:blur(4px) saturate(.72) brightness(.98);
@@ -2697,12 +2287,6 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   .project-physics-orb.is-active .project-physics-orb-visual{animation:none}
 }
 
-/* ---- 光球容器 ---- */
-/* ---- 单颗光球 ---- */
-
-/* 光球 hover */
-/* 光球内标题 */
-/* ---- 光球粒子 ---- */
 /* ---- 展开遮罩 ---- */
 .projects-expand-overlay{
   position:fixed;

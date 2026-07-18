@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect x="5" y="7" width="54" height="52" rx="8" fill="#fff8e9" stroke="#302d3a" stroke-width="4"/>
+  <path d="M10 18C22 10 34 12 55 8V23C38 26 22 24 10 29Z" fill="#f7b7cf"/>
+  <path d="M8 43C24 35 41 38 57 31V53C42 58 25 55 8 59Z" fill="#a9dcef"/>
+  <text x="32" y="43" fill="#302d3a" font-family="Trebuchet MS, sans-serif" font-size="23" font-weight="700" text-anchor="middle">YN</text>
+</svg>

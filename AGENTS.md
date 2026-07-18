@@ -44,7 +44,7 @@
 
 ### HOME
 
-- 视觉以 `images/Home参考.png` 和 `images/HOME/` 下的细节参考图为主。
+- 视觉参考保存在 `docs/references/`；运行时资源统一从 `assets/` 读取。
 - 主标题为 `YE NAN`，副标题为 `Builder · Dreamer · Braver`。
 - Home 静态视觉使用与 Projects 一致的插画纸张语言：深色手绘描边、奶油纸张底、粉蓝绿黄贴纸色块、小圆角和轻微错位硬阴影；不改变 3D 人物与彩蛋交互。
 - Home、About Me、Internship 背景共用粉蓝绿黄纸带飘落动画；进入 Projects 及后续 section 后自动隐藏。
@@ -65,15 +65,14 @@
 
 - 当前基线为：三张实习卡片直接展示并可点击展开详情。
 - 主卡片与详情视图已统一为 Projects 插画窗口的视觉语言：深色手绘描边、奶油纸张底、粉蓝绿扁平色块、轻微错位硬阴影和小圆角；不再使用紫蓝玻璃渐变卡片。
-- 详情页的 `Back to Journey` 位于左侧预览卡左下角，不放在右侧详情正文中；主脚本与兜底脚本需保持一致。
-- 代码中保留了早期开场图/撕裂相关样式痕迹，但当前实际状态以已落地代码为准。
-- `js/internship-boot.js` 是独立兜底脚本，修改 Internship 时需同时检查它与 `js/main.js` 的一致性。
+- 详情页的 `Back to Journey` 位于左侧预览卡左下角，不放在右侧详情正文中。
+- Internship 由 `js/main.js` 单一脚本渲染；旧开场图、撕裂动画和重复兜底脚本已移除。
 
 ### Projects
 
 - 当前基线为：Matter.js 2D 物理 + DOM/CSS 手绘球体；桌面生成约 52 个球，移动端约 30 个球，从 section 顶部落下、碰撞并堆叠在底部。
-- `js/projects-orbs.js` 是当前主流程模块，物理引擎使用本地 `js/vendor/matter.min.js`（Matter.js 0.20.0）；`js/projects-ocean.js` 为停用的旧海洋方案，不再由 `js/main.js` 引用。
-- 背景使用用户指定图片副本 `images/Projects/chiikawa-spring.jpg`，以 `62%` 不透明度全屏铺设；原始临时上传图片不修改。
+- `js/projects-orbs.js` 是当前主流程模块，物理引擎使用本地 `js/vendor/matter.min.js`（Matter.js 0.20.0）；旧海洋模块已从仓库移除。
+- 背景使用发布资源 `assets/projects/chiikawa-spring.jpg`，以 `62%` 不透明度全屏铺设；原始素材保存在本地 `source-assets/`，不进入发布目录。
 - 球体采用与背景一致的扁平插画风：深色描边、不规则圆形、粉蓝奶油和少量绿色；鼠标靠近会施加低阻力推力，球体受左右墙和底部边界约束。
 - 两个 `active` 项目仍为 `AI-powered Project Management Platform` 与 `MetaFit`，使用明显白色光圈、柔光和球内多颗星标；只有这两个球可点击，其他球是装饰性物理球。
 - AI Project Management 详情不再显示无实际目标的 `View Details` 外链按钮。
@@ -86,13 +85,13 @@
 - 当前基线为：`6 Skill + 2 Learning + 1 Play` 的 `3 x 3` 翻牌区，导航使用单一 `Skills & Learning` 入口指向该合并 section。
 - 普通卡片点击后翻面显示文字；`AI Video Production` 翻面后先显示英文确认框，确认后打开可拖拽、可关闭的视频窗口。
 - `Me & My Friends` 翻面后先显示英文确认框，确认后平滑下滑到主站第六屏的翻牌游戏，并在进入时重置牌局。
-- 右侧使用用户提供的 Chiikawa 参考图副本 `images/Play/chiikawa-side.jpg`，原始外部素材不修改。
-- 媒体窗口已接入由原始 MOV 转码生成的 `images/Play/ai-video-production.m4v`；原始 MOV 保留不变。
+- 右侧使用发布资源 `assets/play/companion.jpg`；原始素材不进入发布目录。
+- 媒体窗口按用户确认后加载 `assets/play/ai-video-production.m4v`；原始视频保存在本地源目录。
 
 ### Me & My Friends
 
 - 游戏以内嵌 `#travel-memory` section 存在于主站，不使用独立 `play.html`。
-- 使用 `images/Play/` 的 12 张照片组成 6 个编号配对，支持洗牌、匹配、错误回翻、计步、重置和完成状态。
+- 使用 `assets/play/` 的 12 张轻量照片组成 6 个编号配对；游戏接近可见时才初始化并加载图片，支持洗牌、匹配、错误回翻、计步、重置和完成状态。
 - 游戏视觉继续使用网站的白色、淡蓝、淡粉和淡紫配色，并在桌面端保留 Chiikawa 陪伴图。
 
 ## 修改与验证
@@ -102,3 +101,9 @@
 - 页面样式修改后必须在桌面尺寸和窄屏尺寸检查布局，确保文字、人物、标签和交互入口互不遮挡。
 - 完成验证后把验证方式和结果写入当天日志。
 - 若发现 `AGENTS.md` 中的阶段描述再次落后于代码现状，应优先更新本文件或日志，再继续开发。
+
+## 发布结构
+
+- Cloudflare Pages 使用 `npm run build` 生成 `dist/`；只发布 `index.html`、`css/`、`js/` 和 `assets/`。
+- `source-assets/` 保存本地原始照片、视频、模型和临时参考，不提交、不发布。
+- `scripts/optimize-assets.sh` 用于 macOS 本地生成轻量图片和视频；`scripts/build-site.mjs` 负责生成 Cloudflare 发布目录。

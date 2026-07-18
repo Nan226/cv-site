@@ -1,0 +1,9 @@
+{
+  "name": "yenan-cv-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-site.mjs",
+    "optimize:assets": "bash scripts/optimize-assets.sh"
+  }
+}

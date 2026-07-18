@@ -3,18 +3,18 @@
 
   var PAIR_COLORS = ['#d889ad', '#7ca8df', '#7fb99a', '#d4a94f', '#9a7fd4', '#db8f82'];
   var MEMORY_CARDS = [
-    { pair: '01', image: 'images/Play/图1.jpg', alt: 'Portrait against a blue background' },
-    { pair: '01', image: 'images/Play/微信图片_20260716090703_468_85.jpg', alt: 'Portrait with cat ear accessories' },
-    { pair: '02', image: 'images/Play/微信图片_20260716090746_469_85.jpg', alt: 'Portrait making a hand pose' },
-    { pair: '02', image: 'images/Play/微信图片_20260716091459_479_85.jpg', alt: 'Portrait holding a flower fan' },
-    { pair: '03', image: 'images/Play/微信图片_20260716090847_471_85.jpg', alt: 'Two friends with cat paw poses' },
-    { pair: '03', image: 'images/Play/微信图片_20260716090901_472_85.jpg', alt: 'Close selfie with a friend' },
-    { pair: '04', image: 'images/Play/微信图片_20260716090959_475_85.jpg', alt: 'Indoor portrait with a friend' },
-    { pair: '04', image: 'images/Play/微信图片_20260716091044_478_85.jpg', alt: 'Travel portrait with a friend' },
-    { pair: '05', image: 'images/Play/微信图片_20260716090917_473_85.jpg', alt: 'Traditional dress portrait with a friend' },
-    { pair: '05', image: 'images/Play/微信图片_20260716090943_474_85.jpg', alt: 'Winter portrait with a friend' },
-    { pair: '06', image: 'images/Play/微信图片_20260716091023_476_85.jpg', alt: 'Outdoor portrait with a friend' },
-    { pair: '06', image: 'images/Play/微信图片_20260716091037_477_85.jpg', alt: 'Cafe portrait with a friend' }
+    { pair: '01', image: 'assets/play/pair-01-a.jpg', alt: 'Portrait against a blue background' },
+    { pair: '01', image: 'assets/play/pair-01-b.jpg', alt: 'Portrait with cat ear accessories' },
+    { pair: '02', image: 'assets/play/pair-02-a.jpg', alt: 'Portrait making a hand pose' },
+    { pair: '02', image: 'assets/play/pair-02-b.jpg', alt: 'Portrait holding a flower fan' },
+    { pair: '03', image: 'assets/play/pair-03-a.jpg', alt: 'Two friends with cat paw poses' },
+    { pair: '03', image: 'assets/play/pair-03-b.jpg', alt: 'Close selfie with a friend' },
+    { pair: '04', image: 'assets/play/pair-04-a.jpg', alt: 'Indoor portrait with a friend' },
+    { pair: '04', image: 'assets/play/pair-04-b.jpg', alt: 'Travel portrait with a friend' },
+    { pair: '05', image: 'assets/play/pair-05-a.jpg', alt: 'Traditional dress portrait with a friend' },
+    { pair: '05', image: 'assets/play/pair-05-b.jpg', alt: 'Winter portrait with a friend' },
+    { pair: '06', image: 'assets/play/pair-06-a.jpg', alt: 'Outdoor portrait with a friend' },
+    { pair: '06', image: 'assets/play/pair-06-b.jpg', alt: 'Cafe portrait with a friend' }
   ];
 
   var board = document.getElementById('memoryBoard');
@@ -33,6 +33,7 @@
   var matches = 0;
   var locked = false;
   var mismatchTimer = null;
+  var initialized = false;
 
   function shuffle(items) {
     var shuffled = items.slice();
@@ -126,7 +127,8 @@
     var image = document.createElement('img');
     image.src = item.image;
     image.alt = item.alt;
-    image.loading = 'eager';
+    image.loading = 'lazy';
+    image.decoding = 'async';
     var stamp = document.createElement('span');
     stamp.className = 'memory-pair-stamp';
     stamp.textContent = 'PAIR ' + item.pair;
@@ -138,6 +140,7 @@
   }
 
   function resetGame() {
+    initialized = true;
     if (mismatchTimer) window.clearTimeout(mismatchTimer);
     firstCard = null;
     secondCard = null;
@@ -162,5 +165,20 @@
   });
 
   window.travelMemoryGame = { reset: resetGame };
-  resetGame();
+
+  var section = document.getElementById('travel-memory');
+  if (section && 'IntersectionObserver' in window) {
+    var observer = new IntersectionObserver(function (entries) {
+      if (initialized || !entries.some(function (entry) { return entry.isIntersecting; })) return;
+      resetGame();
+      observer.disconnect();
+    }, {
+      root: document.getElementById('scrollContainer'),
+      rootMargin: '45% 0px',
+      threshold: 0.01
+    });
+    observer.observe(section);
+  } else {
+    resetGame();
+  }
 })();

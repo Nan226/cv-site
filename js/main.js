@@ -167,6 +167,14 @@ import { initProjectsOrbs } from './projects-orbs.js?v=20260717-8';
   const easterEggHint = document.getElementById('easterEggHint');
   if (!container || !canvas) return;
 
+  function revealFallbackImage() {
+    if (!fallbackImage) return;
+    if (!fallbackImage.getAttribute('src') && fallbackImage.dataset.src) {
+      fallbackImage.src = fallbackImage.dataset.src;
+    }
+    fallbackImage.classList.add('is-visible');
+  }
+
   // ---- Scene / Camera / Renderer ----
   const scene = new THREE.Scene();
 
@@ -178,7 +186,7 @@ import { initProjectsOrbs } from './projects-orbs.js?v=20260717-8';
     const modelStatus = document.getElementById('modelStatus');
     if (spinner) spinner.classList.add('is-hidden');
     canvas.classList.add('is-hidden');
-    if (fallbackImage) fallbackImage.classList.add('is-visible');
+    revealFallbackImage();
     if (interactHint) interactHint.classList.add('is-hidden');
     if (easterEggHint) easterEggHint.classList.add('is-hidden');
     if (modelStatus) {
@@ -806,7 +814,7 @@ import { initProjectsOrbs } from './projects-orbs.js?v=20260717-8';
     updateModelStatus(attempt === 1 ? 'Loading 3D character...' : 'Retrying 3D character...');
 
     loader.load(
-      'images/HOME/完美娃娃-web.glb',
+      'assets/home/character.glb',
       (gltf) => {
         if (fallbackImage) fallbackImage.classList.remove('is-visible');
         canvas.classList.remove('is-hidden');
@@ -866,7 +874,7 @@ import { initProjectsOrbs } from './projects-orbs.js?v=20260717-8';
         const spinner = document.getElementById('loadingSpinner');
         if (spinner) spinner.classList.add('is-hidden');
         canvas.classList.add('is-hidden');
-        if (fallbackImage) fallbackImage.classList.add('is-visible');
+        revealFallbackImage();
         if (interactHint) interactHint.classList.add('is-hidden');
         if (easterEggHint) easterEggHint.classList.add('is-hidden');
         updateModelStatus('Static character preview');
@@ -1418,9 +1426,9 @@ var INTERNSHIP_CARDS = [
     role: 'Data Development Intern',
     period: 'APR 2025 - AUG 2025',
     location: 'Shenzhen, Guangdong',
-    image: 'images/Internship/卡片1.jpg',
-    aboutImage: 'images/About me/照片3.png',
-    logo: 'images/About me/Keendata.png',
+    image: 'assets/internship/keendata.jpg',
+    aboutImage: 'assets/about/keendata.jpg',
+    logo: 'assets/about/keendata-logo.png',
     summary: 'Supported big data platform development, system deployment, and project delivery processes, combining software engineering practice with cross-functional collaboration.',
     tags: ['Big Data', 'Java Development', 'Hadoop', 'Bug Management'],
     responsibilities: [
@@ -1448,9 +1456,9 @@ var INTERNSHIP_CARDS = [
     role: 'Project Management Intern',
     period: 'JAN 2026 - MAY 2026',
     location: 'Shenzhen, Guangdong',
-    image: 'images/Internship/卡片2.jpg',
-    aboutImage: 'images/About me/照片5.png',
-    logo: 'images/About me/XGRIDS.png',
+    image: 'assets/internship/xgrids.jpg',
+    aboutImage: 'assets/about/xgrids.jpg',
+    logo: 'assets/about/xgrids-logo.png',
     summary: 'Supported agile delivery, AI-driven process optimization, and software-hardware integrated product iteration for 3D reconstruction solutions.',
     tags: ['Agile Delivery', 'AI Automation', '3D Reconstruction', 'Project Management'],
     responsibilities: [
@@ -1480,9 +1488,9 @@ var INTERNSHIP_CARDS = [
     role: 'Intelligent Driving Project Management Intern',
     period: 'JUN 2026 - PRESENT',
     location: 'Wuhu, Anhui',
-    image: 'images/Internship/卡片3.jpg',
-    aboutImage: 'images/About me/照片6.png',
-    logo: 'images/About me/CHERY.png',
+    image: 'assets/internship/chery.jpg',
+    aboutImage: 'assets/about/chery.jpg',
+    logo: 'assets/about/chery-logo.png',
     summary: 'Supported Robotaxi project delivery, cross-functional coordination, and PMO process optimization for intelligent driving development.',
     tags: ['Intelligent Driving', 'PMO', 'Jira Management', 'Project Coordination'],
     responsibilities: [
@@ -1518,14 +1526,11 @@ function initInternshipJourney() {
   if (stage.dataset.internshipReady === 'true') return;
   stage.dataset.internshipReady = 'true';
 
-  // ---- 预加载图片 ----
-  preloadInternshipImages();
-
   // ---- 构建卡片 ----
   buildInternshipCards(cardsContainer);
 
-  // ---- 直接展示卡片，不再经过 intro → tearing → cards ----
-  stage.classList.remove('is-intro', 'is-tearing', 'is-detail', 'is-opening-detail');
+  // ---- 直接展示卡片 ----
+  stage.classList.remove('is-detail', 'is-opening-detail');
   stage.classList.add('is-cards');
   currentInternshipState = 'cards';
   cardsContainer.querySelectorAll('.internship-card').forEach(function (card) {
@@ -1559,15 +1564,6 @@ function initInternshipJourney() {
   });
 }
 
-function preloadInternshipImages() {
-  var images = ['images/Internship/主页面.jpg'];
-  INTERNSHIP_CARDS.forEach(function (c) { images.push(c.image); });
-  images.forEach(function (src) {
-    var img = new Image();
-    img.src = src;
-  });
-}
-
 function buildInternshipCards(container) {
   if (!container) return;
   var html = '';
@@ -1575,7 +1571,7 @@ function buildInternshipCards(container) {
     html += '<div class="internship-card" data-card-id="' + cardData.id + '" tabindex="0" role="button" aria-label="' + cardData.company + ' internship card">'
       + '<div class="internship-card-inner">'
       + '<div class="internship-card-front">'
-      + '<img src="' + cardData.image + '" alt="' + cardData.company + ' internship card" loading="lazy">'
+      + '<img src="' + cardData.image + '" alt="' + cardData.company + ' internship card" loading="lazy" decoding="async">'
       + '<span class="card-front-number">' + String(index + 1).padStart(2, '0') + '</span>'
       + '</div>'
       + '<div class="internship-card-back">'
@@ -2104,7 +2100,7 @@ var ABOUT_CARDS = [
   {
     id: 'base-info', period: 'FEB 2003', location: 'Quanzhou, Fujian',
     category: 'Base Info', icon: 'id-card', title: 'Base Information', subtitle: '',
-    image: 'images/About me/照片1.JPEG', logo: 'images/照片.JPG',
+    image: 'assets/about/profile.jpg', logo: 'assets/about/profile-logo.jpg',
     items: [],
     tags: [
       'enfp',
@@ -2121,7 +2117,7 @@ var ABOUT_CARDS = [
   {
     id: 'huaqiao', period: 'SEP 2020 - JUN 2024', location: 'Xiamen, Fujian',
     category: 'Education', icon: 'graduation-cap', title: 'Huaqiao University', subtitle: '',
-    image: 'images/About me/照片2.jpg', logo: 'images/About me/华侨大学校徽.png',
+    image: 'assets/about/huaqiao.jpg', logo: 'assets/about/huaqiao-logo.png',
     items: [],
     tags: ['Top 10% GPA','First-Class Scholarship','IELTS 6.5','CET-6','Class Life Committee','Sangzi WeAssistant','Plant Art Club Lead'],
     action: null
@@ -2130,7 +2126,7 @@ var ABOUT_CARDS = [
     id: 'keendata', period: 'APR 2025 - AUG 2025', location: 'Shenzhen, Guangdong',
     category: 'Internship', icon: 'briefcase-business', title: 'Keendata',
     subtitle: 'Project Management Intern',
-    image: 'images/About me/照片3.png', logo: 'images/About me/Keendata.png',
+    image: 'assets/about/keendata.jpg', logo: 'assets/about/keendata-logo.png',
     items: [],
     tags: ['Big Data Platform','Issue Tracking','Requirements Management','Custom Delivery'],
     action: { label: 'View Details', icon: 'arrow-up-right', disabled: false }
@@ -2139,7 +2135,7 @@ var ABOUT_CARDS = [
     id: 'polyu', period: 'SEP 2025', location: 'Hung Hom, Hong Kong',
     category: 'Education', icon: 'graduation-cap',
     title: 'The Hong Kong Polytechnic University', subtitle: '',
-    image: 'images/About me/照片4.png', logo: 'images/About me/香港理工大学校徽.png',
+    image: 'assets/about/polyu.jpg', logo: 'assets/about/polyu-logo.png',
     items: [],
     tags: ['QS Top 50','Metaverse','Top 10% GPA'],
     action: null
@@ -2148,7 +2144,7 @@ var ABOUT_CARDS = [
     id: 'xgrids', period: 'JAN 2026 - MAY 2026', location: 'Shenzhen, Guangdong',
     category: 'Internship', icon: 'scan-line', title: 'XGRIDS',
     subtitle: 'Project Management Intern',
-    image: 'images/About me/照片5.png', logo: 'images/About me/XGRIDS.png',
+    image: 'assets/about/xgrids.jpg', logo: 'assets/about/xgrids-logo.png',
     items: [],
     tags: ['Software Delivery','3D Reconstruction','Spatial Computing'],
     action: { label: 'View Details', icon: 'arrow-up-right', disabled: false }
@@ -2157,7 +2153,7 @@ var ABOUT_CARDS = [
     id: 'chery', period: 'JUN 2026 - PRESENT', location: 'Wuhu, Anhui',
     category: 'Internship', icon: 'car-front', title: 'CHERY',
     subtitle: 'Project Management Intern',
-    image: 'images/About me/照片6.png', logo: 'images/About me/CHERY.png',
+    image: 'assets/about/chery.jpg', logo: 'assets/about/chery-logo.png',
     items: [],
     tags: ['Intelligent Driving','ADSD','Jira Governance','Quality Management','Robotaxi'],
     action: { label: 'View Details', icon: 'arrow-up-right', disabled: false }
@@ -2325,16 +2321,6 @@ function initAboutMe() {
     var internshipStage = document.getElementById('internshipStage');
     var internshipDetail = document.getElementById('internshipDetail');
     if (internshipStage && internshipDetail) {
-      // 确保处于 cards 状态
-      if (currentInternshipState === 'intro') {
-        // 先触发切换到 cards 状态
-        var stage = document.getElementById('internshipStage');
-        if (stage) {
-          stage.classList.remove('is-intro');
-          stage.classList.add('is-cards');
-          currentInternshipState = 'cards';
-        }
-      }
       // 延迟打开详情，等滚动到位
       setTimeout(function () {
         openInternshipDetail(cardId, internshipDetail, internshipStage);

@@ -2,11 +2,11 @@
 
 当前正式模型文件：
 
-`images/HOME/完美娃娃-web.glb`（网页轻量版，Draco 压缩，约 1.2 MB）
+`assets/home/character.glb`（网页轻量版，Draco 压缩，约 1.2 MB）
 
 原始高精度压缩模型：
 
-`images/HOME/完美娃娃-draco.glb`（约 12.5 MB，仅用于保留源质量）
+`source-assets/images/HOME/完美娃娃-draco.glb`（仅在本地保留源质量）
 
 ## 视觉要求
 
@@ -30,4 +30,4 @@
 - 建议提供 `blink`、`smile`、`angry`、`puff` 或相近命名的表情 morph target
 
 模型会自动重试三次。连续加载失败后，页面显示
-`images/HOME/娃娃正面.png` 作为静态兜底，不向访客展示旧 Three.js 简模。
+`assets/home/character-fallback.png` 作为静态兜底，不向访客展示旧 Three.js 简模。

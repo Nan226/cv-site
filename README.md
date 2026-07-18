@@ -1,39 +1,26 @@
-# 个人网站
+# YE NAN Portfolio
 
-#### 介绍
-{**以下是 Gitee 平台说明，您可以替换此简介**
-Gitee 是 OSCHINA 推出的基于 Git 的代码托管平台（同时支持 SVN）。专为开发者提供稳定、高效、安全的云端软件开发协作平台
-无论是个人、团队、或是企业，都能够用 Gitee 实现代码托管、项目管理、协作开发。企业项目请看 [https://gitee.com/enterprises](https://gitee.com/enterprises)}
+一个使用原生 HTML、CSS、JavaScript 和 Three.js 构建的个人作品集网站。
 
-#### 软件架构
-软件架构说明
+## 本地运行
 
+```bash
+npm run build
+python3 -m http.server 4173 -d dist
+```
 
-#### 安装教程
+打开 <http://127.0.0.1:4173/>。
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+## 发布
 
-#### 使用说明
+Cloudflare Pages 使用以下设置：
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+- Build command: `npm run build`
+- Build output directory: `dist`
+- Node.js: 18 或更高版本
 
-#### 参与贡献
+运行时文件只来自 `assets/`、`css/`、`js/` 和 `index.html`。原始照片、视频、模型与设计参考保存在本地 `source-assets/`，不会发布。
 
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+## 素材优化
 
-
-#### 特技
-
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+macOS 下运行 `npm run optimize:assets` 可重新生成轻量图片和 480p 展示视频。原始素材不会被覆盖。

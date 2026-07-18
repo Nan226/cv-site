@@ -4,10 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>YE NAN — Portfolio</title>
-  <link rel="stylesheet" href="css/style.css?v=20260717-17">
-  <link rel="stylesheet" href="css/play.css?v=20260716-3">
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="js/vendor/matter.min.js?v=0.20.0"></script>
+  <meta name="description" content="YE NAN — builder, dreamer and braver. A playful portfolio of projects, internships, skills and memories.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css?v=20260718-1">
+  <link rel="stylesheet" href="css/play.css?v=20260718-1">
+  <script defer src="js/vendor/lucide.min.js?v=0.468.0"></script>
+  <script defer src="js/vendor/matter.min.js?v=0.20.0"></script>
   <script type="importmap">
     {
       "imports": {
@@ -64,8 +66,9 @@
       <img
         id="characterFallbackImage"
         class="character-fallback-image"
-        src="images/HOME/娃娃正面.png"
+        data-src="assets/home/character-fallback.png"
         alt="Front view of Ye Nan's character"
+        decoding="async"
       >
 
       <!-- Loading spinner -->
@@ -148,11 +151,6 @@
 
       <!-- 内容区 -->
       <div class="internship-content" id="internshipContent">
-        <!-- 淡背景主图 -->
-        <div class="internship-intro-image" id="internshipIntroImage" aria-hidden="true">
-          <img src="images/Internship/主页面.jpg" alt="Internship journey watercolor">
-        </div>
-
         <!-- 三张卡片 (JS 动态填充) -->
         <div class="internship-cards" id="internshipCards">
           <!-- JS 渲染 -->
@@ -215,7 +213,7 @@
       <aside class="skills-chiikawa" aria-label="Chiikawa companions">
         <p class="skills-chiikawa-label">CURIOSITY CREW</p>
         <div class="skills-chiikawa-crop">
-          <img src="images/Play/chiikawa-side.jpg" alt="Chiikawa friends holding ice cream">
+          <img src="assets/play/companion.jpg" alt="Chiikawa friends holding ice cream" loading="lazy" decoding="async">
         </div>
         <p class="skills-chiikawa-note">Keep learning.<br>Keep playing.</p>
       </aside>
@@ -264,7 +262,7 @@
       <aside class="memory-companion" aria-label="Chiikawa memory crew">
         <p>MEMORY CREW</p>
         <div class="memory-companion-crop">
-          <img src="images/Play/chiikawa-side.jpg" alt="Chiikawa friends holding ice cream">
+          <img src="assets/play/companion.jpg" alt="Chiikawa friends holding ice cream" loading="lazy" decoding="async">
         </div>
         <span>Little moments,<br>kept together.</span>
       </aside>
@@ -312,7 +310,7 @@
     role="dialog"
     aria-labelledby="skillShowcaseTitle"
     aria-hidden="true"
-    data-video-src="images/Play/ai-video-production.m4v"
+    data-video-src="assets/play/ai-video-production.m4v"
   >
     <div class="skill-showcase-titlebar" id="skillShowcaseDragHandle">
       <div class="skill-showcase-window-dots" aria-hidden="true">
@@ -379,7 +377,7 @@
           <span class="resume-opt-lang">中文</span>
           <span class="resume-opt-hint">Coming Soon</span>
         </button>
-        <a class="resume-dialog-option" href="images/PRD/Nan YE.pdf" download="Nan_YE_Resume.pdf">
+        <a class="resume-dialog-option" href="assets/resume/Nan-YE.pdf" download="Nan_YE_Resume.pdf">
           <i data-lucide="file-text" style="width:1.4rem;height:1.4rem"></i>
           <span class="resume-opt-lang">English</span>
           <span class="resume-opt-hint">PDF · Download</span>
@@ -388,8 +386,7 @@
     </div>
   </div>
 
-  <script src="js/internship-boot.js?v=20260717-2"></script>
-  <script src="js/play.js?v=20260716-3"></script>
-  <script type="module" src="js/main.js?v=20260717-20"></script>
+  <script src="js/play.js?v=20260717-4"></script>
+  <script type="module" src="js/main.js?v=20260718-1"></script>
 </body>
 </html>
