@@ -23,4 +23,4 @@ Cloudflare Pages 使用以下设置：
 
 ## 素材优化
 
-macOS 下运行 `npm run optimize:assets` 可重新生成轻量图片和 480p 展示视频。原始素材不会被覆盖。
+macOS 下运行 `npm run optimize:assets` 可重新生成 WebP 图片和低码率展示视频。图片步骤需要 Python 3 与 Pillow，原始素材不会被覆盖。

@@ -30,4 +30,4 @@
 - 建议提供 `blink`、`smile`、`angry`、`puff` 或相近命名的表情 morph target
 
 模型会自动重试三次。连续加载失败后，页面显示
-`assets/home/character-fallback.png` 作为静态兜底，不向访客展示旧 Three.js 简模。
+`assets/home/character-fallback.webp` 作为静态兜底，不向访客展示旧 Three.js 简模。

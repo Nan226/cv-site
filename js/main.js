@@ -1426,8 +1426,8 @@ var INTERNSHIP_CARDS = [
     role: 'Data Development Intern',
     period: 'APR 2025 - AUG 2025',
     location: 'Shenzhen, Guangdong',
-    image: 'assets/internship/keendata.jpg',
-    aboutImage: 'assets/about/keendata.jpg',
+    image: 'assets/internship/keendata.webp',
+    aboutImage: 'assets/about/keendata.webp',
     logo: 'assets/about/keendata-logo.png',
     summary: 'Supported big data platform development, system deployment, and project delivery processes, combining software engineering practice with cross-functional collaboration.',
     tags: ['Big Data', 'Java Development', 'Hadoop', 'Bug Management'],
@@ -1456,8 +1456,8 @@ var INTERNSHIP_CARDS = [
     role: 'Project Management Intern',
     period: 'JAN 2026 - MAY 2026',
     location: 'Shenzhen, Guangdong',
-    image: 'assets/internship/xgrids.jpg',
-    aboutImage: 'assets/about/xgrids.jpg',
+    image: 'assets/internship/xgrids.webp',
+    aboutImage: 'assets/about/xgrids.webp',
     logo: 'assets/about/xgrids-logo.png',
     summary: 'Supported agile delivery, AI-driven process optimization, and software-hardware integrated product iteration for 3D reconstruction solutions.',
     tags: ['Agile Delivery', 'AI Automation', '3D Reconstruction', 'Project Management'],
@@ -1488,8 +1488,8 @@ var INTERNSHIP_CARDS = [
     role: 'Intelligent Driving Project Management Intern',
     period: 'JUN 2026 - PRESENT',
     location: 'Wuhu, Anhui',
-    image: 'assets/internship/chery.jpg',
-    aboutImage: 'assets/about/chery.jpg',
+    image: 'assets/internship/chery.webp',
+    aboutImage: 'assets/about/chery.webp',
     logo: 'assets/about/chery-logo.png',
     summary: 'Supported Robotaxi project delivery, cross-functional coordination, and PMO process optimization for intelligent driving development.',
     tags: ['Intelligent Driving', 'PMO', 'Jira Management', 'Project Coordination'],
@@ -1571,7 +1571,7 @@ function buildInternshipCards(container) {
     html += '<div class="internship-card" data-card-id="' + cardData.id + '" tabindex="0" role="button" aria-label="' + cardData.company + ' internship card">'
       + '<div class="internship-card-inner">'
       + '<div class="internship-card-front">'
-      + '<img src="' + cardData.image + '" alt="' + cardData.company + ' internship card" loading="lazy" decoding="async">'
+      + '<img src="' + cardData.image + '" alt="' + cardData.company + ' internship card" loading="eager" decoding="async" fetchpriority="low">'
       + '<span class="card-front-number">' + String(index + 1).padStart(2, '0') + '</span>'
       + '</div>'
       + '<div class="internship-card-back">'
@@ -2100,7 +2100,7 @@ var ABOUT_CARDS = [
   {
     id: 'base-info', period: 'FEB 2003', location: 'Quanzhou, Fujian',
     category: 'Base Info', icon: 'id-card', title: 'Base Information', subtitle: '',
-    image: 'assets/about/profile.jpg', logo: 'assets/about/profile-logo.jpg',
+    image: 'assets/about/profile.webp', logo: 'assets/about/profile-logo.webp',
     items: [],
     tags: [
       'enfp',
@@ -2117,7 +2117,7 @@ var ABOUT_CARDS = [
   {
     id: 'huaqiao', period: 'SEP 2020 - JUN 2024', location: 'Xiamen, Fujian',
     category: 'Education', icon: 'graduation-cap', title: 'Huaqiao University', subtitle: '',
-    image: 'assets/about/huaqiao.jpg', logo: 'assets/about/huaqiao-logo.png',
+    image: 'assets/about/huaqiao.webp', logo: 'assets/about/huaqiao-logo.png',
     items: [],
     tags: ['Top 10% GPA','First-Class Scholarship','IELTS 6.5','CET-6','Class Life Committee','Sangzi WeAssistant','Plant Art Club Lead'],
     action: null
@@ -2126,7 +2126,7 @@ var ABOUT_CARDS = [
     id: 'keendata', period: 'APR 2025 - AUG 2025', location: 'Shenzhen, Guangdong',
     category: 'Internship', icon: 'briefcase-business', title: 'Keendata',
     subtitle: 'Project Management Intern',
-    image: 'assets/about/keendata.jpg', logo: 'assets/about/keendata-logo.png',
+    image: 'assets/about/keendata.webp', logo: 'assets/about/keendata-logo.png',
     items: [],
     tags: ['Big Data Platform','Issue Tracking','Requirements Management','Custom Delivery'],
     action: { label: 'View Details', icon: 'arrow-up-right', disabled: false }
@@ -2135,7 +2135,7 @@ var ABOUT_CARDS = [
     id: 'polyu', period: 'SEP 2025', location: 'Hung Hom, Hong Kong',
     category: 'Education', icon: 'graduation-cap',
     title: 'The Hong Kong Polytechnic University', subtitle: '',
-    image: 'assets/about/polyu.jpg', logo: 'assets/about/polyu-logo.png',
+    image: 'assets/about/polyu.webp', logo: 'assets/about/polyu-logo.png',
     items: [],
     tags: ['QS Top 50','Metaverse','Top 10% GPA'],
     action: null
@@ -2144,7 +2144,7 @@ var ABOUT_CARDS = [
     id: 'xgrids', period: 'JAN 2026 - MAY 2026', location: 'Shenzhen, Guangdong',
     category: 'Internship', icon: 'scan-line', title: 'XGRIDS',
     subtitle: 'Project Management Intern',
-    image: 'assets/about/xgrids.jpg', logo: 'assets/about/xgrids-logo.png',
+    image: 'assets/about/xgrids.webp', logo: 'assets/about/xgrids-logo.png',
     items: [],
     tags: ['Software Delivery','3D Reconstruction','Spatial Computing'],
     action: { label: 'View Details', icon: 'arrow-up-right', disabled: false }
@@ -2153,7 +2153,7 @@ var ABOUT_CARDS = [
     id: 'chery', period: 'JUN 2026 - PRESENT', location: 'Wuhu, Anhui',
     category: 'Internship', icon: 'car-front', title: 'CHERY',
     subtitle: 'Project Management Intern',
-    image: 'assets/about/chery.jpg', logo: 'assets/about/chery-logo.png',
+    image: 'assets/about/chery.webp', logo: 'assets/about/chery-logo.png',
     items: [],
     tags: ['Intelligent Driving','ADSD','Jira Governance','Quality Management','Robotaxi'],
     action: { label: 'View Details', icon: 'arrow-up-right', disabled: false }
@@ -2218,7 +2218,7 @@ function initAboutMe() {
     // Image
     var imgHTML =
       '<div class="card-image-wrap">' +
-        '<img src="' + card.image + '" alt="' + card.title + '" loading="' + (i === 0 ? 'eager' : 'lazy') + '">' +
+        '<img src="' + card.image + '" alt="' + card.title + '" loading="eager" decoding="async" fetchpriority="low">' +
         '<span class="card-category">' + card.category + '</span>' +
         '<span class="card-number">' + String(i + 1).padStart(2, '0') + '</span>' +
       '</div>';
@@ -2471,6 +2471,11 @@ function initAboutMe() {
       });
       mobileNodeMap.forEach(function (m) {
         m.node.classList.toggle('active', m.index === closestIdx);
+        if (m.index === closestIdx) {
+          m.node.setAttribute('aria-current', 'step');
+        } else {
+          m.node.removeAttribute('aria-current');
+        }
       });
     }
     cardsContainer.addEventListener('scroll', updateMobileActive, { passive: true });
@@ -2865,6 +2870,7 @@ function initSkillShowcaseWindow() {
   if (!panel || !handle || !closeButton || !video || !playToggle || !playGlyph || !empty || !emptyText || !status) return null;
 
   var dragState = null;
+  var videoPrepared = false;
 
   function clampPosition(left, top) {
     var panelWidth = panel.offsetWidth;
@@ -2892,17 +2898,17 @@ function initSkillShowcaseWindow() {
     status.textContent = nextStatus;
   }
 
-  function loadVideo() {
+  function prepareVideo() {
+    if (videoPrepared) return;
     var source = (panel.dataset.videoSrc || '').trim();
-    video.pause();
-    video.removeAttribute('src');
-    video.load();
     if (!source) {
       setEmptyState('Video source pending', 'READY TO LOAD');
       return;
     }
 
-    setEmptyState('Loading video...', 'LOADING');
+    videoPrepared = true;
+    video.preload = 'auto';
+    setEmptyState('Buffering video...', 'PRELOADING');
     video.src = source;
     video.load();
   }
@@ -2917,12 +2923,16 @@ function initSkillShowcaseWindow() {
     } else {
       clampPosition(parseFloat(panel.style.left) || 0, parseFloat(panel.style.top) || 0);
     }
-    loadVideo();
+    prepareVideo();
+    if (video.readyState >= 2) {
+      panel.classList.add('has-media');
+      status.textContent = video.readyState >= 4 ? 'READY' : 'PLAYABLE';
+    }
     if (window.lucide) window.lucide.createIcons();
   }
 
   function close() {
-    panel.classList.remove('is-open', 'is-dragging', 'has-media');
+    panel.classList.remove('is-open', 'is-dragging');
     panel.setAttribute('aria-hidden', 'true');
     closeButton.tabIndex = -1;
     video.pause();
@@ -2977,6 +2987,10 @@ function initSkillShowcaseWindow() {
     panel.classList.add('has-media');
     status.textContent = 'PLAYABLE';
   });
+  video.addEventListener('canplaythrough', function () {
+    panel.classList.add('has-media');
+    status.textContent = 'READY';
+  });
   video.addEventListener('play', function () {
     playToggle.classList.add('is-playing');
     playGlyph.textContent = '\u23f8';
@@ -3000,7 +3014,24 @@ function initSkillShowcaseWindow() {
     if (event.key === 'Escape' && panel.classList.contains('is-open')) close();
   });
 
-  return { open: open, close: close };
+  var preloadTrigger = document.getElementById('internship');
+  var scrollRoot = document.getElementById('scrollContainer');
+  if (preloadTrigger && 'IntersectionObserver' in window) {
+    var preloadObserver = new IntersectionObserver(function (entries) {
+      if (!entries.some(function (entry) { return entry.isIntersecting; })) return;
+      prepareVideo();
+      preloadObserver.disconnect();
+    }, {
+      root: scrollRoot,
+      rootMargin: '50% 0px',
+      threshold: 0.01
+    });
+    preloadObserver.observe(preloadTrigger);
+  } else {
+    window.setTimeout(prepareVideo, 5000);
+  }
+
+  return { open: open, close: close, prepare: prepareVideo };
 }
 
 // ---- 简历下载弹框 ----

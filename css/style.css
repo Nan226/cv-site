@@ -2010,7 +2010,7 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   z-index:1;
   inset:0;
   pointer-events:none;
-  background:url('../assets/projects/chiikawa-spring.jpg') center center / cover no-repeat;
+  background:url('../assets/projects/chiikawa-spring.webp') center center / cover no-repeat;
   opacity:.62;
   filter:saturate(.94) brightness(1.02);
 }
@@ -3789,4 +3789,62 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
 .internship-stage{z-index:3;}
 .three-canvas.is-easter-lit{
   filter:drop-shadow(0 0 12px rgba(211,190,255,.95)) drop-shadow(0 0 38px rgba(166,112,245,.78));
+}
+
+@media(max-width:768px){
+  .about-timeline{
+    width:100%;
+    overflow:visible;
+    padding:.7vh .65rem .7vh;
+  }
+  .about-timeline::before,
+  .about-timeline::after{
+    display:none;
+  }
+  .timeline-track{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    width:100%;
+    gap:.48rem .42rem;
+    overflow:visible;
+    padding:.45rem 0 .2rem;
+  }
+  .timeline-track::before{display:none;}
+  .timeline-node{
+    width:100%;
+    min-width:0;
+    padding:.26rem .16rem .3rem;
+    gap:3px;
+    border:1px solid rgba(48,45,58,.35);
+    border-radius:5px;
+    background:rgba(255,248,233,.82);
+    box-shadow:2px 2px 0 rgba(95,75,80,.1);
+  }
+  .timeline-node.active{
+    border-color:var(--illustration-ink);
+    background:var(--illustration-paper);
+    box-shadow:3px 3px 0 rgba(95,75,80,.14);
+  }
+  .timeline-period{
+    min-height:1.05rem;
+    font-size:.43rem;
+    line-height:1.14;
+    white-space:normal;
+  }
+  .timeline-location{
+    max-width:100%;
+    min-height:1rem;
+    overflow:visible;
+    font-size:.4rem;
+    line-height:1.15;
+    white-space:normal;
+    text-overflow:clip;
+  }
+}
+
+@media(max-width:360px){
+  .timeline-track{gap:.38rem .32rem;}
+  .timeline-node{padding:.22rem .1rem .26rem;}
+  .timeline-period{font-size:.39rem;}
+  .timeline-location{font-size:.37rem;}
 }

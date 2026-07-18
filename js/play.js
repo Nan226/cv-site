@@ -3,18 +3,18 @@
 
   var PAIR_COLORS = ['#d889ad', '#7ca8df', '#7fb99a', '#d4a94f', '#9a7fd4', '#db8f82'];
   var MEMORY_CARDS = [
-    { pair: '01', image: 'assets/play/pair-01-a.jpg', alt: 'Portrait against a blue background' },
-    { pair: '01', image: 'assets/play/pair-01-b.jpg', alt: 'Portrait with cat ear accessories' },
-    { pair: '02', image: 'assets/play/pair-02-a.jpg', alt: 'Portrait making a hand pose' },
-    { pair: '02', image: 'assets/play/pair-02-b.jpg', alt: 'Portrait holding a flower fan' },
-    { pair: '03', image: 'assets/play/pair-03-a.jpg', alt: 'Two friends with cat paw poses' },
-    { pair: '03', image: 'assets/play/pair-03-b.jpg', alt: 'Close selfie with a friend' },
-    { pair: '04', image: 'assets/play/pair-04-a.jpg', alt: 'Indoor portrait with a friend' },
-    { pair: '04', image: 'assets/play/pair-04-b.jpg', alt: 'Travel portrait with a friend' },
-    { pair: '05', image: 'assets/play/pair-05-a.jpg', alt: 'Traditional dress portrait with a friend' },
-    { pair: '05', image: 'assets/play/pair-05-b.jpg', alt: 'Winter portrait with a friend' },
-    { pair: '06', image: 'assets/play/pair-06-a.jpg', alt: 'Outdoor portrait with a friend' },
-    { pair: '06', image: 'assets/play/pair-06-b.jpg', alt: 'Cafe portrait with a friend' }
+    { pair: '01', image: 'assets/play/pair-01-a.webp', alt: 'Portrait against a blue background' },
+    { pair: '01', image: 'assets/play/pair-01-b.webp', alt: 'Portrait with cat ear accessories' },
+    { pair: '02', image: 'assets/play/pair-02-a.webp', alt: 'Portrait making a hand pose' },
+    { pair: '02', image: 'assets/play/pair-02-b.webp', alt: 'Portrait holding a flower fan' },
+    { pair: '03', image: 'assets/play/pair-03-a.webp', alt: 'Two friends with cat paw poses' },
+    { pair: '03', image: 'assets/play/pair-03-b.webp', alt: 'Close selfie with a friend' },
+    { pair: '04', image: 'assets/play/pair-04-a.webp', alt: 'Indoor portrait with a friend' },
+    { pair: '04', image: 'assets/play/pair-04-b.webp', alt: 'Travel portrait with a friend' },
+    { pair: '05', image: 'assets/play/pair-05-a.webp', alt: 'Traditional dress portrait with a friend' },
+    { pair: '05', image: 'assets/play/pair-05-b.webp', alt: 'Winter portrait with a friend' },
+    { pair: '06', image: 'assets/play/pair-06-a.webp', alt: 'Outdoor portrait with a friend' },
+    { pair: '06', image: 'assets/play/pair-06-b.webp', alt: 'Cafe portrait with a friend' }
   ];
 
   var board = document.getElementById('memoryBoard');
@@ -127,8 +127,9 @@
     var image = document.createElement('img');
     image.src = item.image;
     image.alt = item.alt;
-    image.loading = 'lazy';
+    image.loading = 'eager';
     image.decoding = 'async';
+    image.fetchPriority = 'low';
     var stamp = document.createElement('span');
     stamp.className = 'memory-pair-stamp';
     stamp.textContent = 'PAIR ' + item.pair;
@@ -174,7 +175,7 @@
       observer.disconnect();
     }, {
       root: document.getElementById('scrollContainer'),
-      rootMargin: '45% 0px',
+      rootMargin: '125% 0px',
       threshold: 0.01
     });
     observer.observe(section);

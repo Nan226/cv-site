@@ -57,6 +57,7 @@
 
 - 当前基线为：时间线 + 环绕轮播卡片。
 - 时间线与轮播卡片已统一为奶油纸张、深色描边、扁平粉蓝绿黄标签和硬阴影；桌面 3D 环绕、移动端横滑及自动旋转逻辑不变。
+- 手机端时间线使用 `3 x 2` 完整布局，六个节点无需横向滚动即可显示；点击节点仍会将对应卡片平滑居中并同步高亮。
 - 卡片图片与正文比例已按屏幕高度响应式分配：较矮桌面以完整容纳正文为先，常规高桌面图片约占三分之二；移动端继续使用紧凑横滑比例。标签、标题和操作按钮必须完整留在卡片边界内。
 - 卡片包含基础信息、教育和实习节点，并保留 Resume 弹框与跳转 Internship 的入口。
 - 可见 UI 文案以英文为主。
@@ -72,7 +73,7 @@
 
 - 当前基线为：Matter.js 2D 物理 + DOM/CSS 手绘球体；桌面生成约 52 个球，移动端约 30 个球，从 section 顶部落下、碰撞并堆叠在底部。
 - `js/projects-orbs.js` 是当前主流程模块，物理引擎使用本地 `js/vendor/matter.min.js`（Matter.js 0.20.0）；旧海洋模块已从仓库移除。
-- 背景使用发布资源 `assets/projects/chiikawa-spring.jpg`，以 `62%` 不透明度全屏铺设；原始素材保存在本地 `source-assets/`，不进入发布目录。
+- 背景使用发布资源 `assets/projects/chiikawa-spring.webp`，以 `62%` 不透明度全屏铺设；原始素材保存在本地 `source-assets/`，不进入发布目录。
 - 球体采用与背景一致的扁平插画风：深色描边、不规则圆形、粉蓝奶油和少量绿色；鼠标靠近会施加低阻力推力，球体受左右墙和底部边界约束。
 - 两个 `active` 项目仍为 `AI-powered Project Management Platform` 与 `MetaFit`，使用明显白色光圈、柔光和球内多颗星标；只有这两个球可点击，其他球是装饰性物理球。
 - AI Project Management 详情不再显示无实际目标的 `View Details` 外链按钮。
@@ -85,13 +86,13 @@
 - 当前基线为：`6 Skill + 2 Learning + 1 Play` 的 `3 x 3` 翻牌区，导航使用单一 `Skills & Learning` 入口指向该合并 section。
 - 普通卡片点击后翻面显示文字；`AI Video Production` 翻面后先显示英文确认框，确认后打开可拖拽、可关闭的视频窗口。
 - `Me & My Friends` 翻面后先显示英文确认框，确认后平滑下滑到主站第六屏的翻牌游戏，并在进入时重置牌局。
-- 右侧使用发布资源 `assets/play/companion.jpg`；原始素材不进入发布目录。
-- 媒体窗口按用户确认后加载 `assets/play/ai-video-production.m4v`；原始视频保存在本地源目录。
+- 右侧使用发布资源 `assets/play/companion.webp`；原始素材不进入发布目录。
+- 媒体窗口使用约 `3.6 MB`、`480 x 272` 的 `assets/play/ai-video-production.m4v`；进入 About/Internship 附近时开始后台缓冲，用户确认打开时复用已加载的视频，不重复清空 `src`。
 
 ### Me & My Friends
 
 - 游戏以内嵌 `#travel-memory` section 存在于主站，不使用独立 `play.html`。
-- 使用 `assets/play/` 的 12 张轻量照片组成 6 个编号配对；游戏接近可见时才初始化并加载图片，支持洗牌、匹配、错误回翻、计步、重置和完成状态。
+- 使用 `assets/play/` 的 12 张 WebP 照片组成 6 个编号配对；进入 Projects 附近时提前初始化并以低优先级加载，支持洗牌、匹配、错误回翻、计步、重置和完成状态。
 - 游戏视觉继续使用网站的白色、淡蓝、淡粉和淡紫配色，并在桌面端保留 Chiikawa 陪伴图。
 
 ## 修改与验证
@@ -106,4 +107,5 @@
 
 - Cloudflare Pages 使用 `npm run build` 生成 `dist/`；只发布 `index.html`、`css/`、`js/` 和 `assets/`。
 - `source-assets/` 保存本地原始照片、视频、模型和临时参考，不提交、不发布。
-- `scripts/optimize-assets.sh` 用于 macOS 本地生成轻量图片和视频；`scripts/build-site.mjs` 负责生成 Cloudflare 发布目录。
+- 运行时照片统一使用按展示尺寸生成的 WebP；当前 `assets/` 约 6 MB、`dist/` 约 12 MB。
+- `scripts/optimize-assets.sh` 调用 `scripts/optimize-images.py` 生成 WebP，并使用 macOS `avconvert` 生成低码率视频；`scripts/build-site.mjs` 负责生成 Cloudflare 发布目录。

@@ -23,4 +23,4 @@ Only `assets/`, `css/`, `js/` and `index.html` are published. Original photos, v
 
 ## Asset Optimization
 
-Run `npm run optimize:assets` on macOS to regenerate lightweight images and the 480p showcase video without overwriting source files.
+Run `npm run optimize:assets` on macOS to regenerate WebP images and the lower-bitrate showcase video without overwriting source files. The image step requires Python 3 and Pillow.
