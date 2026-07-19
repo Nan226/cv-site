@@ -2,6 +2,26 @@
   'use strict';
 
   var PAIR_COLORS = ['#d889ad', '#7ca8df', '#7fb99a', '#d4a94f', '#9a7fd4', '#db8f82'];
+  var I18N = {
+    en: {
+      findPairs: 'FIND THE PAIRS',
+      oneOpen: 'ONE MEMORY OPEN',
+      pairFound: 'PAIR {pair} FOUND',
+      tryAnother: 'TRY ANOTHER PAIR',
+      completed: 'Completed in {moves} moves.',
+      hiddenCard: 'Hidden memory card {index}',
+      pairStamp: 'PAIR {pair}'
+    },
+    zh: {
+      findPairs: '寻找配对',
+      oneOpen: '已翻开一张',
+      pairFound: '第 {pair} 组已找到',
+      tryAnother: '再试一组',
+      completed: '用 {moves} 步完成。',
+      hiddenCard: '隐藏的回忆卡片 {index}',
+      pairStamp: '第 {pair} 组'
+    }
+  };
   var MEMORY_CARDS = [
     { pair: '01', image: 'assets/play/pair-01-a.webp', alt: 'Portrait against a blue background' },
     { pair: '01', image: 'assets/play/pair-01-b.webp', alt: 'Portrait with cat ear accessories' },
@@ -35,6 +55,18 @@
   var mismatchTimer = null;
   var initialized = false;
 
+  function getLanguage() {
+    return document.documentElement.lang && document.documentElement.lang.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+  }
+
+  function t(key, values) {
+    var text = (I18N[getLanguage()] && I18N[getLanguage()][key]) || I18N.en[key] || key;
+    Object.keys(values || {}).forEach(function (name) {
+      text = text.replace('{' + name + '}', values[name]);
+    });
+    return text;
+  }
+
   function shuffle(items) {
     var shuffled = items.slice();
     for (var i = shuffled.length - 1; i > 0; i--) {
@@ -62,7 +94,7 @@
   }
 
   function showComplete() {
-    completeSummary.textContent = 'Completed in ' + formatNumber(moves) + ' moves.';
+    completeSummary.textContent = t('completed', { moves: formatNumber(moves) });
     completeOverlay.classList.add('is-open');
     completeOverlay.setAttribute('aria-hidden', 'false');
     playAgainButton.focus();
@@ -77,7 +109,7 @@
       firstCard.disabled = true;
       secondCard.disabled = true;
       matches++;
-      statusOutput.textContent = 'PAIR ' + firstCard.dataset.pair + ' FOUND';
+      statusOutput.textContent = t('pairFound', { pair: firstCard.dataset.pair });
       updateStats();
       clearTurn();
       if (matches === 6) window.setTimeout(showComplete, 520);
@@ -85,13 +117,13 @@
     }
 
     locked = true;
-    statusOutput.textContent = 'TRY ANOTHER PAIR';
+    statusOutput.textContent = t('tryAnother');
     mismatchTimer = window.setTimeout(function () {
       firstCard.classList.remove('is-flipped');
       secondCard.classList.remove('is-flipped');
       firstCard.setAttribute('aria-pressed', 'false');
       secondCard.setAttribute('aria-pressed', 'false');
-      statusOutput.textContent = 'FIND THE PAIRS';
+      statusOutput.textContent = t('findPairs');
       clearTurn();
     }, 820);
   }
@@ -102,7 +134,7 @@
     card.setAttribute('aria-pressed', 'true');
     if (!firstCard) {
       firstCard = card;
-      statusOutput.textContent = 'ONE MEMORY OPEN';
+      statusOutput.textContent = t('oneOpen');
       return;
     }
     secondCard = card;
@@ -114,7 +146,7 @@
     card.type = 'button';
     card.className = 'memory-card';
     card.dataset.pair = item.pair;
-    card.setAttribute('aria-label', 'Hidden memory card ' + (index + 1));
+    card.setAttribute('aria-label', t('hiddenCard', { index: index + 1 }));
     card.setAttribute('aria-pressed', 'false');
     card.style.setProperty('--pair-color', PAIR_COLORS[Number(item.pair) - 1]);
 
@@ -132,7 +164,7 @@
     image.fetchPriority = 'low';
     var stamp = document.createElement('span');
     stamp.className = 'memory-pair-stamp';
-    stamp.textContent = 'PAIR ' + item.pair;
+    stamp.textContent = t('pairStamp', { pair: item.pair });
     photo.append(image, stamp);
     inner.append(cover, photo);
     card.appendChild(inner);
@@ -152,7 +184,7 @@
     board.textContent = '';
     completeOverlay.classList.remove('is-open');
     completeOverlay.setAttribute('aria-hidden', 'true');
-    statusOutput.textContent = 'FIND THE PAIRS';
+    statusOutput.textContent = t('findPairs');
     updateStats();
     shuffle(MEMORY_CARDS).forEach(function (item, index) {
       board.appendChild(createCard(item, index));
@@ -161,6 +193,17 @@
 
   resetButton.addEventListener('click', resetGame);
   playAgainButton.addEventListener('click', resetGame);
+  window.addEventListener('cv-language-change', function () {
+    statusOutput.textContent = matches === 6 ? statusOutput.textContent : t('findPairs');
+    board.querySelectorAll('.memory-card').forEach(function (card, index) {
+      card.setAttribute('aria-label', t('hiddenCard', { index: index + 1 }));
+      var stamp = card.querySelector('.memory-pair-stamp');
+      if (stamp) stamp.textContent = t('pairStamp', { pair: card.dataset.pair });
+    });
+    if (completeOverlay.classList.contains('is-open')) {
+      completeSummary.textContent = t('completed', { moves: formatNumber(moves) });
+    }
+  });
   document.addEventListener('keydown', function (event) {
     if (event.key === 'Escape' && completeOverlay.classList.contains('is-open')) resetGame();
   });

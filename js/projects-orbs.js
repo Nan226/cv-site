@@ -53,7 +53,7 @@ function createOrbElement(definition) {
 
   element.type = 'button';
   element.dataset.projectId = project.id;
-  element.setAttribute('aria-label', 'Open ' + project.title + ' project details');
+  element.setAttribute('aria-label', project.openAria || ('Open ' + project.title + ' project details'));
 
   var star = document.createElement('span');
   star.className = 'project-physics-orb-star';
@@ -63,12 +63,21 @@ function createOrbElement(definition) {
   var label = document.createElement('span');
   label.className = 'project-physics-orb-label';
   var code = document.createElement('small');
-  code.textContent = project.code || 'ILLUMINATED PROJECT';
+  code.textContent = project.code || project.illuminatedLabel || 'ILLUMINATED PROJECT';
   var title = document.createElement('strong');
   title.textContent = project.sceneTitle || project.title;
   label.append(code, title);
   element.append(star, label);
   return element;
+}
+
+function updateOrbProjectElement(element, project) {
+  if (!element || !project) return;
+  element.setAttribute('aria-label', project.openAria || ('Open ' + project.title + ' project details'));
+  var code = element.querySelector('.project-physics-orb-label small');
+  var title = element.querySelector('.project-physics-orb-label strong');
+  if (code) code.textContent = project.code || project.illuminatedLabel || 'ILLUMINATED PROJECT';
+  if (title) title.textContent = project.sceneTitle || project.title;
 }
 
 function createFallback(shell, projects, onProjectClick) {
@@ -107,6 +116,11 @@ function createFallback(shell, projects, onProjectClick) {
   return {
     resetFocus: function () {},
     resize: function () {},
+    updateProjects: function (nextProjects) {
+      nextProjects.filter(function (project) { return project.state === 'active'; }).forEach(function (project) {
+        updateOrbProjectElement(layer.querySelector('[data-project-id="' + project.id + '"]'), project);
+      });
+    },
     dispose: function () {
       shell.classList.remove('is-fallback');
       shell.textContent = '';
@@ -370,6 +384,17 @@ export function initProjectsOrbs(section, stage, projectData, onProjectClick) {
     selectedEntry = null;
   }
 
+  function updateProjects(nextProjectData) {
+    activeProjects = nextProjectData.filter(function (project) { return project.state === 'active'; }).slice(0, 2);
+    entries.forEach(function (entry) {
+      if (!entry.definition.project) return;
+      var nextProject = activeProjects.find(function (project) { return project.id === entry.definition.project.id; });
+      if (!nextProject) return;
+      entry.definition.project = nextProject;
+      updateOrbProjectElement(entry.element, nextProject);
+    });
+  }
+
   var observer = new IntersectionObserver(function (observations) {
     observations.forEach(function (observation) {
       if (observation.isIntersecting) start();
@@ -396,6 +421,7 @@ export function initProjectsOrbs(section, stage, projectData, onProjectClick) {
   return {
     resetFocus: resetFocus,
     resize: resize,
+    updateProjects: updateProjects,
     dispose: function () {
       stop();
       observer.disconnect();

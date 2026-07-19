@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-language-ready="false">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>YE NAN — Portfolio</title>
   <meta name="description" content="YE NAN — builder, dreamer and braver. A playful portfolio of projects, internships, skills and memories.">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="css/style.css?v=20260718-2">
-  <link rel="stylesheet" href="css/play.css?v=20260718-2">
+  <link rel="stylesheet" href="css/style.css?v=20260719-1">
+  <link rel="stylesheet" href="css/play.css?v=20260719-1">
   <script defer src="js/vendor/lucide.min.js?v=0.468.0"></script>
   <script defer src="js/vendor/matter.min.js?v=0.20.0"></script>
   <script type="importmap">
@@ -24,18 +24,58 @@
   <!-- 背景飘浮彩带容器 (fixed，跨 section 显示) -->
   <div class="ribbons-container" id="ribbonsContainer" aria-hidden="true"></div>
 
+  <!-- ========== 首次语言选择弹框 ========== -->
+  <div class="language-gate" id="languageGate" aria-hidden="true">
+    <div class="language-gate-card" role="dialog" aria-modal="true" aria-labelledby="languageGateTitle" aria-describedby="languageGateText" tabindex="-1">
+      <p class="language-gate-kicker" data-i18n="languageGate.kicker">WELCOME FILE</p>
+      <h2 id="languageGateTitle" data-i18n="languageGate.title">Choose Your Language</h2>
+      <p id="languageGateText" data-i18n="languageGate.text">Select a language while the site prepares the magic.</p>
+      <div class="language-gate-actions">
+        <button class="language-gate-option" type="button" data-language-choice="en">
+          <span>English</span>
+          <small>Continue in EN</small>
+        </button>
+        <button class="language-gate-option" type="button" data-language-choice="zh">
+          <span>中文</span>
+          <small>进入中文版</small>
+        </button>
+      </div>
+      <p class="language-gate-loading" id="languageGateLoading" data-i18n="languageGate.loading">Preparing images, model and video...</p>
+    </div>
+  </div>
+
+  <!-- ========== 右下角常驻工具条 ========== -->
+  <div class="floating-tools" id="floatingTools" data-collapsed="false" aria-label="Quick actions">
+    <button class="floating-tools-handle" id="floatingToolsHandle" type="button" aria-label="Collapse quick actions" title="Collapse quick actions">
+      <span aria-hidden="true">YN</span>
+    </button>
+    <div class="floating-tools-panel" id="floatingToolsPanel">
+      <button class="floating-tool-btn" id="languageToggleBtn" type="button" aria-label="Switch language" title="Switch language">
+        <i data-lucide="languages" aria-hidden="true"></i>
+        <span data-i18n="tools.language">中文</span>
+      </button>
+      <button class="floating-tool-btn" id="resumeToolBtn" type="button" aria-label="Download resume" title="Download resume">
+        <i data-lucide="download" aria-hidden="true"></i>
+        <span data-i18n="tools.resume">Resume</span>
+      </button>
+      <button class="floating-tool-btn floating-tool-collapse" id="floatingToolsCollapse" type="button" aria-label="Collapse quick actions" title="Collapse quick actions">
+        <i data-lucide="chevron-down" aria-hidden="true"></i>
+      </button>
+    </div>
+  </div>
+
   <!-- ========== 顶部导航 (fixed，跨所有页面) ========== -->
   <nav class="navbar" id="mainNavbar">
-    <a href="#" class="nav-home" id="navHome" title="Back to Home" aria-label="Back to Home">
+    <a href="#" class="nav-home" id="navHome" title="Back to Home" aria-label="Back to Home" data-i18n-title="nav.homeTitle" data-i18n-aria-label="nav.homeTitle">
       <i data-lucide="house" class="nav-home-icon" aria-hidden="true"></i>
-      <span class="nav-home-text">Home</span>
+      <span class="nav-home-text" data-i18n="nav.home">Home</span>
     </a>
     <ul class="nav-list">
-      <li><a href="#" class="nav-item" data-text="About Me">About Me</a></li>
-      <li><a href="#" class="nav-item" data-text="Internship">Internship</a></li>
-      <li><a href="#" class="nav-item" data-text="Projects">Projects</a></li>
-      <li><a href="#" class="nav-item" data-text="Skills &amp; Learning">Skills &amp; Learning</a></li>
-      <li><a href="#" class="nav-item" data-text="Me &amp; My Friends">Me &amp; My Friends</a></li>
+      <li><a href="#" class="nav-item" data-section="about" data-i18n="nav.about" data-text="About Me">About Me</a></li>
+      <li><a href="#" class="nav-item" data-section="internship" data-i18n="nav.internship" data-text="Internship">Internship</a></li>
+      <li><a href="#" class="nav-item" data-section="projects" data-i18n="nav.projects" data-text="Projects">Projects</a></li>
+      <li><a href="#" class="nav-item" data-section="skills-learning" data-i18n="nav.skills" data-text="Skills &amp; Learning">Skills &amp; Learning</a></li>
+      <li><a href="#" class="nav-item" data-section="travel-memory" data-i18n="nav.friends" data-text="Me &amp; My Friends">Me &amp; My Friends</a></li>
     </ul>
   </nav>
 
@@ -48,12 +88,12 @@
   <!-- ========== Hero 区域 ========== -->
   <section class="hero">
     <h1 class="hero-name">YE NAN</h1>
-    <p class="hero-subtitle">Builder · Dreamer · Braver</p>
+    <p class="hero-subtitle" data-i18n="home.subtitle">Builder · Dreamer · Braver</p>
   </section>
 
   <!-- 左右交互提示 -->
-  <div class="interact-hint" id="interactHint">Click the character to interact</div>
-  <div class="easter-egg-hint" id="easterEggHint">Tear all tags to unlock easter egg</div>
+  <div class="interact-hint" id="interactHint" data-i18n="home.interactHint">Click the character to interact</div>
+  <div class="easter-egg-hint" id="easterEggHint" data-i18n="home.easterHint">Tear all tags to unlock easter egg</div>
 
   <!-- ========== 角色展示区（Three.js 3D人物） ========== -->
   <section class="character-area">
@@ -74,29 +114,29 @@
       <!-- Loading spinner -->
       <div class="loading-spinner" id="loadingSpinner">
         <div class="spinner-ring"></div>
-        <span class="spinner-text">loading</span>
+        <span class="spinner-text" data-i18n="home.loading">loading</span>
       </div>
 
       <!-- 倒计时（在人物背后） -->
       <div class="countdown-display" id="countdownDisplay"></div>
       <p class="model-status" id="modelStatus" role="status" aria-live="polite">
-        Preparing 3D character...
+        <span data-i18n="home.modelPreparing">Preparing 3D character...</span>
       </p>
 
       <!-- 角色左右标签 -->
       <div class="character-tags tags-left">
-        <span class="tag">PMO</span>
-        <span class="tag">ENFP</span>
-        <span class="tag">Metaverse</span>
-        <span class="tag">Cross-functional Communicator</span>
-        <span class="tag">AI Enthusiast</span>
+        <span class="tag" data-i18n="home.tagPmo">PMO</span>
+        <span class="tag" data-i18n="home.tagEnfp">ENFP</span>
+        <span class="tag" data-i18n="home.tagMetaverse">Metaverse</span>
+        <span class="tag" data-i18n="home.tagCommunicator">Cross-functional Communicator</span>
+        <span class="tag" data-i18n="home.tagAi">AI Enthusiast</span>
       </div>
       <div class="character-tags tags-right">
-        <span class="tag">Fast Learner</span>
-        <span class="tag">Creative</span>
-        <span class="tag">Strong Execution</span>
-        <span class="tag">Data-driven</span>
-        <span class="tag">CS Background</span>
+        <span class="tag" data-i18n="home.tagLearner">Fast Learner</span>
+        <span class="tag" data-i18n="home.tagCreative">Creative</span>
+        <span class="tag" data-i18n="home.tagExecution">Strong Execution</span>
+        <span class="tag" data-i18n="home.tagData">Data-driven</span>
+        <span class="tag" data-i18n="home.tagCs">CS Background</span>
       </div>
 
     </div>
@@ -104,7 +144,7 @@
 
   <!-- ========== 底部 ========== -->
   <footer class="footer">
-    <p class="footer-text">COURAGE MATTERS MORE THAN COMPETENCE</p>
+    <p class="footer-text" data-i18n="home.footer">COURAGE MATTERS MORE THAN COMPETENCE</p>
   </footer>
 
   </section><!-- /#home -->
@@ -114,12 +154,12 @@
 
     <!-- 标题区 -->
     <div class="about-header">
-      <h2 class="about-main-title">About Me</h2>
+      <h2 class="about-main-title" data-i18n="about.title">About Me</h2>
     </div>
 
     <!-- 时间线 -->
     <div class="about-timeline">
-      <span class="timeline-label">Timeline</span>
+      <span class="timeline-label" data-i18n="about.timeline">Timeline</span>
       <div class="timeline-track" id="timelineTrack">
         <!-- JS 动态填充 -->
       </div>
@@ -145,8 +185,8 @@
 
       <!-- 标题 -->
       <div class="internship-header">
-        <h2 class="internship-main-title">Internship Journey</h2>
-        <p class="internship-subtitle">Three chapters of practice</p>
+        <h2 class="internship-main-title" data-i18n="internship.title">Internship Journey</h2>
+        <p class="internship-subtitle" data-i18n="internship.subtitle">Three chapters of practice</p>
       </div>
 
       <!-- 内容区 -->
@@ -169,10 +209,10 @@
   <section id="projects" class="page-section projects-section">
     <div class="projects-stage" id="projectsStage">
       <div class="projects-header">
-        <h2 class="projects-main-title">Project Showcase</h2>
-        <p class="projects-tagline">Click the glowing orbs to explore each project.</p>
+        <h2 class="projects-main-title" data-i18n="projects.title">Project Showcase</h2>
+        <p class="projects-tagline" data-i18n="projects.tagline">Click the glowing orbs to explore each project.</p>
       </div>
-      <div class="projects-scene-shell" id="projectsSceneShell" aria-label="Interactive project sphere field"></div>
+      <div class="projects-scene-shell" id="projectsSceneShell" aria-label="Interactive project sphere field" data-i18n-aria-label="projects.sceneAria"></div>
       <div id="projectMorphOrigin" class="project-morph-origin" aria-hidden="true"></div>
     </div>
     <div class="projects-expand-overlay" id="projectsExpandOverlay">
@@ -192,30 +232,30 @@
 
     <div class="skills-learning-layout">
       <header class="skills-learning-copy">
-        <p class="skills-learning-kicker">PROFILE DECK 09</p>
-        <h2 class="skills-learning-title">Skills<br><span class="skills-learning-title-second">&amp; Learning</span></h2>
-        <p class="skills-learning-tagline">Built through practice. Expanded through curiosity.</p>
-        <div class="skills-learning-counts" aria-label="Deck contents">
-          <span><b>06</b> Skills</span>
-          <span><b>02</b> Learning</span>
-          <span><b>01</b> Play</span>
+        <p class="skills-learning-kicker" data-i18n="skills.kicker">PROFILE DECK 09</p>
+        <h2 class="skills-learning-title"><span data-i18n="skills.titleA">Skills</span><br><span class="skills-learning-title-second" data-i18n="skills.titleB">&amp; Learning</span></h2>
+        <p class="skills-learning-tagline" data-i18n="skills.tagline">Built through practice. Expanded through curiosity.</p>
+        <div class="skills-learning-counts" aria-label="Deck contents" data-i18n-aria-label="skills.countsAria">
+          <span><b>06</b> <span data-i18n="skills.countSkills">Skills</span></span>
+          <span><b>02</b> <span data-i18n="skills.countLearning">Learning</span></span>
+          <span><b>01</b> <span data-i18n="skills.countPlay">Play</span></span>
         </div>
       </header>
 
       <div class="skills-board-wrap">
         <div class="skills-board-labels" aria-hidden="true">
-          <span>SKILL</span>
-          <span class="skills-board-label-learning">LEARNING / PLAY</span>
+          <span data-i18n="skills.boardSkill">SKILL</span>
+          <span class="skills-board-label-learning" data-i18n="skills.boardLearning">LEARNING / PLAY</span>
         </div>
-        <div class="skills-board" id="skillsLearningGrid" aria-label="Skills and learning flip cards"></div>
+        <div class="skills-board" id="skillsLearningGrid" aria-label="Skills and learning flip cards" data-i18n-aria-label="skills.gridAria"></div>
       </div>
 
       <aside class="skills-chiikawa" aria-label="Chiikawa companions">
-        <p class="skills-chiikawa-label">CURIOSITY CREW</p>
+        <p class="skills-chiikawa-label" data-i18n="skills.crew">CURIOSITY CREW</p>
         <div class="skills-chiikawa-crop">
           <img src="assets/play/companion.webp" alt="Chiikawa friends holding ice cream" loading="eager" decoding="async" fetchpriority="low">
         </div>
-        <p class="skills-chiikawa-note">Keep learning.<br>Keep playing.</p>
+        <p class="skills-chiikawa-note" data-i18n-html="skills.note">Keep learning.<br>Keep playing.</p>
       </aside>
     </div>
   </section>
@@ -232,48 +272,48 @@
 
     <div class="memory-layout">
       <section class="memory-stats" aria-labelledby="memoryTitle">
-        <p class="memory-kicker">MEMORY FILE 06</p>
-        <h2 id="memoryTitle" aria-label="Me &amp; My Friends">Me &amp; My<br> Friends</h2>
+        <p class="memory-kicker" data-i18n="memory.kicker">MEMORY FILE 06</p>
+        <h2 id="memoryTitle" aria-label="Me &amp; My Friends" data-i18n-html="memory.title" data-i18n-aria-label="memory.titleAria">Me &amp; My<br> Friends</h2>
         <div class="memory-stat-lines">
-          <p><span>Matches</span><strong id="memoryMatches">00 / 06</strong></p>
-          <p><span>Moves</span><strong id="memoryMoves">00</strong></p>
+          <p><span data-i18n="memory.matches">Matches</span><strong id="memoryMatches">00 / 06</strong></p>
+          <p><span data-i18n="memory.moves">Moves</span><strong id="memoryMoves">00</strong></p>
         </div>
         <div class="memory-status-row">
           <p class="memory-status" id="memoryStatus" aria-live="polite">FIND THE PAIRS</p>
           <div class="memory-inline-actions">
-            <a class="memory-icon-button" href="#skills-learning" aria-label="Back to Skills and Learning" title="Back to Skills and Learning">
+            <a class="memory-icon-button" href="#skills-learning" aria-label="Back to Skills and Learning" title="Back to Skills and Learning" data-i18n-aria-label="memory.backAria" data-i18n-title="memory.backAria">
               <span aria-hidden="true">&uarr;</span>
             </a>
-            <button class="memory-icon-button" id="memoryReset" type="button" aria-label="Shuffle and restart" title="Shuffle and restart">
+            <button class="memory-icon-button" id="memoryReset" type="button" aria-label="Shuffle and restart" title="Shuffle and restart" data-i18n-aria-label="memory.resetAria" data-i18n-title="memory.resetAria">
               <span aria-hidden="true">&#8635;</span>
             </button>
           </div>
         </div>
       </section>
 
-      <section class="memory-board-shell" aria-label="Me and my friends memory card game">
+      <section class="memory-board-shell" aria-label="Me and my friends memory card game" data-i18n-aria-label="memory.boardAria">
         <div class="memory-board-header" aria-hidden="true">
-          <span>PAIR THE STAMPS</span>
-          <span>12 CARDS</span>
+          <span data-i18n="memory.boardHeaderA">PAIR THE STAMPS</span>
+          <span data-i18n="memory.boardHeaderB">12 CARDS</span>
         </div>
         <div class="memory-board" id="memoryBoard"></div>
       </section>
 
       <aside class="memory-companion" aria-label="Chiikawa memory crew">
-        <p>MEMORY CREW</p>
+        <p data-i18n="memory.crew">MEMORY CREW</p>
         <div class="memory-companion-crop">
           <img src="assets/play/companion.webp" alt="Chiikawa friends holding ice cream" loading="eager" decoding="async" fetchpriority="low">
         </div>
-        <span>Little moments,<br>kept together.</span>
+        <span data-i18n-html="memory.note">Little moments,<br>kept together.</span>
       </aside>
     </div>
 
     <div class="memory-complete" id="memoryComplete" aria-hidden="true">
       <div class="memory-complete-panel" role="dialog" aria-labelledby="memoryCompleteTitle">
         <span>06 / 06</span>
-        <h2 id="memoryCompleteTitle">All memories found</h2>
+        <h2 id="memoryCompleteTitle" data-i18n="memory.completeTitle">All memories found</h2>
         <p id="memoryCompleteSummary">Completed in 00 moves.</p>
-        <button id="memoryPlayAgain" type="button">Play Again</button>
+        <button id="memoryPlayAgain" type="button" data-i18n="memory.playAgain">Play Again</button>
       </div>
     </div>
   </section>
@@ -287,10 +327,10 @@
     <div class="blink-lid blink-lid-bottom" id="blinkLidBottom"></div>
     <!-- Slogan 左右分列，不被人物遮挡 -->
     <div class="easter-egg-slogan slogan-left" id="easterEggSloganLeft">
-      SHATTER THE<br>LABELS.
+      <span data-i18n-html="easter.left">SHATTER THE<br>LABELS.</span>
     </div>
     <div class="easter-egg-slogan slogan-right" id="easterEggSloganRight">
-      BEYOND<br>DEFINITION.
+      <span data-i18n-html="easter.right">BEYOND<br>DEFINITION.</span>
     </div>
     <!-- 暗黑粒子容器 -->
     <div class="dark-particles" id="darkParticles"></div>
@@ -300,7 +340,7 @@
       <div class="chain-handle"></div>
     </div>
     <!-- 拉绳提示文字 -->
-    <p class="pull-chain-hint">Pull the chain to bring back the light</p>
+    <p class="pull-chain-hint" data-i18n="easter.pullHint">Pull the chain to bring back the light</p>
   </div>
 
   <!-- ========== Skills 媒体展示窗口 ========== -->
@@ -317,10 +357,10 @@
         <span></span><span></span><span></span>
       </div>
       <div class="skill-showcase-window-title">
-        <span>AI VIDEO</span>
-        <strong id="skillShowcaseTitle">SHOWCASE</strong>
+        <span data-i18n="showcase.kicker">AI VIDEO</span>
+        <strong id="skillShowcaseTitle" data-i18n="showcase.title">SHOWCASE</strong>
       </div>
-      <button class="skill-showcase-close" id="skillShowcaseClose" type="button" aria-label="Close AI Video Production showcase" tabindex="-1">
+      <button class="skill-showcase-close" id="skillShowcaseClose" type="button" aria-label="Close AI Video Production showcase" tabindex="-1" data-i18n-aria-label="showcase.closeAria">
         <i data-lucide="x" style="width:1rem;height:1rem"></i>
       </button>
     </div>
@@ -333,19 +373,20 @@
           playsinline
           preload="auto"
           aria-label="AI Video Production video"
+          data-i18n-aria-label="showcase.videoAria"
         ></video>
-        <button class="skill-showcase-play-toggle" id="skillShowcasePlayToggle" type="button" aria-label="Play video">
+        <button class="skill-showcase-play-toggle" id="skillShowcasePlayToggle" type="button" aria-label="Play video" data-i18n-aria-label="showcase.playAria">
           <span id="skillShowcasePlayGlyph" aria-hidden="true">&#9654;</span>
         </button>
         <div class="skill-showcase-empty" id="skillShowcaseEmpty">
           <i data-lucide="clapperboard" style="width:1.7rem;height:1.7rem"></i>
-          <strong>AI Video Production</strong>
-          <span id="skillShowcaseEmptyText">Video source pending</span>
+          <strong data-i18n="showcase.emptyTitle">AI Video Production</strong>
+          <span id="skillShowcaseEmptyText" data-i18n="showcase.emptyText">Video source pending</span>
         </div>
       </div>
       <div class="skill-showcase-meta">
-        <span>AI-assisted storytelling</span>
-        <span id="skillShowcaseStatus">READY TO LOAD</span>
+        <span data-i18n="showcase.meta">AI-assisted storytelling</span>
+        <span id="skillShowcaseStatus" data-i18n="showcase.statusReadyToLoad">READY TO LOAD</span>
       </div>
     </div>
   </div>
@@ -353,12 +394,12 @@
   <!-- ========== Skills 行为确认框 ========== -->
   <div class="skill-action-confirm" id="skillActionConfirm" aria-hidden="true">
     <div class="skill-action-confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="skillActionConfirmTitle" aria-describedby="skillActionConfirmText" tabindex="-1">
-      <p class="skill-action-confirm-kicker" id="skillActionConfirmKicker">BEFORE YOU GO</p>
-      <h3 id="skillActionConfirmTitle">Continue?</h3>
-      <p id="skillActionConfirmText">Choose whether to continue.</p>
+      <p class="skill-action-confirm-kicker" id="skillActionConfirmKicker" data-i18n="confirm.kicker">BEFORE YOU GO</p>
+      <h3 id="skillActionConfirmTitle" data-i18n="confirm.title">Continue?</h3>
+      <p id="skillActionConfirmText" data-i18n="confirm.text">Choose whether to continue.</p>
       <div class="skill-action-confirm-actions">
-        <button class="skill-action-confirm-cancel" id="skillActionConfirmCancel" type="button">Not Now</button>
-        <button class="skill-action-confirm-submit" id="skillActionConfirmSubmit" type="button">Continue</button>
+        <button class="skill-action-confirm-cancel" id="skillActionConfirmCancel" type="button" data-i18n="confirm.cancel">Not Now</button>
+        <button class="skill-action-confirm-submit" id="skillActionConfirmSubmit" type="button" data-i18n="confirm.submit">Continue</button>
       </div>
     </div>
   </div>
@@ -366,27 +407,27 @@
   <!-- ========== 简历下载弹框 ========== -->
   <div class="resume-dialog-overlay" id="resumeDialogOverlay">
     <div class="resume-dialog">
-      <button class="resume-dialog-close" id="resumeDialogClose" aria-label="Close">
+      <button class="resume-dialog-close" id="resumeDialogClose" aria-label="Close" data-i18n-aria-label="resume.closeAria">
         <i data-lucide="x" style="width:1.1rem;height:1.1rem"></i>
       </button>
-      <h3 class="resume-dialog-title">Download Resume</h3>
-      <p class="resume-dialog-sub">Choose your preferred language</p>
+      <h3 class="resume-dialog-title" data-i18n="resume.title">Download Resume</h3>
+      <p class="resume-dialog-sub" data-i18n="resume.subtitle">Choose your preferred language</p>
       <div class="resume-dialog-options">
-        <button class="resume-dialog-option is-disabled" disabled>
+        <a class="resume-dialog-option" href="assets/resume/%E5%8F%B6%E6%A5%A0_%E9%A6%99%E6%B8%AF%E7%90%86%E5%B7%A5%E5%A4%A7%E5%AD%A6-PMO.pdf" download="Ye_Nan_Resume_CN.pdf">
           <i data-lucide="file-text" style="width:1.4rem;height:1.4rem"></i>
           <span class="resume-opt-lang">中文</span>
-          <span class="resume-opt-hint">Coming Soon</span>
-        </button>
+          <span class="resume-opt-hint" data-i18n="resume.downloadCn">PDF · 下载</span>
+        </a>
         <a class="resume-dialog-option" href="assets/resume/Nan-YE.pdf" download="Nan_YE_Resume.pdf">
           <i data-lucide="file-text" style="width:1.4rem;height:1.4rem"></i>
           <span class="resume-opt-lang">English</span>
-          <span class="resume-opt-hint">PDF · Download</span>
+          <span class="resume-opt-hint" data-i18n="resume.downloadEn">PDF · Download</span>
         </a>
       </div>
     </div>
   </div>
 
-  <script src="js/play.js?v=20260718-2"></script>
-  <script type="module" src="js/main.js?v=20260718-2"></script>
+  <script src="js/play.js?v=20260719-1"></script>
+  <script type="module" src="js/main.js?v=20260719-1"></script>
 </body>
 </html>

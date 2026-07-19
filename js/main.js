@@ -5,7 +5,667 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
-import { initProjectsOrbs } from './projects-orbs.js?v=20260717-8';
+import { initProjectsOrbs } from './projects-orbs.js?v=20260719-1';
+
+const LANGUAGE_KEY = 'cv-site-language';
+const DEFAULT_LANGUAGE = 'en';
+const I18N = {
+  en: {
+    languageGate: {
+      kicker: 'WELCOME FILE',
+      title: 'Choose Your Language',
+      text: 'Select a language while the site prepares the magic.',
+      loading: 'Preparing images, model and video...'
+    },
+    tools: { language: '中文', resume: 'Resume', expand: 'Expand quick actions', collapse: 'Collapse quick actions' },
+    nav: {
+      home: 'Home',
+      homeTitle: 'Back to Home',
+      about: 'About Me',
+      internship: 'Internship',
+      projects: 'Projects',
+      skills: 'Skills & Learning',
+      friends: 'Me & My Friends'
+    },
+    home: {
+      subtitle: 'Builder · Dreamer · Braver',
+      interactHint: 'Click the character to interact',
+      easterHint: 'Tear all tags to unlock easter egg',
+      loading: 'loading',
+      modelPreparing: 'Preparing 3D character...',
+      modelLoading: 'Loading 3D character...',
+      modelRetrying: 'Retrying 3D character...',
+      modelReady: '3D character ready',
+      modelStillLoading: 'Still loading 3D character...',
+      modelStatic: 'Static character preview',
+      tagPmo: 'PMO',
+      tagEnfp: 'ENFP',
+      tagMetaverse: 'Metaverse',
+      tagCommunicator: 'Cross-functional Communicator',
+      tagAi: 'AI Enthusiast',
+      tagLearner: 'Fast Learner',
+      tagCreative: 'Creative',
+      tagExecution: 'Strong Execution',
+      tagData: 'Data-driven',
+      tagCs: 'CS Background',
+      footer: 'COURAGE MATTERS MORE THAN COMPETENCE'
+    },
+    about: { title: 'About Me', timeline: 'Timeline' },
+    internship: {
+      title: 'Internship Journey',
+      subtitle: 'Three chapters of practice',
+      cardKicker: 'Internship',
+      viewDetails: 'View Details',
+      back: 'Back to Journey',
+      responsibilities: 'Responsibilities',
+      methods: 'Tools & Methods',
+      highlights: 'Highlights'
+    },
+    projects: {
+      title: 'Project Showcase',
+      tagline: 'Click the glowing orbs to explore each project.',
+      sceneAria: 'Interactive project sphere field',
+      file: 'PROJECT FILE',
+      closeAria: 'Close project details',
+      highlights: 'Highlights',
+      techStack: 'Tech Stack',
+      status: 'Status',
+      openAriaPrefix: 'Open',
+      openAriaSuffix: 'project details',
+      illuminated: 'ILLUMINATED PROJECT'
+    },
+    skills: {
+      kicker: 'PROFILE DECK 09',
+      titleA: 'Skills',
+      titleB: '& Learning',
+      tagline: 'Built through practice. Expanded through curiosity.',
+      countsAria: 'Deck contents',
+      countSkills: 'Skills',
+      countLearning: 'Learning',
+      countPlay: 'Play',
+      boardSkill: 'SKILL',
+      boardLearning: 'LEARNING / PLAY',
+      gridAria: 'Skills and learning flip cards',
+      crew: 'CURIOSITY CREW',
+      note: 'Keep learning.<br>Keep playing.',
+      reveal: 'Reveal',
+      hide: 'Hide',
+      videoKicker: 'VIDEO SHOWCASE',
+      videoTitle: 'Open the AI Video showcase?',
+      videoText: 'This will open a movable video window with sound controls.',
+      videoConfirm: 'Open Video',
+      videoCancel: 'Not Now',
+      playKicker: 'BEFORE YOU GO',
+      playTitle: 'Start the flip-card game?',
+      playText: 'You will move to the next page and begin a six-pair memory round.',
+      playConfirm: 'Start Game',
+      playCancel: 'Stay Here'
+    },
+    memory: {
+      kicker: 'MEMORY FILE 06',
+      title: 'Me &amp; My<br> Friends',
+      titleAria: 'Me & My Friends',
+      matches: 'Matches',
+      moves: 'Moves',
+      backAria: 'Back to Skills and Learning',
+      resetAria: 'Shuffle and restart',
+      boardAria: 'Me and my friends memory card game',
+      boardHeaderA: 'PAIR THE STAMPS',
+      boardHeaderB: '12 CARDS',
+      crew: 'MEMORY CREW',
+      note: 'Little moments,<br>kept together.',
+      completeTitle: 'All memories found',
+      playAgain: 'Play Again'
+    },
+    easter: {
+      left: 'SHATTER THE<br>LABELS.',
+      right: 'BEYOND<br>DEFINITION.',
+      pullHint: 'Pull the chain to bring back the light'
+    },
+    showcase: {
+      kicker: 'AI VIDEO',
+      title: 'SHOWCASE',
+      closeAria: 'Close AI Video Production showcase',
+      videoAria: 'AI Video Production video',
+      playAria: 'Play video',
+      pauseAria: 'Pause video',
+      emptyTitle: 'AI Video Production',
+      emptyText: 'Video source pending',
+      buffering: 'Buffering video...',
+      couldNotLoad: 'Video could not be loaded',
+      meta: 'AI-assisted storytelling',
+      statusReadyToLoad: 'READY TO LOAD',
+      statusPreloading: 'PRELOADING',
+      statusPlayable: 'PLAYABLE',
+      statusReady: 'READY',
+      statusControls: 'USE VIDEO CONTROLS',
+      statusCheckSource: 'CHECK SOURCE'
+    },
+    confirm: {
+      kicker: 'BEFORE YOU GO',
+      title: 'Continue?',
+      text: 'Choose whether to continue.',
+      cancel: 'Not Now',
+      submit: 'Continue'
+    },
+    resume: {
+      title: 'Download Resume',
+      subtitle: 'Choose your preferred language',
+      closeAria: 'Close',
+      downloadCn: 'PDF · Download',
+      downloadEn: 'PDF · Download'
+    }
+  },
+  zh: {
+    languageGate: {
+      kicker: '欢迎档案',
+      title: '选择网站语言',
+      text: '你选择语言的时候，我会先把图片、模型和视频悄悄准备好。',
+      loading: '正在预加载图片、模型和视频...'
+    },
+    tools: { language: 'English', resume: '简历', expand: '展开快捷按钮', collapse: '收起快捷按钮' },
+    nav: {
+      home: '首页',
+      homeTitle: '回到首页',
+      about: '关于我',
+      internship: '实习经历',
+      projects: '项目展示',
+      skills: '技能与学习',
+      friends: '我和朋友们'
+    },
+    home: {
+      subtitle: '建造者 · 造梦者 · 勇敢者',
+      interactHint: '点击人物进行互动',
+      easterHint: '撕碎所有标签解锁彩蛋',
+      loading: '加载中',
+      modelPreparing: '正在准备 3D 人物...',
+      modelLoading: '正在加载 3D 人物...',
+      modelRetrying: '正在重试加载 3D 人物...',
+      modelReady: '3D 人物已准备好',
+      modelStillLoading: '3D 人物仍在加载中...',
+      modelStatic: '静态人物预览',
+      tagPmo: 'PMO',
+      tagEnfp: 'ENFP',
+      tagMetaverse: '元宇宙',
+      tagCommunicator: '跨团队沟通',
+      tagAi: 'AI 爱好者',
+      tagLearner: '快速学习',
+      tagCreative: '创意表达',
+      tagExecution: '执行力强',
+      tagData: '数据驱动',
+      tagCs: '计算机背景',
+      footer: '勇气比能力更重要'
+    },
+    about: { title: '关于我', timeline: '时间线' },
+    internship: {
+      title: '实习旅程',
+      subtitle: '三段实践章节',
+      cardKicker: '实习',
+      viewDetails: '查看详情',
+      back: '返回旅程',
+      responsibilities: '主要职责',
+      methods: '工具与方法',
+      highlights: '亮点成果'
+    },
+    projects: {
+      title: '项目展示',
+      tagline: '点击发光小球查看具体项目。',
+      sceneAria: '可互动的项目小球场',
+      file: '项目档案',
+      closeAria: '关闭项目详情',
+      highlights: '项目亮点',
+      techStack: '技术栈',
+      status: '状态',
+      openAriaPrefix: '打开',
+      openAriaSuffix: '项目详情',
+      illuminated: '发光项目'
+    },
+    skills: {
+      kicker: '能力卡组 09',
+      titleA: '技能',
+      titleB: '与学习',
+      tagline: '在实践中建立，在好奇里扩展。',
+      countsAria: '卡组内容',
+      countSkills: '技能',
+      countLearning: '学习',
+      countPlay: '游戏',
+      boardSkill: '技能',
+      boardLearning: '学习 / 游戏',
+      gridAria: '技能与学习翻牌卡片',
+      crew: '好奇小队',
+      note: '保持学习。<br>保持玩心。',
+      reveal: '翻开',
+      hide: '收起',
+      videoKicker: '视频展示',
+      videoTitle: '打开 AI Video 展示窗口吗？',
+      videoText: '这会打开一个可移动的视频窗口，并带有声音控制。',
+      videoConfirm: '打开视频',
+      videoCancel: '暂时不要',
+      playKicker: '出发之前',
+      playTitle: '开始翻牌游戏吗？',
+      playText: '你会移动到下一屏，开始一轮六组配对的记忆游戏。',
+      playConfirm: '开始游戏',
+      playCancel: '留在这里'
+    },
+    memory: {
+      kicker: '回忆档案 06',
+      title: '我和<br>朋友们',
+      titleAria: '我和朋友们',
+      matches: '配对',
+      moves: '步数',
+      backAria: '返回技能与学习',
+      resetAria: '重新洗牌开始',
+      boardAria: '我和朋友们的记忆翻牌游戏',
+      boardHeaderA: '配对这些印章',
+      boardHeaderB: '12 张卡片',
+      crew: '回忆小队',
+      note: '小小瞬间，<br>一起收藏。',
+      completeTitle: '全部回忆已找到',
+      playAgain: '再玩一次'
+    },
+    easter: {
+      left: '撕碎<br>标签。',
+      right: '超越<br>定义。',
+      pullHint: '拉动开关，把光带回来'
+    },
+    showcase: {
+      kicker: 'AI 视频',
+      title: '展示',
+      closeAria: '关闭 AI Video Production 展示窗口',
+      videoAria: 'AI Video Production 视频',
+      playAria: '播放视频',
+      pauseAria: '暂停视频',
+      emptyTitle: 'AI Video Production',
+      emptyText: '视频资源待加载',
+      buffering: '正在缓冲视频...',
+      couldNotLoad: '视频加载失败',
+      meta: 'AI 辅助叙事',
+      statusReadyToLoad: '准备加载',
+      statusPreloading: '预加载中',
+      statusPlayable: '可播放',
+      statusReady: '已就绪',
+      statusControls: '请使用视频控件',
+      statusCheckSource: '检查资源'
+    },
+    confirm: {
+      kicker: '出发之前',
+      title: '继续吗？',
+      text: '请选择是否继续。',
+      cancel: '暂时不要',
+      submit: '继续'
+    },
+    resume: {
+      title: '下载简历',
+      subtitle: '请选择你想下载的语言版本',
+      closeAria: '关闭',
+      downloadCn: 'PDF · 下载',
+      downloadEn: 'PDF · Download'
+    }
+  }
+};
+
+const ABOUT_TRANSLATIONS = {
+  zh: {
+    'base-info': {
+      period: '2003 年 2 月',
+      location: '福建泉州',
+      category: '基础信息',
+      title: '基础信息',
+      tags: ['enfp', '软妹', '00 后', '创作者', '学习者', { label: '电话', value: '183 5056 5182' }, { label: '微信', value: 'kunan0226' }, { label: '邮箱', value: 'kunan0226@163.com' }],
+      action: '简历'
+    },
+    huaqiao: {
+      period: '2020 年 9 月 - 2024 年 6 月',
+      location: '福建厦门',
+      category: '教育经历',
+      title: '华侨大学',
+      tags: ['GPA 前 10%', '一等奖学金', 'IELTS 6.5', 'CET-6', '班级生活委员', '桑梓微助理', '植物艺术社负责人']
+    },
+    keendata: {
+      period: '2025 年 4 月 - 2025 年 8 月',
+      location: '广东深圳',
+      category: '实习经历',
+      title: 'Keendata',
+      subtitle: '项目管理实习生',
+      tags: ['大数据平台', '问题跟踪', '需求管理', '定制化交付'],
+      action: '查看详情'
+    },
+    polyu: {
+      period: '2025 年 9 月',
+      location: '香港红磡',
+      category: '教育经历',
+      title: '香港理工大学',
+      tags: ['QS 前 50', '元宇宙', 'GPA 前 10%']
+    },
+    xgrids: {
+      period: '2026 年 1 月 - 2026 年 5 月',
+      location: '广东深圳',
+      category: '实习经历',
+      title: 'XGRIDS',
+      subtitle: '项目管理实习生',
+      tags: ['软件交付', '3D 重建', '空间计算'],
+      action: '查看详情'
+    },
+    chery: {
+      period: '2026 年 5 月 - 至今',
+      location: '安徽芜湖',
+      category: '实习经历',
+      title: '奇瑞',
+      subtitle: '智能驾驶项目管理实习生',
+      tags: ['智能驾驶', 'ADSD', 'Jira 治理', '质量管理', 'Robotaxi'],
+      action: '查看详情'
+    }
+  }
+};
+
+const INTERNSHIP_TRANSLATIONS = {
+  zh: {
+    keendata: {
+      role: '数据开发实习生',
+      period: '2025 年 4 月 - 2025 年 8 月',
+      location: '广东深圳',
+      summary: '支持大数据平台开发、系统部署和项目交付流程，把软件工程实践与跨团队协作结合起来。',
+      tags: ['大数据', 'Java 开发', 'Hadoop', 'Bug 管理'],
+      responsibilities: [
+        '协助 Hadoop 集群部署与环境配置，梳理部署流程并沉淀技术文档',
+        '开发 Java 内部通知模块，完成实现、测试与验证，支撑系统通信需求',
+        '跟踪 20+ 个系统级问题，协调 Bug 验证、打包、部署与发布流程',
+        '与技术团队协作排查系统问题，维护问题记录并推动缺陷闭环'
+      ],
+      methods: ['Java 后端模块开发', 'Hadoop 集群部署与环境配置', 'Bug 跟踪、排查与发布验证', '技术文档与流程标准化', '跨团队沟通与进度跟踪'],
+      highlights: ['完成 Java 通知模块从开发到验证的交付', '沉淀标准化部署文档，提高环境搭建和知识转移效率', '支持 20+ 个系统级问题闭环，提升交付质量']
+    },
+    xgrids: {
+      role: '项目管理实习生',
+      period: '2026 年 1 月 - 2026 年 5 月',
+      location: '广东深圳',
+      summary: '支持 3D 重建软硬件一体产品的敏捷交付、AI 流程优化与产品迭代。',
+      tags: ['敏捷交付', 'AI 自动化', '3D 重建', '项目管理'],
+      responsibilities: [
+        '支持 3D 重建手持扫描产品的软件硬件一体化迭代与交付管理，跟踪需求、进度和发布节点',
+        '协调研发、产品、算法、硬件、测试等团队，保障产品生命周期中的信息对齐',
+        '管理 30+ 个核心需求，支持需求评审、优先级排序、排期、测试与发布',
+        '进行 Bug 跟踪分析与缺陷管理，通过数据洞察提升团队流程效率',
+        '使用 AI 工具探索风险提醒、自动排期和项目状态管理等智能化方案'
+      ],
+      methods: ['敏捷/Scrum 迭代规划与里程碑跟踪', 'Jira backlog 与需求生命周期管理', '产品、工程和测试跨团队协作', 'Bug 分析、优先级排序与缺陷生命周期管理', 'AI 辅助流程优化与自动化探索'],
+      highlights: ['协调 5 个跨职能团队，支持软硬件一体产品端到端交付', '跟踪管理 30+ 个需求，提升需求可见性与交付协同', '应用 AI 工具和数据分析优化 Bug 管理流程', '支持 SOP 优化，提升研发协作效率']
+    },
+    chery: {
+      company: '奇瑞',
+      role: '智能驾驶项目管理实习生',
+      period: '2026 年 5 月 - 至今',
+      location: '安徽芜湖',
+      summary: '支持 Robotaxi 项目交付、跨团队协同和智能驾驶开发中的 PMO 流程优化。',
+      tags: ['智能驾驶', 'PMO', 'Jira 管理', '项目协同'],
+      responsibilities: [
+        '支持 Robotaxi 智能驾驶项目规划与执行管理，跟踪开发里程碑、排期与交付进度',
+        '协调研发、测试和工程团队沟通，组织项目会议、跟进待办事项并推动跨团队对齐',
+        '管理 Jira 问题生命周期，包括需求跟踪、缺陷跟进和流程监控，提升问题可见性与解决效率',
+        '与质量团队协作优化 Bug 跟踪流程，建立提醒机制，支持问题闭环管理',
+        '协助项目资源管理，包括车辆资源、测试资源协调和部分成本跟踪'
+      ],
+      methods: ['Jira 流程管理与问题生命周期跟踪', '项目排期管理与里程碑跟踪', '跨职能沟通与会议协调', '资源跟踪与风险识别', '提升项目透明度和自动提醒的数字化工具'],
+      highlights: ['支持 Robotaxi 智能驾驶项目交付管理，提升开发进度和关键里程碑可见性', '建立 Jira 问题跟踪与提醒机制，提升逾期问题管理和升级效率', '维护车辆、测试与交付准备相关资源跟踪流程', '通过标准化汇报和跨团队协作提升 PMO 效率']
+    }
+  }
+};
+
+const PROJECT_TRANSLATIONS = {
+  zh: {
+    robotaxi: {
+      title: 'Robotaxi 智能驾驶',
+      category: '技术',
+      summary: '自研 L4 Robotaxi 智能驾驶系统概念占位。',
+      description: '未来 L4 Robotaxi 智能驾驶项目占位，等待补充详细内容。',
+      tags: ['智能驾驶', 'Robotaxi', 'VLA 模型', 'Jira', 'PMO']
+    },
+    'ai-pm': {
+      title: 'AI 驱动的项目管理平台',
+      sceneTitle: 'AI 项目管理',
+      category: '产品设计',
+      tagline: '用于提升项目可见性与执行效率的智能工作流系统',
+      summary: '设计轻量级 AI 项目管理平台，解决排期可见性不足、流程复杂和跨 PM、开发、测试、UI 团队协作低效的问题。',
+      role: '产品经理 / AI 方案设计',
+      description: '设计轻量级 AI 项目管理平台，解决排期可见性不足、流程复杂和跨 PM、开发、测试、UI 团队协作低效的问题。',
+      status: 'MVP 开发与测试阶段',
+      techStack: ['AI Agent', '产品设计', 'PMO', '工作流自动化'],
+      tags: ['AI Agent', '产品设计', 'PMO', '工作流自动化'],
+      highlights: [
+        '访谈 17 位研发成员，将协作痛点转化为产品需求和 MVP 路线图',
+        '设计连接需求、任务和 Bug 的核心数据模型，并规划三级权限体系',
+        '提出项目健康度、可拖拽任务看板、阻塞提醒和逾期自动升级等智能工作流机制',
+        '设计风险预测、排期辅助、延迟识别通知、自动项目报告和复盘等 AI Agent 场景'
+      ]
+    },
+    metafit: {
+      title: 'MetaFit - AI 时尚推荐与虚拟试穿',
+      sceneTitle: 'MetaFit 虚拟试穿',
+      category: '产品设计',
+      tagline: '结合 LLM 推荐与 AIGC 虚拟试穿，提升个性化购物体验',
+      summary: '开发端到端智能时尚系统，集成 LLM 推荐和 AIGC 虚拟试穿，提升线上购物个性化和用户体验。',
+      role: '项目负责人 / AI 产品设计',
+      description: '开发端到端智能时尚系统，集成 LLM 推荐和 AIGC 虚拟试穿，提升线上购物个性化和用户体验。',
+      status: 'MVP 开发与集成测试',
+      techStack: ['LLM', 'RAG', 'AIGC', '计算机视觉', 'Prompt Engineering'],
+      tags: ['LLM', 'RAG', 'AIGC', '计算机视觉', 'Prompt Engineering'],
+      highlights: [
+        '参与系统架构设计，构建完整流程：用户意图 -> RAG 推荐 -> AIGC 虚拟试穿',
+        '定义 MVP 功能并协调前后端模块开发进度',
+        '设计并优化覆盖品类、材质、风格和版型偏好的结构化提示词',
+        '通过 Bad Case 分析推荐偏差和生成失败，提升提示词鲁棒性',
+        '协调集成测试并收集用户反馈，指导后续迭代'
+      ]
+    },
+    'metaverse-classroom': { title: '元宇宙课堂（即将更新）', category: '创意', summary: '正在探索中的虚拟现实课堂体验。', description: '元宇宙课堂产品概念探索，结合实时 3D 环境与协作学习流程，目前处于早期构思阶段。', tags: ['元宇宙', 'VR', '教育科技'] },
+    'ar-showroom': { title: 'AR 展厅（即将更新）', category: '创意', summary: '正在探索中的增强现实产品展厅。', description: '基于增强现实的产品展厅概念，探索沉浸式品牌体验、移动端兼容和 3D 资产流程。', tags: ['AR', '3D', '品牌'] },
+    'ai-research': { title: 'AI 研究实验室（即将更新）', category: '技术', summary: '探索 AI 驱动产品创新的研究项目。', description: '围绕真实产品场景探索 AI 能力，包括 LLM 集成、提示词工程和应用型机器学习。', tags: ['AI', 'LLM', '研究'] },
+    'iot-garden': { title: 'IoT 智能花园（即将更新）', category: '技术', summary: '早期设计中的 IoT 智能园艺系统。', description: '基于 IoT 的智能花园概念，整合土壤传感器、自动浇水和移动端看板。', tags: ['IoT', '硬件', '传感器'] },
+    'data-viz': { title: '数据可视化（即将更新）', category: '创意', summary: '设计中的交互式数据可视化工具。', description: 'Web 数据可视化平台概念，探索交互图表、实时数据流和审美化叙事。', tags: ['数据可视化', 'D3', '叙事'] }
+  }
+};
+
+const SKILL_TRANSLATIONS = {
+  zh: {
+    0: { faceLabel: '技能 01', backLabel: '技能', title: 'Scrum', description: '围绕冲刺规划、每日同步、评审和复盘建立交付节奏。' },
+    1: { faceLabel: '技能 02', backLabel: '展示技能', title: 'AI Video 制作', description: '通过提示词构建分镜、生成视觉、剪辑并完成叙事组装。' },
+    2: { faceLabel: '学习 01', backLabel: '学习', title: '产品策略', description: '连接市场信号、用户价值和业务取舍。' },
+    3: { faceLabel: '技能 03', backLabel: '技能', title: '项目管理', description: '把模糊目标拆成负责人、里程碑、风险和决策。' },
+    4: { faceLabel: '技能 04', backLabel: '技能', title: '跨职能协作', description: '让产品、设计、工程和利益相关方保持对齐。' },
+    5: { faceLabel: '学习 02', backLabel: '学习', title: '生成式 AI 工作流', description: '测试 Agent、多模态工具和可复用的 AI 辅助系统。' },
+    6: { faceLabel: '技能 05', backLabel: '技能', title: '数据分析', description: '用指标、问题模式和交付信号辅助更清晰的判断。' },
+    7: { faceLabel: '技能 06', backLabel: '技能', title: '3D 与空间计算', description: '接触 3D 重建、SLAM 和数字孪生相关工作流。' },
+    8: { faceLabel: '游戏', backLabel: '记忆游戏', title: '我和朋友们', description: '六组人物、地点和小小冒险的配对记忆。' }
+  }
+};
+
+const WARMUP_ASSETS = [
+  'assets/home/character-fallback.webp',
+  'assets/home/character.glb',
+  'assets/about/profile.webp',
+  'assets/about/huaqiao.webp',
+  'assets/about/keendata.webp',
+  'assets/about/polyu.webp',
+  'assets/about/xgrids.webp',
+  'assets/about/chery.webp',
+  'assets/internship/keendata.webp',
+  'assets/internship/xgrids.webp',
+  'assets/internship/chery.webp',
+  'assets/projects/chiikawa-spring.webp',
+  'assets/play/companion.webp',
+  'assets/play/pair-01-a.webp',
+  'assets/play/pair-01-b.webp',
+  'assets/play/pair-02-a.webp',
+  'assets/play/pair-02-b.webp',
+  'assets/play/pair-03-a.webp',
+  'assets/play/pair-03-b.webp',
+  'assets/play/pair-04-a.webp',
+  'assets/play/pair-04-b.webp',
+  'assets/play/pair-05-a.webp',
+  'assets/play/pair-05-b.webp',
+  'assets/play/pair-06-a.webp',
+  'assets/play/pair-06-b.webp'
+];
+
+let currentLanguage = localStorage.getItem(LANGUAGE_KEY) || DEFAULT_LANGUAGE;
+let warmupStarted = false;
+
+function t(key, lang) {
+  var source = I18N[lang || currentLanguage] || I18N[DEFAULT_LANGUAGE];
+  return key.split('.').reduce(function (value, part) {
+    return value && Object.prototype.hasOwnProperty.call(value, part) ? value[part] : undefined;
+  }, source) ?? key;
+}
+
+function getLocalized(base, translations, id) {
+  var localized = translations[currentLanguage] && translations[currentLanguage][id];
+  return localized ? Object.assign({}, base, localized) : base;
+}
+
+function updateTearText(el, value) {
+  var wrap = el.closest('.nav-tear-wrap');
+  el.textContent = value;
+  el.dataset.text = value;
+  if (!wrap) return;
+  wrap.querySelectorAll('.nav-tear-half').forEach(function (half) {
+    half.textContent = value;
+  });
+}
+
+function updateTagText(el, value) {
+  var inner = el.querySelector('.tag-inner');
+  if (!inner) {
+    el.textContent = value;
+    return;
+  }
+  inner.querySelectorAll('.tag-orig,.tag-shard').forEach(function (part) {
+    part.textContent = value;
+  });
+}
+
+function applyStaticTranslations() {
+  document.documentElement.lang = currentLanguage === 'zh' ? 'zh-CN' : 'en';
+  document.querySelectorAll('[data-i18n]').forEach(function (el) {
+    var value = t(el.dataset.i18n);
+    if (el.classList.contains('nav-item')) updateTearText(el, value);
+    else if (el.classList.contains('tag')) updateTagText(el, value);
+    else el.textContent = value;
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(function (el) {
+    el.innerHTML = t(el.dataset.i18nHtml);
+  });
+  document.querySelectorAll('[data-i18n-aria-label]').forEach(function (el) {
+    el.setAttribute('aria-label', t(el.dataset.i18nAriaLabel));
+  });
+  document.querySelectorAll('[data-i18n-title]').forEach(function (el) {
+    el.setAttribute('title', t(el.dataset.i18nTitle));
+  });
+  var dock = document.getElementById('floatingTools');
+  var handle = document.getElementById('floatingToolsHandle');
+  var collapsed = dock && dock.dataset.collapsed === 'true';
+  if (handle) {
+    handle.setAttribute('aria-label', collapsed ? t('tools.expand') : t('tools.collapse'));
+    handle.setAttribute('title', collapsed ? t('tools.expand') : t('tools.collapse'));
+  }
+}
+
+function startWarmupResources() {
+  if (warmupStarted) return;
+  warmupStarted = true;
+  WARMUP_ASSETS.forEach(function (src, index) {
+    window.setTimeout(function () {
+      if (src.endsWith('.glb')) {
+        var link = document.createElement('link');
+        link.rel = 'preload';
+        link.as = 'fetch';
+        link.href = src;
+        link.crossOrigin = 'anonymous';
+        document.head.appendChild(link);
+        return;
+      }
+      var image = new Image();
+      image.decoding = 'async';
+      image.loading = 'eager';
+      image.src = src;
+    }, index < 6 ? 0 : index * 35);
+  });
+  window.setTimeout(function () {
+    var source = document.getElementById('skillShowcaseWindow')?.dataset.videoSrc;
+    if (!source) return;
+    var video = document.createElement('video');
+    video.preload = 'auto';
+    video.muted = true;
+    video.playsInline = true;
+    video.src = source;
+    video.load();
+  }, 600);
+}
+
+function setLanguage(nextLanguage, options) {
+  if (!I18N[nextLanguage]) nextLanguage = DEFAULT_LANGUAGE;
+  currentLanguage = nextLanguage;
+  if (!options || options.persist !== false) localStorage.setItem(LANGUAGE_KEY, currentLanguage);
+  applyStaticTranslations();
+  if (typeof refreshAboutLanguage === 'function') refreshAboutLanguage();
+  if (typeof refreshInternshipLanguage === 'function') refreshInternshipLanguage();
+  if (typeof refreshProjectsLanguage === 'function') refreshProjectsLanguage();
+  if (typeof refreshSkillsLanguage === 'function') refreshSkillsLanguage();
+  window.dispatchEvent(new CustomEvent('cv-language-change', { detail: { language: currentLanguage } }));
+  if (window.lucide) window.lucide.createIcons();
+}
+
+function initLanguageGateAndTools() {
+  var storedLanguage = localStorage.getItem(LANGUAGE_KEY);
+  var gate = document.getElementById('languageGate');
+  var dock = document.getElementById('floatingTools');
+  var handle = document.getElementById('floatingToolsHandle');
+  var collapseButton = document.getElementById('floatingToolsCollapse');
+  var languageButton = document.getElementById('languageToggleBtn');
+  var resumeButton = document.getElementById('resumeToolBtn');
+
+  startWarmupResources();
+  if (gate && !storedLanguage) {
+    gate.classList.add('is-open');
+    gate.setAttribute('aria-hidden', 'false');
+    window.requestAnimationFrame(function () { gate.querySelector('[data-language-choice="en"]')?.focus(); });
+  } else {
+    document.documentElement.dataset.languageReady = 'true';
+  }
+
+  document.querySelectorAll('[data-language-choice]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      setLanguage(button.dataset.languageChoice || DEFAULT_LANGUAGE);
+      if (gate) {
+        gate.classList.remove('is-open');
+        gate.setAttribute('aria-hidden', 'true');
+      }
+      document.documentElement.dataset.languageReady = 'true';
+    });
+  });
+
+  if (languageButton) {
+    languageButton.addEventListener('click', function () {
+      setLanguage(currentLanguage === 'zh' ? 'en' : 'zh');
+    });
+  }
+  if (resumeButton) {
+    resumeButton.addEventListener('click', function () {
+      var overlay = document.getElementById('resumeDialogOverlay');
+      if (overlay) overlay.classList.add('is-open');
+      if (window.lucide) window.lucide.createIcons();
+    });
+  }
+  function setDockCollapsed(collapsed) {
+    if (!dock) return;
+    dock.dataset.collapsed = collapsed ? 'true' : 'false';
+    applyStaticTranslations();
+  }
+  if (handle) handle.addEventListener('click', function () { setDockCollapsed(!(dock && dock.dataset.collapsed === 'true')); });
+  if (collapseButton) collapseButton.addEventListener('click', function () { setDockCollapsed(true); });
+}
+
+setLanguage(currentLanguage, { persist: false });
+initLanguageGateAndTools();
 
 // ============================================================
 //  导航栏「撕碎」效果
@@ -47,17 +707,9 @@ import { initProjectsOrbs } from './projects-orbs.js?v=20260717-8';
 
 // ---- 导航点击：平滑滚动到对应分区 ----
 (function initNavClicks() {
-  var sectionMap = {
-    'About Me': 'about',
-    'Internship': 'internship',
-    'Projects': 'projects',
-    'Skills & Learning': 'skills-learning',
-    'Me & My Friends': 'travel-memory'
-  };
-
   document.querySelectorAll('.nav-item').forEach(function (link) {
     link.addEventListener('click', function (e) {
-      var targetId = sectionMap[link.textContent.trim()];
+      var targetId = link.dataset.section;
       if (!targetId) return; // 未绑定分区的标签保持默认行为（#）
 
       e.preventDefault();
@@ -190,7 +842,7 @@ import { initProjectsOrbs } from './projects-orbs.js?v=20260717-8';
     if (interactHint) interactHint.classList.add('is-hidden');
     if (easterEggHint) easterEggHint.classList.add('is-hidden');
     if (modelStatus) {
-      modelStatus.textContent = 'Static character preview';
+      modelStatus.textContent = t('home.modelStatic');
       modelStatus.classList.add('is-hidden');
     }
     window.__threeCharacter = {
@@ -811,7 +1463,7 @@ import { initProjectsOrbs } from './projects-orbs.js?v=20260717-8';
     var dracoLoader = new DRACOLoader();
     dracoLoader.setDecoderPath('./js/vendor/libs/draco/');
     loader.setDRACOLoader(dracoLoader);
-    updateModelStatus(attempt === 1 ? 'Loading 3D character...' : 'Retrying 3D character...');
+    updateModelStatus(attempt === 1 ? t('home.modelLoading') : t('home.modelRetrying'));
 
     loader.load(
       'assets/home/character.glb',
@@ -854,7 +1506,7 @@ import { initProjectsOrbs } from './projects-orbs.js?v=20260717-8';
         }
 
         character.visible = false;
-        updateModelStatus('3D character ready');
+        updateModelStatus(t('home.modelReady'));
         hideModelStatus();
         // 隐藏 loading spinner
         var spinner = document.getElementById('loadingSpinner');
@@ -877,7 +1529,7 @@ import { initProjectsOrbs } from './projects-orbs.js?v=20260717-8';
         revealFallbackImage();
         if (interactHint) interactHint.classList.add('is-hidden');
         if (easterEggHint) easterEggHint.classList.add('is-hidden');
-        updateModelStatus('Static character preview');
+        updateModelStatus(t('home.modelStatic'));
         hideModelStatus(0);
       }
     );
@@ -911,7 +1563,7 @@ import { initProjectsOrbs } from './projects-orbs.js?v=20260717-8';
   setTimeout(function () {
     var spinner = document.getElementById('loadingSpinner');
     if (spinner && !spinner.classList.contains('is-hidden')) {
-      updateModelStatus('Still loading 3D character...');
+      updateModelStatus(t('home.modelStillLoading'));
     }
   }, 30000);
 
@@ -1486,7 +2138,7 @@ var INTERNSHIP_CARDS = [
     id: 'chery',
     company: 'CHERY',
     role: 'Intelligent Driving Project Management Intern',
-    period: 'JUN 2026 - PRESENT',
+    period: 'MAY 2026 - PRESENT',
     location: 'Wuhu, Anhui',
     image: 'assets/internship/chery.webp',
     aboutImage: 'assets/about/chery.webp',
@@ -1517,6 +2169,11 @@ var INTERNSHIP_CARDS = [
 ];
 
 var currentInternshipState = 'cards'; // cards | detail
+var activeInternshipId = null;
+
+function getInternshipCardData(card) {
+  return getLocalized(card, INTERNSHIP_TRANSLATIONS, card.id);
+}
 
 function initInternshipJourney() {
   var stage = document.getElementById('internshipStage');
@@ -1568,22 +2225,23 @@ function buildInternshipCards(container) {
   if (!container) return;
   var html = '';
   INTERNSHIP_CARDS.forEach(function (cardData, index) {
-    html += '<div class="internship-card" data-card-id="' + cardData.id + '" tabindex="0" role="button" aria-label="' + cardData.company + ' internship card">'
+    var cardText = getInternshipCardData(cardData);
+    html += '<div class="internship-card" data-card-id="' + cardData.id + '" tabindex="0" role="button" aria-label="' + cardText.company + ' internship card">'
       + '<div class="internship-card-inner">'
       + '<div class="internship-card-front">'
-      + '<img src="' + cardData.image + '" alt="' + cardData.company + ' internship card" loading="eager" decoding="async" fetchpriority="low">'
+      + '<img src="' + cardData.image + '" alt="' + cardText.company + ' internship card" loading="eager" decoding="async" fetchpriority="low">'
       + '<span class="card-front-number">' + String(index + 1).padStart(2, '0') + '</span>'
       + '</div>'
       + '<div class="internship-card-back">'
-      + '<span class="card-back-kicker">Internship ' + String(index + 1).padStart(2, '0') + '</span>'
-      + '<span class="card-back-company"><i data-lucide="building-2" class="card-back-company-icon" aria-hidden="true"></i>' + cardData.company + '</span>'
-      + '<span class="card-back-role">' + cardData.role + '</span>'
-      + '<span class="card-back-period">' + cardData.period + '</span>'
-      + '<p class="card-back-summary">' + cardData.summary + '</p>'
+      + '<span class="card-back-kicker">' + t('internship.cardKicker') + ' ' + String(index + 1).padStart(2, '0') + '</span>'
+      + '<span class="card-back-company"><i data-lucide="building-2" class="card-back-company-icon" aria-hidden="true"></i>' + cardText.company + '</span>'
+      + '<span class="card-back-role">' + cardText.role + '</span>'
+      + '<span class="card-back-period">' + cardText.period + '</span>'
+      + '<p class="card-back-summary">' + cardText.summary + '</p>'
       + '<div class="card-back-tags">'
-      + cardData.tags.map(function (t) { return '<span>' + t + '</span>'; }).join('')
+      + cardText.tags.map(function (tag) { return '<span>' + tag + '</span>'; }).join('')
       + '</div>'
-      + '<span class="card-back-action">View Details <i data-lucide="arrow-right" class="card-back-action-icon" aria-hidden="true"></i></span>'
+      + '<span class="card-back-action">' + t('internship.viewDetails') + ' <i data-lucide="arrow-right" class="card-back-action-icon" aria-hidden="true"></i></span>'
       + '</div>'
       + '</div>'
       + '</div>';
@@ -1597,8 +2255,10 @@ function openInternshipDetail(cardId, detailContainer, stage, cardEl) {
   if (!detailContainer || !stage) return;
   var cardData = INTERNSHIP_CARDS.find(function (c) { return c.id === cardId; });
   if (!cardData) return;
+  var cardText = getInternshipCardData(cardData);
 
   currentInternshipState = 'detail';
+  activeInternshipId = cardId;
   stage.classList.remove('is-cards');
   stage.classList.add('is-detail');
   // is-opening-detail 在 HTML 渲染后再加上，触发翻转进场动画
@@ -1610,39 +2270,39 @@ function openInternshipDetail(cardId, detailContainer, stage, cardEl) {
     var logoHTML = cardData.logo
       ? '<span class="card-logo-wrap"><img src="' + cardData.logo + '" alt="" class="card-logo"></span>'
       : '<span class="card-icon-wrap"><i data-lucide="building-2" class="card-head-icon"></i></span>';
-    var tagsHTML = cardData.tags.map(function (t) { return '<span class="card-tag">' + t + '</span>'; }).join('');
+    var tagsHTML = cardText.tags.map(function (tag) { return '<span class="card-tag">' + tag + '</span>'; }).join('');
 
     var html = '<div class="internship-detail-card">'
       + '<div class="card-image-wrap">'
-      + '<img src="' + aboutImg + '" alt="' + cardData.company + '">'
+      + '<img src="' + aboutImg + '" alt="' + cardText.company + '">'
       + '<span class="card-number">' + String(cardIndex + 1).padStart(2, '0') + '</span>'
       + '</div>'
       + '<div class="card-body">'
       + '<div class="card-head">' + logoHTML
-      + '<div><h3 class="card-title">' + cardData.company + '</h3>'
-      + '<p class="card-subtitle">' + cardData.role + '</p></div>'
+      + '<div><h3 class="card-title">' + cardText.company + '</h3>'
+      + '<p class="card-subtitle">' + cardText.role + '</p></div>'
       + '</div>'
       + '<div class="card-items">' + tagsHTML + '</div>'
       + '</div>'
-      + '<button class="internship-card-back-btn" id="internshipBackBtn"><i data-lucide="arrow-left" class="detail-back-icon" aria-hidden="true"></i> Back to Journey</button>'
+      + '<button class="internship-card-back-btn" id="internshipBackBtn"><i data-lucide="arrow-left" class="detail-back-icon" aria-hidden="true"></i> ' + t('internship.back') + '</button>'
       + '</div>'
       + '<div class="internship-detail-panel">'
-      + '<span class="detail-company"><i data-lucide="building-2" class="detail-company-icon" aria-hidden="true"></i>' + cardData.company + '</span>'
+      + '<span class="detail-company"><i data-lucide="building-2" class="detail-company-icon" aria-hidden="true"></i>' + cardText.company + '</span>'
       + '<div class="detail-role-period">'
-      + '<span class="detail-role">' + cardData.role + '</span>'
-      + '<span class="detail-period">' + cardData.period + '</span>'
+      + '<span class="detail-role">' + cardText.role + '</span>'
+      + '<span class="detail-period">' + cardText.period + '</span>'
       + '</div>'
-      + '<span class="detail-location"><i data-lucide="map-pin" style="width:.6rem;height:.6rem"></i> ' + cardData.location + '</span>'
-      + '<p class="detail-summary">' + cardData.summary + '</p>'
-      + '<div class="detail-tags">' + cardData.tags.map(function (t) { return '<span>' + t + '</span>'; }).join('') + '</div>'
-      + '<div class="detail-section"><h4><i data-lucide="clipboard-list" class="detail-section-icon" aria-hidden="true"></i>Responsibilities</h4><ul>'
-      + cardData.responsibilities.map(function (r) { return '<li>' + r + '</li>'; }).join('')
+      + '<span class="detail-location"><i data-lucide="map-pin" style="width:.6rem;height:.6rem"></i> ' + cardText.location + '</span>'
+      + '<p class="detail-summary">' + cardText.summary + '</p>'
+      + '<div class="detail-tags">' + cardText.tags.map(function (tag) { return '<span>' + tag + '</span>'; }).join('') + '</div>'
+      + '<div class="detail-section"><h4><i data-lucide="clipboard-list" class="detail-section-icon" aria-hidden="true"></i>' + t('internship.responsibilities') + '</h4><ul>'
+      + cardText.responsibilities.map(function (r) { return '<li>' + r + '</li>'; }).join('')
       + '</ul></div>'
-      + '<div class="detail-section"><h4><i data-lucide="wrench" class="detail-section-icon" aria-hidden="true"></i>Tools & Methods</h4><ul>'
-      + cardData.methods.map(function (m) { return '<li>' + m + '</li>'; }).join('')
+      + '<div class="detail-section"><h4><i data-lucide="wrench" class="detail-section-icon" aria-hidden="true"></i>' + t('internship.methods') + '</h4><ul>'
+      + cardText.methods.map(function (m) { return '<li>' + m + '</li>'; }).join('')
       + '</ul></div>'
-      + '<div class="detail-section"><h4><i data-lucide="sparkles" class="detail-section-icon" aria-hidden="true"></i>Highlights</h4><ul>'
-      + cardData.highlights.map(function (h) { return '<li>' + h + '</li>'; }).join('')
+      + '<div class="detail-section"><h4><i data-lucide="sparkles" class="detail-section-icon" aria-hidden="true"></i>' + t('internship.highlights') + '</h4><ul>'
+      + cardText.highlights.map(function (h) { return '<li>' + h + '</li>'; }).join('')
       + '</ul></div>'
       + '</div>';
 
@@ -1675,12 +2335,29 @@ function openInternshipDetail(cardId, detailContainer, stage, cardEl) {
 function closeInternshipDetail(detailContainer, stage) {
   if (!detailContainer || !stage) return;
   currentInternshipState = 'cards';
+  activeInternshipId = null;
   stage.classList.remove('is-detail', 'is-opening-detail');
   stage.classList.add('is-cards');
   // 清除所有卡片的 is-flipping 状态
   var cards = document.querySelectorAll('.internship-card.is-flipping');
   for (var i = 0; i < cards.length; i++) { cards[i].classList.remove('is-flipping'); }
   detailContainer.innerHTML = '';
+}
+
+function refreshInternshipLanguage() {
+  if (!Array.isArray(INTERNSHIP_CARDS)) return;
+  var stage = document.getElementById('internshipStage');
+  var cardsContainer = document.getElementById('internshipCards');
+  var detailContainer = document.getElementById('internshipDetail');
+  if (!stage || !cardsContainer) return;
+  if (currentInternshipState === 'detail' && activeInternshipId && detailContainer) {
+    openInternshipDetail(activeInternshipId, detailContainer, stage);
+    return;
+  }
+  buildInternshipCards(cardsContainer);
+  cardsContainer.querySelectorAll('.internship-card').forEach(function (card) {
+    card.classList.add('is-flipped');
+  });
 }
 
 // ============================================================
@@ -1829,6 +2506,17 @@ var currentProjectState = 'orbs'; // orbs | expanded
 var activeProjectId = null;
 var projectsOrbsAPI = null;
 
+function getProjectDisplayData(project) {
+  var display = getLocalized(project, PROJECT_TRANSLATIONS, project.id);
+  display.openAria = t('projects.openAriaPrefix') + ' ' + display.title + ' ' + t('projects.openAriaSuffix');
+  display.illuminatedLabel = t('projects.illuminated');
+  return display;
+}
+
+function getLocalizedProjects() {
+  return PROJECTS.map(function (project) { return getProjectDisplayData(project); });
+}
+
 function initProjects() {
   var stage = document.getElementById('projectsStage');
   var overlay = document.getElementById('projectsExpandOverlay');
@@ -1836,7 +2524,7 @@ function initProjects() {
   if (!stage || !section || !overlay || stage.dataset.projectsInitialized === 'true') return;
   stage.dataset.projectsInitialized = 'true';
 
-  projectsOrbsAPI = initProjectsOrbs(section, stage, PROJECTS, function (projectId) {
+  projectsOrbsAPI = initProjectsOrbs(section, stage, getLocalizedProjects(), function (projectId) {
     if (currentProjectState === 'expanded') return;
     expandProject(projectId, stage, overlay);
   });
@@ -1859,6 +2547,7 @@ function initProjects() {
 function expandProject(projectId, stage, overlay) {
   var projectData = PROJECTS.find(function (p) { return p.id === projectId; });
   if (!projectData) return;
+  projectData = getProjectDisplayData(projectData);
 
   currentProjectState = 'expanded';
   activeProjectId = projectId;
@@ -1884,9 +2573,9 @@ function expandProject(projectId, stage, overlay) {
   panel.style.setProperty('--project-accent', accent);
 
   var html = '<div class="project-detail-dragbar" data-project-drag-handle>'
-    + '<span class="project-detail-drag-label"><i data-lucide="grip-horizontal" aria-hidden="true"></i><span>PROJECT FILE</span></span>'
+    + '<span class="project-detail-drag-label"><i data-lucide="grip-horizontal" aria-hidden="true"></i><span>' + t('projects.file') + '</span></span>'
     + '<span class="project-detail-window-code">' + (projectData.code || projectData.period || '') + '</span>'
-    + '<button class="detail-close-btn" id="projectCloseBtn" type="button" title="Close" aria-label="Close project details"><i data-lucide="x" aria-hidden="true"></i></button>'
+    + '<button class="detail-close-btn" id="projectCloseBtn" type="button" title="' + t('projects.closeAria') + '" aria-label="' + t('projects.closeAria') + '"><i data-lucide="x" aria-hidden="true"></i></button>'
     + '</div>';
   // 顶部图（如果有 thumbnail；否则用渐变色条 + 项目编号）
   if (projectData.thumbnail) {
@@ -1922,17 +2611,17 @@ function expandProject(projectId, stage, overlay) {
       + '</div>';
   }
   if (projectData.highlights && projectData.highlights.length > 0) {
-    html += '<div class="detail-section"><h4><i data-lucide="sparkles" style="width:.75rem;height:.75rem;margin-right:.3rem;color:var(--purple)"></i>Highlights</h4><ul class="detail-highlights">'
+    html += '<div class="detail-section"><h4><i data-lucide="sparkles" style="width:.75rem;height:.75rem;margin-right:.3rem;color:var(--purple)"></i>' + t('projects.highlights') + '</h4><ul class="detail-highlights">'
       + projectData.highlights.map(function (h) { return '<li>' + h + '</li>'; }).join('')
       + '</ul></div>';
   }
   if (projectData.techStack && projectData.techStack.length > 0) {
-    html += '<div class="detail-section"><h4><i data-lucide="layers" style="width:.75rem;height:.75rem;margin-right:.3rem;color:var(--purple)"></i>Tech Stack</h4><div class="detail-techstack">'
+    html += '<div class="detail-section"><h4><i data-lucide="layers" style="width:.75rem;height:.75rem;margin-right:.3rem;color:var(--purple)"></i>' + t('projects.techStack') + '</h4><div class="detail-techstack">'
       + projectData.techStack.map(function (t) { return '<span>' + t + '</span>'; }).join('')
       + '</div></div>';
   }
   if (projectData.status) {
-    html += '<div class="detail-status"><i data-lucide="activity" style="width:.65rem;height:.65rem;color:var(--purple)"></i> <b>Status:</b> ' + projectData.status + '</div>';
+    html += '<div class="detail-status"><i data-lucide="activity" style="width:.65rem;height:.65rem;color:var(--purple)"></i> <b>' + t('projects.status') + ':</b> ' + projectData.status + '</div>';
   }
   html += '</div>';
 
@@ -2001,6 +2690,12 @@ function expandProject(projectId, stage, overlay) {
     var closeBtn = document.getElementById('projectCloseBtn');
     if (closeBtn) closeBtn.focus();
   }, 600);
+}
+
+function refreshProjectsLanguage() {
+  if (projectsOrbsAPI && typeof projectsOrbsAPI.updateProjects === 'function') {
+    projectsOrbsAPI.updateProjects(getLocalizedProjects());
+  }
 }
 
 function makeProjectPanelDraggable(panel) {
@@ -2150,7 +2845,7 @@ var ABOUT_CARDS = [
     action: { label: 'View Details', icon: 'arrow-up-right', disabled: false }
   },
   {
-    id: 'chery', period: 'JUN 2026 - PRESENT', location: 'Wuhu, Anhui',
+    id: 'chery', period: 'MAY 2026 - PRESENT', location: 'Wuhu, Anhui',
     category: 'Internship', icon: 'car-front', title: 'CHERY',
     subtitle: 'Project Management Intern',
     image: 'assets/about/chery.webp', logo: 'assets/about/chery-logo.png',
@@ -2166,6 +2861,10 @@ var carouselTarget = null;   // snap 目标角度
 var carouselAuto = true;     // 是否自动旋转
 var carouselRAF = null;
 
+function getAboutCardData(card) {
+  return getLocalized(card, ABOUT_TRANSLATIONS, card.id);
+}
+
 function initAboutMe() {
   var timelineTrack = document.getElementById('timelineTrack');
   var cardsContainer = document.getElementById('aboutCards');
@@ -2176,15 +2875,16 @@ function initAboutMe() {
 
   // ---- 渲染时间线 ----
   ABOUT_CARDS.forEach(function (card, i) {
+    var cardText = getAboutCardData(card);
     var btn = document.createElement('button');
     btn.className = 'timeline-node' + (i === 0 ? ' active' : '');
     btn.setAttribute('type', 'button');
-    btn.setAttribute('aria-label', card.title);
+    btn.setAttribute('aria-label', cardText.title);
     if (i === 0) btn.setAttribute('aria-current', 'step');
     btn.innerHTML =
       '<span class="timeline-dot"></span>' +
-      '<span class="timeline-period">' + card.period + '</span>' +
-      '<span class="timeline-location">' + card.location + '</span>';
+      '<span class="timeline-period">' + cardText.period + '</span>' +
+      '<span class="timeline-location">' + cardText.location + '</span>';
     btn.addEventListener('click', function () { snapToCard(i); });
     timelineTrack.appendChild(btn);
   });
@@ -2207,10 +2907,11 @@ function initAboutMe() {
   }
 
   ABOUT_CARDS.forEach(function (card, i) {
+    var cardText = getAboutCardData(card);
     var el = document.createElement('div');
     el.className = 'about-card';
     el.dataset.cardId = card.id;
-    el.setAttribute('aria-label', 'Slide ' + (i + 1) + ' of ' + cardCount + ': ' + card.title);
+    el.setAttribute('aria-label', 'Slide ' + (i + 1) + ' of ' + cardCount + ': ' + cardText.title);
 
     // 初始 transform
     el.style.transform = 'rotateY(' + (i * angleStep) + 'deg) translateZ(' + radius + 'px)';
@@ -2218,8 +2919,8 @@ function initAboutMe() {
     // Image
     var imgHTML =
       '<div class="card-image-wrap">' +
-        '<img src="' + card.image + '" alt="' + card.title + '" loading="eager" decoding="async" fetchpriority="low">' +
-        '<span class="card-category">' + card.category + '</span>' +
+        '<img src="' + card.image + '" alt="' + cardText.title + '" loading="eager" decoding="async" fetchpriority="low">' +
+        '<span class="card-category">' + cardText.category + '</span>' +
         '<span class="card-number">' + String(i + 1).padStart(2, '0') + '</span>' +
       '</div>';
 
@@ -2227,13 +2928,13 @@ function initAboutMe() {
     var headIconHTML = card.logo
       ? '<span class="card-logo-wrap"><img src="' + card.logo + '" alt="" class="card-logo"></span>'
       : '<span class="card-icon-wrap"><i data-lucide="' + card.icon + '" class="card-head-icon"></i></span>';
-    var subtitleHTML = card.subtitle ? '<p class="card-subtitle">' + card.subtitle + '</p>' : '';
+    var subtitleHTML = cardText.subtitle ? '<p class="card-subtitle">' + cardText.subtitle + '</p>' : '';
 
     // Items
     var itemsHTML = '';
-    if (card.items.length > 0) {
+    if (cardText.items.length > 0) {
       itemsHTML = '<div class="card-info-list">';
-      card.items.forEach(function (item) {
+      cardText.items.forEach(function (item) {
         itemsHTML +=
           '<div class="card-info-item">' +
             '<i data-lucide="' + item.icon + '"></i>' +
@@ -2242,9 +2943,9 @@ function initAboutMe() {
           '</div>';
       });
       itemsHTML += '</div>';
-    } else if (card.tags.length > 0) {
+    } else if (cardText.tags.length > 0) {
       itemsHTML = '<div class="card-items">';
-      card.tags.forEach(function (tag) {
+      cardText.tags.forEach(function (tag) {
         if (typeof tag === 'string') {
           itemsHTML += '<span class="card-tag">' + tag + '</span>';
         } else {
@@ -2260,11 +2961,12 @@ function initAboutMe() {
     // Action
     var actionHTML = '';
     if (card.action) {
+      var actionLabel = cardText.action || card.action.label;
       actionHTML =
         '<div class="card-action">' +
           '<button class="card-action-btn"' + (card.action.disabled ? ' disabled title="Coming Soon"' : '') + '>' +
             '<i data-lucide="' + card.action.icon + '"></i>' +
-            '<span>' + (card.action.disabled ? (card.action.disabledLabel || 'Coming Soon') : card.action.label) + '</span>' +
+            '<span>' + (card.action.disabled ? (card.action.disabledLabel || 'Coming Soon') : actionLabel) + '</span>' +
           '</button>' +
         '</div>';
     }
@@ -2272,7 +2974,7 @@ function initAboutMe() {
     el.innerHTML = imgHTML +
       '<div class="card-body">' +
         '<div class="card-head">' + headIconHTML +
-          '<div><h3 class="card-title">' + card.title + '</h3>' + subtitleHTML + '</div>' +
+          '<div><h3 class="card-title">' + cardText.title + '</h3>' + subtitleHTML + '</div>' +
         '</div>' +
         itemsHTML +
         actionHTML +
@@ -2567,6 +3269,59 @@ function getCurrentAboutFrontIndex() {
   return index < 0 ? index + cardCount : index;
 }
 
+function refreshAboutLanguage() {
+  if (!Array.isArray(ABOUT_CARDS)) return;
+  var timelineTrack = document.getElementById('timelineTrack');
+  var wrapper = document.getElementById('carouselWrapper');
+  if (timelineTrack) {
+    timelineTrack.querySelectorAll('.timeline-node').forEach(function (node, index) {
+      var card = ABOUT_CARDS[index];
+      if (!card) return;
+      var cardText = getAboutCardData(card);
+      node.setAttribute('aria-label', cardText.title);
+      var period = node.querySelector('.timeline-period');
+      var location = node.querySelector('.timeline-location');
+      if (period) period.textContent = cardText.period;
+      if (location) location.textContent = cardText.location;
+    });
+  }
+  if (!wrapper) return;
+  wrapper.querySelectorAll('.about-card').forEach(function (cardEl, index) {
+    var card = ABOUT_CARDS[index];
+    if (!card) return;
+    var cardText = getAboutCardData(card);
+    cardEl.setAttribute('aria-label', (currentLanguage === 'zh' ? '第 ' + (index + 1) + ' / ' + ABOUT_CARDS.length + ' 张：' : 'Slide ' + (index + 1) + ' of ' + ABOUT_CARDS.length + ': ') + cardText.title);
+    var image = cardEl.querySelector('.card-image-wrap img');
+    var category = cardEl.querySelector('.card-category');
+    var title = cardEl.querySelector('.card-title');
+    var subtitle = cardEl.querySelector('.card-subtitle');
+    var items = cardEl.querySelector('.card-items');
+    var actionLabel = cardEl.querySelector('.card-action-btn span');
+    if (image) image.alt = cardText.title;
+    if (category) category.textContent = cardText.category;
+    if (title) title.textContent = cardText.title;
+    if (subtitle) subtitle.textContent = cardText.subtitle || '';
+    if (items) {
+      items.innerHTML = '';
+      cardText.tags.forEach(function (tag) {
+        var span = document.createElement('span');
+        span.className = typeof tag === 'string' ? 'card-tag' : 'card-tag card-tag-private';
+        if (typeof tag === 'string') {
+          span.textContent = tag;
+        } else {
+          span.tabIndex = 0;
+          span.dataset.privateValue = tag.value;
+          span.textContent = tag.label;
+        }
+        items.appendChild(span);
+      });
+    }
+    if (actionLabel && card.action && !card.action.disabled) {
+      actionLabel.textContent = cardText.action || card.action.label;
+    }
+  });
+}
+
 function stabilizeAboutCarousel() {
   if (window.innerWidth < 769) return;
   var index = getCurrentAboutFrontIndex();
@@ -2694,6 +3449,10 @@ var SKILLS_LEARNING_CARDS = [
   }
 ];
 
+function getSkillCardData(item, index) {
+  return getLocalized(item, SKILL_TRANSLATIONS, String(index));
+}
+
 function initSkillsLearning() {
   var grid = document.getElementById('skillsLearningGrid');
   if (!grid || grid.dataset.initialized === 'true') return;
@@ -2701,14 +3460,16 @@ function initSkillsLearning() {
   var showcaseAPI = initSkillShowcaseWindow();
   var confirmAPI = initSkillActionConfirm();
 
-  SKILLS_LEARNING_CARDS.forEach(function (item) {
+  SKILLS_LEARNING_CARDS.forEach(function (item, itemIndex) {
+    var cardText = getSkillCardData(item, itemIndex);
     var card = document.createElement('button');
     card.type = 'button';
     card.className = 'skill-flip-card' + (item.kind === 'play' ? ' skill-play-card' : '') + (item.showcase ? ' has-showcase' : '');
     card.dataset.kind = item.kind;
+    card.dataset.cardIndex = String(itemIndex);
     if (item.showcase) card.dataset.showcase = item.showcase;
     card.setAttribute('aria-pressed', 'false');
-    card.setAttribute('aria-label', 'Reveal ' + item.title);
+    card.setAttribute('aria-label', t('skills.reveal') + ' ' + cardText.title);
     card.style.setProperty('--card-accent', item.accent);
 
     var inner = document.createElement('span');
@@ -2718,7 +3479,7 @@ function initSkillsLearning() {
     front.className = 'skill-flip-face skill-flip-front';
     var frontType = document.createElement('span');
     frontType.className = 'skill-card-type';
-    frontType.textContent = item.faceLabel;
+    frontType.textContent = cardText.faceLabel;
     var question = document.createElement('span');
     question.className = 'skill-card-question';
     question.textContent = '?';
@@ -2731,12 +3492,12 @@ function initSkillsLearning() {
     back.className = 'skill-flip-face skill-flip-back';
     var backType = document.createElement('span');
     backType.className = 'skill-card-type';
-    backType.textContent = item.backLabel;
+    backType.textContent = cardText.backLabel;
     var title = document.createElement('strong');
-    title.textContent = item.title;
+    title.textContent = cardText.title;
     var description = document.createElement('span');
     description.className = 'skill-card-description';
-    description.textContent = item.description;
+    description.textContent = cardText.description;
     back.append(backType, title, description);
 
     if (item.marker) {
@@ -2751,17 +3512,17 @@ function initSkillsLearning() {
     card.addEventListener('click', function () {
       var isFlipped = card.classList.toggle('is-flipped');
       card.setAttribute('aria-pressed', isFlipped ? 'true' : 'false');
-      card.setAttribute('aria-label', (isFlipped ? 'Hide ' : 'Reveal ') + item.title);
+      card.setAttribute('aria-label', (isFlipped ? t('skills.hide') : t('skills.reveal')) + ' ' + getSkillCardData(item, itemIndex).title);
       if (isFlipped && item.showcase && showcaseAPI && confirmAPI) {
         window.setTimeout(function () {
           if (!card.classList.contains('is-flipped')) return;
           confirmAPI.open({
             action: 'video',
-            kicker: 'VIDEO SHOWCASE',
-            title: 'Open the AI Video showcase?',
-            text: 'This will open a movable video window with sound controls.',
-            confirmLabel: 'Open Video',
-            cancelLabel: 'Not Now',
+            kicker: t('skills.videoKicker'),
+            title: t('skills.videoTitle'),
+            text: t('skills.videoText'),
+            confirmLabel: t('skills.videoConfirm'),
+            cancelLabel: t('skills.videoCancel'),
             onConfirm: showcaseAPI.open
           });
         }, 420);
@@ -2771,11 +3532,11 @@ function initSkillsLearning() {
           if (!card.classList.contains('is-flipped')) return;
           confirmAPI.open({
             action: 'play',
-            kicker: 'BEFORE YOU GO',
-            title: 'Start the flip-card game?',
-            text: 'You will move to the next page and begin a six-pair memory round.',
-            confirmLabel: 'Start Game',
-            cancelLabel: 'Stay Here',
+            kicker: t('skills.playKicker'),
+            title: t('skills.playTitle'),
+            text: t('skills.playText'),
+            confirmLabel: t('skills.playConfirm'),
+            cancelLabel: t('skills.playCancel'),
             onConfirm: function () {
               var target = document.getElementById(item.target);
               if (window.travelMemoryGame) window.travelMemoryGame.reset();
@@ -2786,6 +3547,27 @@ function initSkillsLearning() {
       }
     });
     grid.appendChild(card);
+  });
+}
+
+function refreshSkillsLanguage() {
+  if (!Array.isArray(SKILLS_LEARNING_CARDS)) return;
+  var grid = document.getElementById('skillsLearningGrid');
+  if (!grid) return;
+  grid.querySelectorAll('.skill-flip-card').forEach(function (card) {
+    var index = Number(card.dataset.cardIndex);
+    var item = SKILLS_LEARNING_CARDS[index];
+    if (!item) return;
+    var cardText = getSkillCardData(item, index);
+    var faceType = card.querySelector('.skill-flip-front .skill-card-type');
+    var backType = card.querySelector('.skill-flip-back .skill-card-type');
+    var title = card.querySelector('.skill-flip-back strong');
+    var description = card.querySelector('.skill-card-description');
+    if (faceType) faceType.textContent = cardText.faceLabel;
+    if (backType) backType.textContent = cardText.backLabel;
+    if (title) title.textContent = cardText.title;
+    if (description) description.textContent = cardText.description;
+    card.setAttribute('aria-label', (card.classList.contains('is-flipped') ? t('skills.hide') : t('skills.reveal')) + ' ' + cardText.title);
   });
 }
 
@@ -2817,11 +3599,11 @@ function initSkillActionConfirm() {
   function open(options) {
     lastFocused = document.activeElement;
     overlay.dataset.action = options.action || 'default';
-    kicker.textContent = options.kicker || 'BEFORE YOU GO';
-    title.textContent = options.title || 'Continue?';
-    text.textContent = options.text || 'Choose whether to continue.';
-    cancelButton.textContent = options.cancelLabel || 'Not Now';
-    submitButton.textContent = options.confirmLabel || 'Continue';
+    kicker.textContent = options.kicker || t('confirm.kicker');
+    title.textContent = options.title || t('confirm.title');
+    text.textContent = options.text || t('confirm.text');
+    cancelButton.textContent = options.cancelLabel || t('confirm.cancel');
+    submitButton.textContent = options.confirmLabel || t('confirm.submit');
     confirmAction = typeof options.onConfirm === 'function' ? options.onConfirm : null;
     overlay.classList.add('is-open');
     overlay.setAttribute('aria-hidden', 'false');
@@ -2893,7 +3675,7 @@ function initSkillShowcaseWindow() {
     panel.classList.remove('has-media');
     playToggle.classList.remove('is-playing');
     playGlyph.textContent = '\u25b6';
-    playToggle.setAttribute('aria-label', 'Play video');
+    playToggle.setAttribute('aria-label', t('showcase.playAria'));
     emptyText.textContent = message;
     status.textContent = nextStatus;
   }
@@ -2902,13 +3684,13 @@ function initSkillShowcaseWindow() {
     if (videoPrepared) return;
     var source = (panel.dataset.videoSrc || '').trim();
     if (!source) {
-      setEmptyState('Video source pending', 'READY TO LOAD');
+      setEmptyState(t('showcase.emptyText'), t('showcase.statusReadyToLoad'));
       return;
     }
 
     videoPrepared = true;
     video.preload = 'auto';
-    setEmptyState('Buffering video...', 'PRELOADING');
+    setEmptyState(t('showcase.buffering'), t('showcase.statusPreloading'));
     video.src = source;
     video.load();
   }
@@ -2926,7 +3708,7 @@ function initSkillShowcaseWindow() {
     prepareVideo();
     if (video.readyState >= 2) {
       panel.classList.add('has-media');
-      status.textContent = video.readyState >= 4 ? 'READY' : 'PLAYABLE';
+      status.textContent = video.readyState >= 4 ? t('showcase.statusReady') : t('showcase.statusPlayable');
     }
     if (window.lucide) window.lucide.createIcons();
   }
@@ -2938,7 +3720,7 @@ function initSkillShowcaseWindow() {
     video.pause();
     playToggle.classList.remove('is-playing');
     playGlyph.textContent = '\u25b6';
-    playToggle.setAttribute('aria-label', 'Play video');
+    playToggle.setAttribute('aria-label', t('showcase.playAria'));
     dragState = null;
   }
 
@@ -2978,31 +3760,31 @@ function initSkillShowcaseWindow() {
   playToggle.addEventListener('click', function (event) {
     event.stopPropagation();
     if (video.paused) {
-      video.play().catch(function () { status.textContent = 'USE VIDEO CONTROLS'; });
+      video.play().catch(function () { status.textContent = t('showcase.statusControls'); });
     } else {
       video.pause();
     }
   });
   video.addEventListener('loadeddata', function () {
     panel.classList.add('has-media');
-    status.textContent = 'PLAYABLE';
+    status.textContent = t('showcase.statusPlayable');
   });
   video.addEventListener('canplaythrough', function () {
     panel.classList.add('has-media');
-    status.textContent = 'READY';
+    status.textContent = t('showcase.statusReady');
   });
   video.addEventListener('play', function () {
     playToggle.classList.add('is-playing');
     playGlyph.textContent = '\u23f8';
-    playToggle.setAttribute('aria-label', 'Pause video');
+    playToggle.setAttribute('aria-label', t('showcase.pauseAria'));
   });
   video.addEventListener('pause', function () {
     playToggle.classList.remove('is-playing');
     playGlyph.textContent = '\u25b6';
-    playToggle.setAttribute('aria-label', 'Play video');
+    playToggle.setAttribute('aria-label', t('showcase.playAria'));
   });
   video.addEventListener('error', function () {
-    setEmptyState('Video could not be loaded', 'CHECK SOURCE');
+    setEmptyState(t('showcase.couldNotLoad'), t('showcase.statusCheckSource'));
   });
   panel.addEventListener('pointerdown', function () { panel.style.zIndex = '1201'; });
   window.addEventListener('resize', function () {
