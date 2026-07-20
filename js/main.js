@@ -2230,7 +2230,6 @@ function buildInternshipCards(container) {
       + '<div class="internship-card-inner">'
       + '<div class="internship-card-front">'
       + '<img src="' + cardData.image + '" alt="' + cardText.company + ' internship card" loading="eager" decoding="async" fetchpriority="low">'
-      + '<span class="card-front-number">' + String(index + 1).padStart(2, '0') + '</span>'
       + '</div>'
       + '<div class="internship-card-back">'
       + '<span class="card-back-kicker">' + t('internship.cardKicker') + ' ' + String(index + 1).padStart(2, '0') + '</span>'

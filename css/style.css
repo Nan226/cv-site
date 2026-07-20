@@ -1600,21 +1600,6 @@ a{text-decoration:none;color:inherit}ul{list-style:none}
   background:linear-gradient(180deg,transparent 56%,rgba(255,250,240,.86) 100%);
   pointer-events:none;
 }
-.card-front-number{
-  position:absolute;
-  right:.65rem;
-  bottom:.62rem;
-  z-index:2;
-  font-family:var(--font-heading);
-  font-size:clamp(.7rem,1.2vw,.95rem);
-  line-height:1;
-  color:var(--illustration-text);
-  background:var(--illustration-paper);
-  border:1px solid var(--illustration-ink);
-  border-radius:4px;
-  padding:.28em .45em;
-  box-shadow:2px 2px 0 rgba(95,75,80,.14);
-}
 
 /* 卡片背面（信息面） */
 .internship-card-back{
