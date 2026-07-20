@@ -7,3 +7,7 @@ __pycache__/
 .wrangler/
 .dev.vars
 source-assets/
+.build/
+assets/resume/*.pdf
+!assets/resume/Nan-YE.pdf
+!assets/resume/Ye-Nan-Resume-CN.pdf
